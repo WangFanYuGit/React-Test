@@ -1,0 +1,302 @@
+{% liquid
+  assign discount_bg = 'https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/265_2x_1e877f82-e25a-45de-863d-fce15adeda91.png?v=1623512350'  
+  assign header = section.settings.featured_header
+%}
+<section class="featured_products_section" data-animate_images="true">
+  <div class="header lazyload" data-animate_text="true">{{ header }}</div>
+  <div class="featured_product_list">
+    {% for block in section.blocks %}
+      {% liquid 
+        assign product_img = block.settings.featured_products_img
+        assign product_img_mobile = block.settings.featured_products_img_mobile
+        assign product_title = block.settings.featured_products_title
+        assign product_price_sale = block.settings.featured_products_price_sale 
+        assign product_price_virtual = block.settings.featured_products_price_virtual 
+        assign product_url = block.settings.featured_products_url
+        assign product_sale_percent = product_price_sale | divided_by: product_price_virtual | times: 100 | minus: 100 | abs | round | append: '%' 
+      %}
+    <a href="{{ product_url }}" target="_blank" rel="nofollow" class="featured_product_wrap">
+      <div class="featured_product_bg">
+        <img src="{{ product_img | img_url: 'master' }}" alt="" class="lazyload mobile-hide">
+        <img src="{{ product_img_mobile | img_url: 'master' }}" alt="" class="lazyload mobile-show">
+        <div class="featured_discount_wrap">
+          <img src="{{ discount_bg }}" alt="" class="lazyload">
+          <span class="featured_discount_text">
+            {{ product_sale_percent }}<br>
+            OFF
+          </span>
+        </div>
+      </div>
+      <div class="featured_product_info lazyload">
+        <div class="featured_product_title lazyload" data-animate_text="true">{{ product_title }}</div>
+        <div class="featured_product_shop_wrap">
+          <div class="featured_product_shop_box">
+            <div class="featured_product_price_wrap">
+              <div class="featured_product_price_sale">${{ product_price_sale }}</div>
+              <div class="featured_product_price_virtual">${{ product_price_virtual }}</div>
+            </div>
+            <button class="featured_learn_more">
+              Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+</section>
+
+
+<style>
+  @media screen and (min-width: 768px) {
+    .featured_products_section {
+      background: #070658;
+    }
+    .header {
+      padding: 2vw 0;
+      text-align: center;
+      font-size: 2.8vw;
+      line-height: 3.8vw;
+    }
+    .featured_product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 1vw 18vw 3vw;
+    }
+    .featured_product_wrap {
+      display: flex;
+      flex-direction: column;
+      width: calc(33.3% - 0.75vw);
+      margin-bottom: 1.5vw;
+      background: #fff;
+    }
+    .featured_product_bg {
+      position: relative;
+      padding: 3vw 4vw 1.5vw;
+      flex: 1;
+    }
+    .featured_discount_wrap {
+      position: absolute;
+      width: 3.2vw;
+      right: 5%;
+      top: 0;
+    }
+    .featured_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.1vw;
+      line-height: 1.2vw;
+      font-weight: bold;
+    }
+
+    .featured_product_info {
+      padding: 0 1.5vw;
+      color: #333;
+    }
+    .featured_product_title {
+      font-weight: bold;
+      font-size: 1.3vw;
+      line-height: 1.8vw;
+      text-align: center;
+      padding-bottom: 1vw;
+      border-bottom: 1px solid #888;
+    }
+    .featured_product_sub_title {
+      font-size: .9vw;
+      line-height: 1.2vw;
+    }
+    .featured_product_star {
+      width: 5vw;
+      margin-left: -.2vw;
+    }
+    .featured_product_shop_wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1vw 0 1.5vw;
+    }
+    .featured_product_price_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .featured_product_price_sale {
+      font-size: 1.5vw;
+      font-weight: bold;
+      line-height: 2vw;
+      margin-right: 0.5vw;
+    }
+    .featured_product_price_virtual {
+      font-size: .9vw;
+      line-height: 1.2vw;
+      color: #888;
+      text-decoration: line-through;
+    }
+    .featured_learn_more {
+      width: 7.5vw;
+      border-radius: 1vw;
+      line-height: 2vw;
+      text-align: center;
+      color: #fff;
+      background: #17A2E4;
+      font-size: .9vw;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .featured_products_section {
+      background: #070658;
+    }
+    .header {
+      padding: 20px 0;
+      text-align: center;
+      font-size: 24px;
+      line-height: 30px;
+    }
+    .featured_product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 10px 20px 15px;
+    }
+    .featured_product_wrap {
+      display: flex;
+      flex-direction: column;
+      width: calc(50% - 5px);
+      margin-bottom: 15px;
+      background: #fff;
+    }
+    .featured_product_bg {
+      position: relative;
+      padding: 15px 20px 10px;
+      flex: 1;
+    }
+    .featured_discount_wrap {
+      position: absolute;
+      width: 34px;
+      right: 5%;
+      top: 0;
+    }
+    .featured_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      line-height: 14px;
+      font-weight: bold;
+    }
+
+    .featured_product_info {
+      padding: 0 10px;
+      color: #333;
+    }
+    .featured_product_title {
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 18px;
+      text-align: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #888;
+    }
+    .featured_product_sub_title {
+      font-size: 12px;
+      line-height: 14px;
+    }
+    .featured_product_shop_wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6px 0 10px;
+    }
+    .featured_product_shop_box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .featured_product_price_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .featured_product_price_sale {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 20px;
+      margin-right: 6px;
+    }
+    .featured_product_price_virtual {
+      font-size: 12px;
+      line-height: 14px;
+      color: #888;
+      text-decoration: line-through;
+    }
+    .featured_learn_more {
+      width: 90px;
+      border-radius: 13px;
+      line-height: 26px;
+      text-align: center;
+      color: #fff;
+      background: #17A2E4;
+      font-size: 12px;
+    }
+  }
+</style>
+
+
+{% schema %}
+  {
+    "name": "Prime Featured Products",
+    "settings": [
+      {
+        "type": "text",
+        "id": "featured_header",
+        "label": "Section Header"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "featured_products",
+        "name": "Featured Products",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "featured_products_img",
+            "label": "Upload Featured Products Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "featured_products_img_mobile",
+            "label": "Upload Featured Products Image of Moblie"
+          },
+          {
+            "type": "text",
+            "id": "featured_products_title",
+            "label": "Featured Products Title"
+          },
+          {
+            "type": "text",
+            "id": "featured_products_price_sale",
+            "label": "Featured Products Sale Price"
+          },
+          {
+            "type": "text",
+            "id": "featured_products_price_virtual",
+            "label": "Featured Products Virtual Price"
+          },
+          {
+            "type": "url",
+            "id": "featured_products_url",
+            "label":"Featured Products Url" 
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
+

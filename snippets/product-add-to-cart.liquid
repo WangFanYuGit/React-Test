@@ -1,0 +1,237 @@
+<div class="replace_product_wrap" data-section-id="{{ product.id }}" data-enable-history-state="true">
+  <div class="product_header">{{ product.title }}</div>
+  <div class="product_wrap">
+    <div class="product_img">
+      <img data-src="{{ product.featured_image | img_url: 'medium' }}" alt="" class="mobile-hide lazyload">
+    </div>
+    <div class="product_content">
+      <div class="product_content_top">
+        <div class="product_title">{{ product.title }}</div>
+        <div class="product_desc">{{ product.description }}</div>
+      </div>
+
+      <div class="product_content_bottom">
+        <div class="product_price_wrap mobile-hide">
+          <span class="price_sale">{{shop.currency}} {{ product.price | divided_by: 100.00 }}</span>
+          <!-- {% render 'product-form', product: product, current_variant: product.selected_or_first_available_variant ,id: form_id, section_id: product.id, class: 'product-single__form'%} -->
+          <button class="btn ddd shop_now js-drawer-open-cart" data-id="{{ product.selected_or_first_available_variant.id }}">Shop Now11111</button>
+        </div>
+        <div class="product_star_wrap">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8118e712fbfbd41557aa6aa6ccc30320.png?v=1625538936" alt="" class="product_star lazyload">
+          <span class="product_reviews">5.0 (5 Reviews)</span>
+        </div>
+        <div class="product_price_wrap mobile-show">
+          <span class="price_sale">{{shop.currency}} {{ product.price | divide_by: 100 }}</span>
+          <span class="price_origin">$39.99</span>
+          <span class="shop_now">Shop Now</span>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+<form method="post" action="/cart/add" id="AddToCartForm-6671024652454" accept-charset="UTF-8"
+        class="product-single__form" enctype="multipart/form-data"><input type="hidden" name="form_type"
+            value="product"><input type="hidden" name="utf8" value="✓">
+
+
+        <select name="id" id="ProductSelect-6671024652454" class="product-single__variants no-js">
+            <option selected="selected" value="39713854226598">
+                Default Title - HK$0.00
+            </option>
+
+        </select>
+
+
+        <!-- <div class="product__quantity product__quantity--button">
+      <label for="Quantity-6671024652454">Quantity</label>
+      <div class="js-qty__wrapper">
+        <input type="text" id="Quantity-6671024652454" class="js-qty__num" value="1" min="1" aria-label="quantity"
+          pattern="[0-9]*" name="quantity">
+        <button type="button" class="js-qty__adjust js-qty__adjust--minus" aria-label="Reduce item quantity by one">
+          <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-minus" viewBox="0 0 20 20">
+            <path fill="#444"
+              d="M17.543 11.029H2.1A1.032 1.032 0 0 1 1.071 10c0-.566.463-1.029 1.029-1.029h15.443c.566 0 1.029.463 1.029 1.029 0 .566-.463 1.029-1.029 1.029z">
+            </path>
+          </svg>
+          <span class="icon__fallback-text" aria-hidden="true">−</span>
+        </button>
+        <button type="button" class="js-qty__adjust js-qty__adjust--plus" aria-label="Increase item quantity by one">
+          <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-plus" viewBox="0 0 20 20">
+            <path fill="#444"
+              d="M17.409 8.929h-6.695V2.258c0-.566-.506-1.029-1.071-1.029s-1.071.463-1.071 1.029v6.671H1.967C1.401 8.929.938 9.435.938 10s.463 1.071 1.029 1.071h6.605V17.7c0 .566.506 1.029 1.071 1.029s1.071-.463 1.071-1.029v-6.629h6.695c.566 0 1.029-.506 1.029-1.071s-.463-1.071-1.029-1.071z">
+            </path>
+          </svg>
+          <span class="icon__fallback-text" aria-hidden="true">+</span>
+        </button>
+      </div>
+    </div> -->
+
+        <button type="submit" name="add" id="AddToCart-6671024652454"
+            class="hvr-fade btn btn--inverse  btn--full add-to-cart CCB add-to-cart--secondary">
+            <span id="AddToCartText-6671024652454" data-default-text="ADD TO CART">
+                ADD TO CART
+            </span>
+        </button>
+
+</div>
+
+
+
+<div class="product_icon_wrap">
+    <div class="product_icon_item">
+        <div class="product_icon_box">
+            <img class=" lazyloaded"
+                src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/145_2x_ac753799-fd78-47be-90b4-9630ee1c8197.png?v=1629081406"
+                alt="">
+        </div>
+        <div class="product_icon_text">Fast &amp; Free Shipping within 24 hours</div>
+    </div>
+    <div class="product_icon_item">
+        <div class="product_icon_box">
+            <img class=" lazyloaded"
+                src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/128_2x_dbf4e6dc-be63-46ca-ad54-dcd969279a40.png?v=1629081406"
+                alt="">
+        </div>
+        <div class="product_icon_text">1 Year Warranty</div>
+    </div>
+</div>
+
+<hr class="hr--small">
+
+<textarea id="VariantsJson-6671024652454" class="hide" aria-hidden="true" aria-label="Product JSON">    [{"id":39713854226598,"title":"Default Title","option1":"Default Title","option2":null,"option3":null,"sku":"H5177","requires_shipping":true,"taxable":true,"featured_image":null,"available":true,"name":"H5177","public_title":null,"options":["Default Title"],"price":0,"weight":0,"compare_at_price":null,"inventory_management":"shopify","barcode":""}]
+    </textarea>
+
+</form>
+
+<div id="star"></div>
+
+<style>
+
+  @media screen and (max-width: 767px) {
+    .taxable_text {
+      font-size: 14px;
+    }
+    .product_header {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .product_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #333;
+    }
+    .product_img {
+      margin-right: 10px;
+      width: 140px;
+    }
+    .product_content {
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 10px;
+    }
+    .product_title {
+      font-size: 16px;
+      line-height: 18px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    .product_desc {
+      font-size: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 100px;
+    }
+    .product_star {
+      width: 60px;
+      margin-right: 2px;
+    }
+    .product_reviews {
+      font-size: 12px;
+    }
+    .price_sale {
+      font-size: 18px;
+      color: #00ace7;
+      margin-right: 2px;
+      font-weight: bold;
+    }
+    .price_origin {
+      font-size: 12px;
+      color: #999;
+      text-decoration: line-through;
+    }
+    .shop_now {
+      display: inline-block;
+      color: #fff;
+      background: #00ace7;
+      border-radius: 2px;
+      width: 80px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 12px;
+    }
+  }
+  @media screen and (min-width: 768px) {
+    .taxable_text {
+      font-size: 1.5vw;
+    }
+    .product_header {
+      font-size: 1.4vw;
+      font-weight: bold;
+      margin-bottom: 1.3vw;
+    }
+    .product_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .product_img {
+      margin-right: 1.2vw;
+    }
+    .product_content {
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product_title {
+      font-size: 1.2vw;
+      font-weight: bold;
+    }
+    .product_desc {
+      font-size: 1vw;
+    }
+    .price_sale {
+      font-size: 1.2vw;
+      color: #00ace7;
+      margin-right: .2vw;
+    }
+    .price_origin {
+      font-size: 1vw;
+      color: #999;
+      text-decoration: line-through;
+    }
+    .product_star {
+      margin-right: .2vw;
+    }
+    .shop_now {
+      display: inline-block;
+      color: #fff;
+      background: #00ace7;
+      border-radius: 2px;
+      width: 80px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 12px;
+    }
+  }
+</style>

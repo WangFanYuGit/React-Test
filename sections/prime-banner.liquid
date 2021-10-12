@@ -1,0 +1,265 @@
+{% assign banner_url = section.settings.banner_img %}
+{% assign banner_url_mobile = section.settings.banner_img_mobile %}
+{% assign show_form = section.settings.show_form %}
+{% assign banner_title = section.settings.banner_title %}
+{% assign banner_sub_title = section.settings.banner_sub_title %}
+{% assign banner_tag_url = section.settings.banner_tag_url %}
+<section class="banner_wrap" data-animate_images="true">
+  <a rel="nofollow" href="{{ banner_tag_url }}" target="_blank">
+    <img data-src="{{ banner_url | img_url: 'master' }}" alt="{{ banner_url.alt | escape }}" class="mobile-hide lazyload">
+    <img data-src="{{ banner_url_mobile | img_url: 'master' }}" alt="{{ banner_url_mobile.alt | escape }}" class="mobile-show lazyload">
+    <div class="banner_info">
+      <div class="banner_icon_wrap">
+        <img src="https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/198_2x_576ceffd-a98c-4d59-ae85-21e36c0a8192.png?v=1623502400" alt="" class="lazyload prime_day_icon">
+      </div>
+      <h2 class="banner_title lazyload" data-animate_text="true">
+        {{ banner_title | replace: "40%" ,"<span>40%</span>" }}
+      </h2>
+      <h3 class="banner_sub_title lazyload {% unless show_form %} hide {% endunless %}" data-animate_text="true">
+        {{ banner_sub_title | replace: "40%" ,"<span>40%</span>" }}
+      </h3>
+      <div class="banner_form_wrap {% unless show_form %} hide {% endunless %}">
+        {%- assign form_id = 'customer-' | append: section.id -%}
+        {%- form 'customer', id: form_id -%}
+        {{ form.errors | default_errors }}
+
+          <div class="flex">
+            <input type="hidden" name="contact[tags]" value="prime-day">
+            <input placeholder="Enter Your Email" type="email" id="ContactFormEmail-{{ section.id }}" class="subscribe_input" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+            
+            {%- if form.posted_successfully? -%} 
+              <button class="subscribe_btn lazyload">
+                <span class="subscribe_btn_text">Successfully Subscribe</span> 
+                <img data-src="https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/270_2x_b3caa772-e26d-4058-81bd-a95dccca0f44.png?v=1623505074" alt="" class="submit_icon lazyload mobile-hide">
+              </button>
+            {%- endif -%}
+
+            <button name="commit" class="subscribe_btn lazyload {% if form.posted_successfully? %} hide {% endif %}" type="submit">
+              <span class="subscribe_btn_text">Subscribe Now</span> 
+            </button>
+          </div>
+        {%- endform -%}
+      </div>
+    </div>
+  </a>
+</section>
+
+
+<style>
+  img {
+    display: block;
+    width: 100%;
+  }
+  @media screen and (min-width: 768px) {
+    .banner_wrap {
+      position: relative;
+      min-height: 300px;
+    }
+    .banner_info {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30vw;
+      
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .banner_icon_wrap {
+      width: 10vw;
+      margin-bottom: 1.5vw;
+    }
+    .banner_title {
+      font-size: 3.3vw;
+      line-height: 4.5vw;
+      margin-bottom: 0;
+    }
+    .banner_title  span {
+      font-size: 4.8vw;
+    }
+    .banner_sub_title {
+      font-size: 2vw;
+      line-height: 3vw;
+      margin-bottom: 0;
+      text-align: center;
+      font-weight: normal !important;
+    }
+    .banner_form_wrap {
+      margin-bottom: .8vw;
+      width: 100%;
+      padding: 0 10px;
+    }
+    .banner_form_wrap .flex {
+      display: flex;
+    }
+    .subscribe_input {
+      border: none;
+      background: #f8f8f8;
+      width: 54%;
+      flex: 1;
+      color: #888;
+    }
+    .submit_icon {
+      display: inline-block;
+      width: 1vw;
+      vertical-align: middle;
+    }
+    .subscribe_input::placeholder {
+      color: #888;
+      font-size: .9vw;
+      font-weight: normal;
+    }
+    .subscribe_btn {
+      flex: 1;
+      background: #17A2E4;
+    }
+    .subscribe_btn_text {
+      font-size: .9vw;
+      text-align: center;
+      color: #fff;
+    }
+
+  }
+
+  @media screen and (max-width: 767px) {
+    .banner_wrap {
+      position: relative;
+      min-height: 500px;
+    }
+    .banner_info {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .banner_icon_wrap {
+      width: 100px;
+      margin-bottom: 30px;
+    }
+    .banner_title {
+      font-size: 30px;
+      line-height: 36px;
+      margin-bottom: 0;
+    }
+    .banner_title  span {
+      font-size: 46px;
+    }
+    .banner_sub_title {
+      font-size: 16px;
+      line-height: 20px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: normal !important;
+    }
+    .banner_sub_title span {
+      font-weight: bold;
+      font-size: 22px;
+    }
+    .banner_form_wrap {
+      margin-bottom: 8px;
+      width: 100%;
+      padding: 0 40px;
+    }
+    .banner_form_wrap form {
+      display: flex;
+      justify-content: center;
+    }
+    .banner_form_wrap .flex {
+      display: flex;
+      width: 100%;
+    } 
+    .subscribe_input {
+      border: none;
+      background: #f8f8f8;
+      color: #888;
+      width: 54%;
+      flex: 1;
+    }
+    .subscribe_input::placeholder {
+      color: #888;
+      font-size: 12px;
+      font-weight: normal;
+    }
+    .subscribe_btn {
+      line-height: 30px;
+      background: #17A2E4;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+    .subscribe_btn_text {
+      font-size: 12px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .submit_icon {
+      display: inline-block;
+      width: 20px;
+      vertical-align: middle;
+    }
+    .submit_icon.mobile-hide {
+      display: none;
+    }
+  }
+
+</style>
+<script>
+  let el = document.querySelector('.banner_form_wrap')
+  el.onclick = function (e) {
+    if (e.target.className == 'subscribe_btn_text') {
+    }else {
+      event.stopPropagation();
+      return false;
+    }
+
+  }
+
+</script>
+
+{% schema %}
+  {
+    "name": "Prime Day Banner",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "banner_img",
+        "label": "Upload Banner Image of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "banner_img_mobile",
+        "label": "Upload Banner Image of Moblie"
+      },
+      {
+        "type": "text",
+        "id": "banner_title",
+        "label": "Input Banner Title"
+      },
+      {
+        "type": "text",
+        "id": "banner_sub_title",
+        "label": "Input Banner Description"
+      },
+      {
+        "type": "url",
+        "id": "banner_tag_url",
+        "label": "旗舰店tag链接"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_form",
+        "label": "Show The Subscribe Form",
+        "default": true
+      }
+    ],
+    "blocks": []
+  }
+{% endschema %}

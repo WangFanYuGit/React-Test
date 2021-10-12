@@ -1,0 +1,857 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% render 'additional-custom-content' %}
+{% render 'product-page-style' %}
+<div class="H6143_H6144">
+  <section>
+    <video 
+    id="{{ section_id }}_video"
+    style="object-fit: fill;width: 100%;" 
+    x5-video-player-type="h5"
+    webkit-playsinline 
+    playsinline
+    proload="metadata"
+    type="webm" 
+    autoplay 
+    controls
+    loop
+    muted
+    src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/hands_video.mp4?v=1612420654"
+  >
+  </video>
+  </section>
+  <div class="mobile-hide ipad-show">
+    <section class="middle_wrap">
+      <div class="title page_text_important">RAINBOW LIGHT EFFECTS</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Our RGBIC technology features multiple IC chips, which allow the strip lights to display 15 different colors all at the same time. With rainbow-like light shows on each strip, your bedroom, kitchen, or living room will transform before your eyes.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/1_787c105c-e6e9-4228-b227-e878fce5cc55.jpg?v=1618382676" alt="banner_1">
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title page_text_important">MULTIPLE WAYS TO CONTROL</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Our RGBIC strip lights support both Alexa and Google Assistant, allowing you to power them on/off, change colors, and adjust brightness with your voice. With the Govee Home app, you’ll also have access to incredible scene&music modes, light effects, and 16 million colors. For more straightfoward control, enjoy the provided IR remote and control box. </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/123.jpg?v=1618890358" alt="banner_1">
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title page_text_important">4 DYNAMIC MUSIC MODES</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Sync any music type with these LED RGBIC strip lights thanks to a built-in, highly sensitive mic.Choose Spectrum mode to significantly jazz up your casual get-togethers or weekend parties with incredible ease. </div>
+    </section>
+    <section class="banner_wrap banner_1 gift">
+
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/4_6a962275-6d47-4d19-ba03-ea8ab7e0defd.jpg?v=1618382676" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">EXCITING SCENE MODES</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">Create the ideal ambiance for your indoor activities thanks to our lively lighting effects. For more creative freedom, use the DIY mode via the Govee Home app, which lets you customize your own scene modes. Have a party planned? Add more mood-boosting color and energetic lighting with our Rainbow mode.</div>
+          </div>
+        </section>
+      </div>
+      <div class="scenes_item">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">SAFE&RELIABLE</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">With an ETL-certified adapter and strong 3M adhesive, you’re ensured a safe and reliable lighting experience during use and installation. Say goodbye to constantly replacing lights and faulty adapters. We provide color and quality where you need it most.</div>
+            <div class="sub_img">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210413111627.png?v=1618284558" alt="">
+            </div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6177.jpg?v=1619315697" alt="">
+        </div>
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title page_text_important">TRANSFORM YOUR HOME DECOR</div>
+      <div class="color_bar"></div>
+    </section>
+
+    <section class="slider hero" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
+      <div class="banner banner2">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6-_1.jpg?v=1618382677" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6-_2.jpg?v=1618382676" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6-_3.jpg?v=1618382677" />
+      </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/7_aa3f977f-53b8-45e3-87fd-ae36155a0b25.jpg?v=1618382677" alt="banner_1">
+    </section>
+    
+    <section class="detail_form_wrap">
+      <div class="detail_form_item left">
+        <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/8_7495518b-bdab-4323-bb48-768e975612c5.png?v=1618292917" alt="">
+        <div class="form_list">
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t1.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">No IC Chip</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t2.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Single color in a line</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t3.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Bright</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t4.png?v=1618292917" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Cuttable</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail_form_item right">
+        <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/8-2.png?v=1618292917" alt="">
+        <div class="form_list">
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t5.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Built-in C</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t6.png?v=1618292917" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Multiple colors in one line</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t7.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Ultra bright</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t8.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Cannot be cut</div>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </section>
+
+    <section class="parameter_table_wrap">
+      <span class="parameter_table_title page_text_important">
+        SPEC
+      </span>
+      <table class="parameter_table" style="max-width: 1250px;margin: 0 auto; background:#0F0F0F;">
+        <tbody>
+          <tr>
+            <td width="30%">Model</td>
+            <td width="35%">H6143</td>
+            <td width="35%">H6144</td>
+          </tr>
+          <tr>
+            <td td>Preview</td>
+            <td><img class="formright-img" src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210413164251.png?v=1618303519"></td>
+            <td>
+            <img class="formright-img" src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/20210413164159.png?v=1618303519"> </td>
+          </tr>
+          <tr>
+            <td>Length</td>
+            <td>5m/16.4ft</td>
+            <td>10m(5m×2 Rolls)<br>/32.8ft(16.4ft×&nbsp;2 Rolls)</td>
+          </tr>
+          <tr>
+            <td>Light color</td>
+            <td colspan="2">RGBIC</td>
+          </tr>
+          <tr>
+            <td>Water resistance</td>
+            <td colspan="2">no</td>
+          </tr>
+          <tr>
+            <td>Control method</td>
+            <td colspan="2">APP, control Box, IR Remote Control, Voice Control
+            </td>
+          </tr>
+          <tr>
+            <td>Power supply</td>
+            <td>Adapter 12V-2A</td>
+            <td>Adapter 12V-4A</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <div class="mobile-show ipad-hide">
+
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/1_44ee5a63-e605-49d0-9676-05c8f0f091ce.jpg?v=1618392878" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">RAINBOW LIGHT EFFECTS</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Our RGBIC technology features multiple IC chips, which allow the strip lights to display 15 different colors all at the same time. With rainbow-like light shows on each strip, your bedroom, kitchen, or living room will transform before your eyes.</div>
+    </section>
+
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/234.jpg?v=1618890358" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">MULTIPLE WAYS TO CONTROL</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Our RGBIC strip lights support both Alexa and Google Assistant, allowing you to power them on/off, change colors, and adjust brightness with your voice. With the Govee Home app, you’ll also have access to incredible scene&music modes, light effects, and 16 million colors. For more straightfoward control, enjoy the provided IR remote and control box. </div>
+    </section>
+
+    <section class="banner_wrap banner_1">
+      <img class="lazyload gift" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/3_bc1f6a7a-6fdb-4dbb-b1a6-3f715a7f1505.gif?v=1618392878" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">4 DYNAMIC MUSIC MODES</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Sync any music type with these LED RGBIC strip lights thanks to a built-in, highly sensitive mic.Choose Spectrum mode to significantly jazz up your casual get-togethers or weekend parties with incredible ease. </div>
+    </section>
+    
+    <section class="banner_wrap banner_1">
+      <img class="lazyload gift" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/4_f87cdebd-b243-428f-9d82-e570e135bdf9.jpg?v=1618392878" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">EXCITING SCENE MODES</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Create the ideal ambiance for your indoor activities thanks to our lively lighting effects. For more creative freedom, use the DIY mode via the Govee Home app, which lets you customize your own scene modes. Have a party planned? Add more mood-boosting color and energetic lighting with our Rainbow mode.</div>
+    </section>
+
+    <section class="banner_wrap banner_1">
+      <img class="lazyload gift" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/5_5c394d2c-7868-4a7a-9f69-50d065ecf819.jpg?v=1618392878" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">SAFE & RELIABLE</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">With an ETL-certified adapter and strong 3M adhesive, you’re ensured a safe and reliable lighting experience during use and installation. Say goodbye to constantly replacing lights and faulty adapters. We provide color and quality where you need it most.</div>
+      <div class="sub_img">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210413111627.png?v=1618284558" alt="">
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title page_text_important">TRANSFORM YOUR HOME DECOR</div>
+      <div class="color_bar"></div>
+    </section>
+
+    <section class="slider hero" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
+      <div class="banner banner2">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6-_1.jpg?v=1618382677" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6-_2.jpg?v=1618382676" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6-_3.jpg?v=1618382677" />
+      </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/7_aa3f977f-53b8-45e3-87fd-ae36155a0b25.jpg?v=1618382677" alt="banner_1">
+    </section>
+    
+    <section class="detail_form_wrap">
+      <div class="detail_form_item left">
+        <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/8_7495518b-bdab-4323-bb48-768e975612c5.png?v=1618292917" alt="">
+        <div class="form_list">
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t1.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">No IC Chip</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t2.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Single color in a line</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t3.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Bright</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t4.png?v=1618292917" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Cuttable</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail_form_item right">
+        <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/8-2.png?v=1618292917" alt="">
+        <div class="form_list">
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t5.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Built-in C</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t6.png?v=1618292917" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Multiple colors in one line</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t7.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Ultra bright</div>
+          </div>
+          <div class="form_list_item">
+            <div class="item_img">
+              <img data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/t8.png?v=1618292916" alt="" class="lazyload">
+            </div>
+            <div class="item_text">Cannot be cut</div>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </section>
+
+    <section class="parameter_table_wrap">
+      <span class="parameter_table_title page_text_important">
+        SPEC
+      </span>
+      <table class="parameter_table" style="max-width: 1250px;margin: 0 auto;">
+        <tbody>
+          <tr>
+            <td width="30%">Model</td>
+            <td width="35%">H6143</td>
+            <td width="35%">H6144</td>
+          </tr>
+          <tr>
+            <td td>Preview </td>
+            <td><img class="formright-img" src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210413164251.png?v=1618303519"></td>
+            <td>
+            <img class="formright-img" src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/20210413164159.png?v=1618303519"> </td>
+          </tr>
+          <tr>
+            <td>Length</td>
+            <td>5m/16.4ft</td>
+            <td>10m(5m×2 Rolls)<br>/32.8ft(16.4ft×&nbsp;2 Rolls)</td>
+          </tr>
+          <tr>
+            <td>Light Color</td>
+            <td colspan="2">RGBIC</td>
+          </tr>
+          <tr>
+            <td>Water Resistance</td>
+            <td colspan="2">No</td>
+          </tr>
+          <tr>
+            <td>Control Method</td>
+            <td colspan="2">APP, Control Box, IR Remote Control, Voice Control
+            </td>
+          </tr>
+          <tr>
+            <td>Power Supply</td>
+            <td>Adapter 12V-2A</td>
+            <td>Adapter 12V-4A</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>
+
+<style>
+  .sub_img {
+    width: 33%;
+    margin: 15px 0;
+  }
+  .detail_form_wrap {
+    background: #000;
+    padding: 2.2vw 4.7vw;
+  }
+  .detail_form_item {
+    width: 50%;
+  }
+  .detail_form_item.left {
+    float: left;
+    padding-right: 10%;
+  }
+  .detail_form_item.right {
+    float: right;
+    padding-left: 10%;
+  }
+  .form_list {
+    padding-top: 1.66vw;
+  }
+  .form_list_item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1vw;
+  }
+  .form_list_item .item_img {
+    width: 10%;
+  }
+  .form_list_item .item_text {
+    padding-left: 1vw;
+  }
+  .clearfix {
+    clear: both;
+  }
+
+  .parameter_table_wrap {
+    padding: 2vw 4vw;
+  }
+  .parameter_table {
+    border-right: 1px solid #6b6b6b;
+    border-bottom: 1px solid #6b6b6b;
+    font-family: 'Avenir Book';
+  }
+  .parameter_table_title {
+    border-bottom: 2px solid #fff;
+    padding-bottom: 1vw;
+    font-weight: bold;
+    font-size: 2.8vw;
+    display: inline-block;
+    margin-bottom: 2vw;
+  }
+  .parameter_table td {
+    padding: 1vw;
+    text-align: center;
+    border-left: 1px solid #6b6b6b;
+    border-top: 1px solid #6b6b6b;
+  }
+  .parameter_table tr td:nth-child(1) {
+    font-weight: 700;
+    word-break: break-word;
+  }
+  .parameter_table td img {
+    width: 60%;
+  }
+
+  .mobile-show .sub_img {
+    margin: 15px auto;
+  }
+  .mobile-show .form_list_item .item_img {
+    width: 20px;
+  }
+  .mobile-show  .parameter_table td {
+    font-size: 12px;
+    padding: 10px;
+    word-break: break-all;
+  }
+  .mobile-show .parameter_table_title {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  .mobile-show .parameter_table td img {
+    width: 80px;
+  }
+  .mobile-show .form_list_item {
+    align-items: flex-start;
+  }
+  .mobile-show .form_list_item .item_text {
+    padding-left: 10px;
+    font-size: 12px;
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .mobile-hide .banner_text .title {
+    font-size: 3.8vw;
+    line-height: 3.8vw;
+  }
+  .mobile-hide .middle_wrap {
+    padding: 4vw;
+  }
+  .mobile-hide .middle_wrap .title {
+    font-size: 3.8vw;
+    line-height: 3.8vw;
+    text-align: center;
+  }
+  .mobile-hide .middle_wrap .sub_title {
+    font-size: 1.1vw;
+    line-height: 1.2vw;
+    text-align: center;
+    margin: 0 auto;
+  }
+  .mobile-hide .middle_wrap .color_bar {
+    margin: 1.2vw auto 1.4vw;
+  }
+  .mobile-hide .scenes_item_wrap_inner {
+    text-align: left;
+    padding: 0 4.5vw;
+  }
+  .mobile-hide .scenes_item_wrap_inner .color_bar {
+    margin: 1.4vw 0;
+  }
+</style>
+<script>
+  window.onload = function () {
+    $(".slider").slick({
+      infinite: true,
+      autoplay: true,
+      autoplaySpeed: 1000,
+      lazyLoad: "progressive",
+      fade: true,
+      speed: 500,
+      arrows: true,
+    });
+
+    $(`<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-left" viewBox="0 0 284.49 498.98"><path d="M249.49 0a35 35 0 0 1 24.75 59.75L84.49 249.49l189.75 189.74a35.002 35.002 0 1 1-49.5 49.5L10.25 274.24a35 35 0 0 1 0-49.5L224.74 10.25A34.89 34.89 0 0 1 249.49 0z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.previous' | t }}</span>`).appendTo('.slick-prev.slick-arrow')
+    $(`<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-right" viewBox="0 0 284.49 498.98"><path d="M35 498.98a35 35 0 0 1-24.75-59.75l189.74-189.74L10.25 59.75a35.002 35.002 0 0 1 49.5-49.5l214.49 214.49a35 35 0 0 1 0 49.5L59.75 488.73A34.89 34.89 0 0 1 35 498.98z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.next' | t }}</span>`).appendTo('.slick-next.slick-arrow')
+    };
+    var img = new Image();
+    img.src = "https://cdn.shopify.com/s/files/1/0558/5433/4115/files/3_50bc23b3-eb8e-4b47-8dae-41ffae1f35ad.gif?v=1618382679";
+    img.onload = function () {
+      var gift = document.querySelector('.gift')
+      document.querySelector('.gift').appendChild(img);
+    }
+</script>

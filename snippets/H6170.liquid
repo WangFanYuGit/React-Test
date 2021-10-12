@@ -1,0 +1,727 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% render 'additional-custom-content' %}
+
+{% render 'product-page-style' %}
+<div id="H6170">
+  <div class="mobile-hide ipad-show">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_56d99efd-a087-4340-b1d8-25b4c3c82dcb.jpg?v=1617784382" alt="banner_1">
+      <div class="banner_text">
+        <div class="title">Govee phantasy strip lights</div>
+        <div class="color_bar"></div>
+        <div class="sub_title">Create your colorful escape</div>
+      </div>
+    </section>
+    <section class="space_wrap">
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao1.png?v=1617778406" alt="">
+        </div>
+        <div>Water resistant</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao2.png?v=1617778406" alt="">
+        </div>
+        <div>Music sync</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao3.png?v=1617778407" alt="">
+        </div>
+        <div>DIY</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao4.png?v=1617778406" alt="">
+        </div>
+        <div>64 scene modes</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao5.png?v=1617778406" alt="">
+        </div>
+        <div>App control</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao6.png?v=1617778407" alt="">
+        </div>
+        <div>30m remote control</div>
+      </div>
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Water resistant design</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">With an IP65 water-resistant rating and a low 12v current, the phantasy strip lights can withstand water splashes and dust, making them safe to use outdoors. Do away with traditional outdoor lighting for parties and holidays. Energize your space with stunning colors.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_8e0c46ff-3d23-402b-a258-7185c0990e19.jpg?v=1617784382" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">64 zestful scene modes</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Liven up your favorite indoor or outdoor activities with over 64 scene modes at your disposal. Wake up gently to vibrant pinks and oranges with sunrise mode, or set the mood for your romantic dinners with candlelight mode.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_12b59a22-c5ac-4f53-83a9-62f246daeefc.jpg?v=1617784383" alt="banner_1">
+      <section class="banner_text">
+        <div class="title">EASY FOR ANYONE TO INSTALL</div>
+        <div class="color_bar"></div>
+        <div class="sub_title">Simply stick the 3M adhesive, located on the back of the Phantasy Strip Lights to any dry, clean surface. Then, attach the provided support clips for more security. The flexible design also allows you to bend them around tight corners. Enjoy installing your lights with family and friends while filling your home with lively colors.</div>
+      </section>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title">ADD COLOR TO YOUR MUSIC</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Music mode allows you to sync any songs to the mic built into the strip lights. Have a backyard dinner party planned? Our Rhythm option offers two additional modes. Choose Dynamic to make your colors dance enthusiastically or Mild for a calmer display.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5_e27c08ec-27d9-4838-9022-5754d7597786.jpg?v=1617784383" alt="banner_2">
+    </section>
+
+    <section class="scenes_wrap H6146">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6.gif?v=1617785231" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title">FOR THE DIY FANS</div>
+            <div class="color_bar"></div>
+            <div class="sub_title">Our DIY mode providers you more creative freedom for personalizing your Phantasy Strip Lights. Create incredible light effects and color options with ease. 4 DIY options (Fade, Jumping, Twinkle, Combo) add even more uniqueness to your color show.</div>
+          </div>
+        </section>
+      </div>
+      <div class="scenes_item">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title">ENJOY EXCITING APP FEATURES</div>
+            <div class="color_bar"></div>
+            <div class="sub_title"></div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/7_aa8f0644-f705-4d12-a976-0541855a9cb6.jpg?v=1617784382" alt="">
+        </div>
+      </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8.jpg?v=1617784383" alt="banner_1">
+
+    </section>
+    <iframe width="100%" height="720" src="https://www.youtube.com/watch?v=XsNbSpWXGio" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+    <section class="specification_wrap">
+      <div class="specification_table_td title">
+        <div class="spacification_td_item">SPECS</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Light Color</div>
+        <div class="spacification_td_item">RGB</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Power Supply</div>
+        <div class="spacification_td_item">12V Adapter</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Length</div>
+        <div class="spacification_td_item">10m <br>(10m/32.8ft  2Rolls Combined Length)</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Water Resistance</div>
+        <div class="spacification_td_item">IP65 Water Resistant <br>(the adapter is not waterproof)</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Control Method</div>
+        <div class="spacification_td_item">Govee Home APP<br> (RF Remote Controller, Control Box)</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="mobile-show ipad-hide">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_dd7d3c3c-1b07-4e85-a17c-78cf47842acc.jpg?v=1617851947" alt="banner_1">
+      <div class="banner_text">
+        <div class="title">Govee phantasy strip lights</div>
+        <div class="sub_title">Create your colorful escape</div>
+      </div>
+    </section>
+    <section class="space_wrap">
+      <div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao1.png?v=1617778406" alt="">
+          </div>
+          <div>Water resistant</div>
+        </div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao4.png?v=1617778406" alt="">
+          </div>
+          <div>64 scene modes</div>
+        </div>
+      </div>
+      <div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao2.png?v=1617778406" alt="">
+          </div>
+          <div>Music sync</div>
+        </div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao5.png?v=1617778406" alt="">
+          </div>
+          <div>App control</div>
+        </div>
+      </div>
+      <div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao3.png?v=1617778407" alt="">
+          </div>
+          <div>DIY</div>
+        </div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/tubiao6.png?v=1617778407" alt="">
+          </div>
+          <div>30m Fernbedienung</div>
+        </div>
+      </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_a69c6d80-dc88-4f8a-a46a-4b45fd52bc67.jpg?v=1617851946" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Water resistant design</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">With an IP65 water-resistant rating and a low 12v current, the phantasy strip lights can withstand water splashes and dust, making them safe to use outdoors. Do away with traditional outdoor lighting for parties and holidays. Energize your space with stunning colors.</div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title">64 zestful scene modes</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Liven up your favorite indoor or outdoor activities with over 64 scene modes at your disposal. Wake up gently to vibrant pinks and oranges with sunrise mode, or set the mood for your romantic dinners with candlelight mode.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5_21cf6eff-04c0-4664-8bf6-013aadb61a71.jpg?v=1617851978" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">EASY FOR ANYONE TO INSTALL</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Simply stick the 3M adhesive, located on the back of the Phantasy Strip Lights to any dry, clean surface. Then, attach the provided support clips for more security. The flexible design also allows you to bend them around tight corners. Enjoy installing your lights with family and friends while filling your home with lively colors.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_2bca901d-6ad5-444c-91b4-f99a010812cc.jpg?v=1617851946" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">ADD COLOR TO YOUR MUSIC</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Musikmodus bietet Ihnen die Möglichkeit die Streifenlichter dank des eingebauten Mikrofons in Synchronisation mit Liedern laufen zu lassen. Haben Sie eine Dinnerparty im Innenhof geplant? Unsere Rhythmusoption bietet Ihnen zwei zusätzliche Modi. Wählen Sie Dynamisch um Ihre Farben energetisch tanzen zu lassen oder Mild für eine ruhigere Show.</div>
+    </section>
+
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6.gif?v=1617785231" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">FOR THE DIY FANS</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Our DIY mode providers you more creative freedom for personalizing your Phantasy Strip Lights. Create incredible light effects and color options with ease. 4 DIY options (Fade, Jumping, Twinkle, Combo) add even more uniqueness to your color show.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/7_faecb4ab-7d8d-4bf8-97f1-c732ecd8588b.jpg?v=1617851978" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">ERLEBEN SIE SPANNENDE <br >APP FEATURES</div>
+      <div class="color_bar"></div>
+      <div class="sub_title"></div>
+    </section>
+
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8_00f040c3-fc60-4a79-9857-f8f4b31f578b.jpg?v=1617851946" alt="banner_2">
+      <section class="banner_text">
+        <div class="title">98.4FT OF EFFEORTLESS REMOTE CONTROL</div>
+        <div class="color_bar"></div>
+        <div class="sub_title">The provided RF remote is equipped with a 98.4ft control range. Manage various functions from other rooms without having to point your remote directly at the strip lights. With more convenient control, colorizing your décor just got so much easier.</div>
+      </section>
+    </section>
+
+    <iframe width="100%" height="375" src="https://www.youtube.com/watch?v=XsNbSpWXGio" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+    <section class="specification_wrap">
+      <div class="specification_table_td title">
+        <div class="spacification_td_item">SPECS</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Light Color</div>
+        <div class="spacification_td_item">RGB</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Power Supply</div>
+        <div class="spacification_td_item">12V Adapter</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Length</div>
+        <div class="spacification_td_item">10m <br>(10m/32.8ft  2Rolls Combined Length)</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Water Resistance</div>
+        <div class="spacification_td_item">IP65 Wasserfest <br>(the adapter is not waterproof)</div>
+      </div>
+      <div class="specification_table_td">
+        <div class="spacification_td_item">Control Method</div>
+        <div class="spacification_td_item">Govee Home APP<br> (RF Remote Controller, Control Box)</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+
+<style>
+  .banner_1 .banner_text {
+    left: 5%;
+  }
+  .middle_wrap .color_bar {
+    background: linear-gradient(90deg,#00ceff,#d2f400,#ff6b00, #ff00ff );
+  }
+  .space_wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 40px 120px;
+  }
+  .space_item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .space_item_img {
+    width: 120px;
+  }
+  .specification_wrap {
+    padding: 20px 14%;
+    display: block;
+  }
+  .specification_table_td {
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .specification_table_td.title .spacification_td_item {
+    font-weight: normal;
+    font-size: 40px;
+  }
+  .specification_table_td > .spacification_td_item:first-child {
+    font-weight: normal;
+  }
+  .spacification_td_item {
+    width: auto;
+    font-size: 22px;
+    padding: 20px 0;
+    text-align: right;
+  }
+
+
+
+  .mobile-show .banner_1 .banner_text {
+    bottom: 4%;
+    transform: none;
+    top: auto;
+    width: auto;
+  }
+  .mobile-show .banner_text .title {
+    font-size: 30px;
+    line-height: 36px;
+    margin-bottom: 8px;
+  }
+  .mobile-show .banner_text .sub_title {
+    font-size: 12px;
+    line-height: 14px;
+    font-weight: normal;
+  }
+  .mobile-show .space_wrap {
+    padding: 10px;
+  }
+  .mobile-show .space_item_img {
+    width: 60px;
+  }
+  .mobile-show .space_item {
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+  .mobile-show .specification_wrap {
+    padding: 10px;
+  }
+  .mobile-show .specification_table_td.title .spacification_td_item {
+    font-size: 18px;
+  }
+  .mobile-show .specification_table_td > .spacification_td_item:first-child {
+    text-align: left;
+  }
+  .mobile-show .spacification_td_item {
+    transform: scale(.9);
+    width: 200px;
+  }
+  @media screen and (max-width: 1365px) {
+    .specification_table_td.title .spacification_td_item {
+      font-size: 40px;
+    }
+    .spacification_td_item {
+      font-size: 20px;
+      padding: 20px 0;
+    }
+  }
+  @media screen and (min-width: 1366px) {
+    .specification_table_td.title .spacification_td_item {
+      font-size: 40px;
+    }
+    .spacification_td_item {
+      font-size: 20px;
+      padding: 20px 0;
+    }
+  }
+  @media screen and (min-width: 1600px) {
+    .specification_table_td.title .spacification_td_item {
+      font-size: 40px;
+    }
+    .spacification_td_item {
+      font-size: 24px;
+      padding: 20px 0;
+    }
+  }
+  @media screen and (min-width: 1920px) {
+    .specification_table_td.title .spacification_td_item {
+      font-size: 50px;
+    }
+    .spacification_td_item {
+      font-size: 28px;
+      padding: 24px 0;
+    }
+  }
+</style>

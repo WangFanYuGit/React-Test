@@ -1,0 +1,1081 @@
+{%- liquid
+    assign current_variant = product.selected_or_first_available_variant
+  
+  assign product_zoom_size = '1800x1800'
+  assign product_image_size = '620x'
+  case image_container_width
+  when 'small'
+  assign product_image_width = 'medium-up--two-fifths'
+  assign product_description_width = 'medium-up--three-fifths'
+  assign product_image_size = '480x'
+  when 'medium'
+  assign product_image_width = 'medium-up--one-half'
+  assign product_description_width = 'medium-up--one-half'
+  assign product_image_size = '620x'
+  when 'large'
+  assign product_image_width = 'medium-up--three-fifths'
+  assign product_description_width = 'medium-up--two-fifths'
+  assign product_image_size = '740x'
+  endcase
+  
+  unless thumbnail_position
+  assign thumbnail_position = 'beside'
+  endunless
+  
+  unless description_style
+  assign description_style = 'full'
+  endunless
+  -%}
+  
+  <div id="ProductSection-{{ section_id }}"
+       class="product-section"
+       data-section-id="{{ section_id }}"
+       data-section-type="product-template"
+       data-product-title="{{ product.title | escape }}"
+       data-product-handle="{{ product.handle }}"
+       {% if settings.product_zoom_enable %}
+       data-image-zoom="true"
+       {% endif %}
+       {% if settings.inventory_enable %}
+       data-inventory="true"
+       {% endif %}
+       {% if settings.inventory_transfers_enable %}
+       data-incoming-inventory="true"
+       {% endif %}
+       {% unless isModal %}
+       data-enable-history-state="true"
+       {% endunless %}>
+  
+    {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+  
+    <div class="page-content">
+      <div class="page-width">
+  
+        {%- if settings.show_breadcrumbs and isModal != true -%}
+        {%- render 'breadcrumbs' -%}
+        {%- endif -%}
+  
+        <div class="grid">
+          <div class="grid__item {{ product_image_width }} product-single__sticky">
+            {%- render 'product-images',
+              section_id: section_id,
+            product: product,
+            isModal: isModal,
+            product_zoom_size: product_zoom_size,
+            product_image_size: product_image_size,
+            thumbnail_position: thumbnail_position,
+            thumbnail_arrows: thumbnail_arrows,
+            video_looping: video_looping,
+            video_style: video_style
+            -%}
+          </div>
+  
+          <div class="grid__item {{ product_description_width }}">
+  
+            <div class="product-single__meta">
+              {%- if settings.vendor_enable -%}
+              <div class="product-single__vendor">
+                {%- assign vendor_handle = product.vendor | handleize  -%}
+                {%- if collections[vendor_handle] != empty -%}
+                <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                  {{ collections[vendor_handle].title }}
+                </a>
+                {%- else -%}
+                {{ product.vendor | link_to_vendor }}
+                {%- endif -%}
+              </div>
+              {%- endif -%}
+  
+              {%- if isModal -%}
+              <p class="h2 product-single__title">
+                {{ product.title }}
+              </p>
+              {%- else -%}
+              <h1 class="h2 product-single__title">
+                {{ product.title }}
+              </h1>
+              {%- endif -%}
+  
+              {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+              {%- if isModal -%}
+              {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+              {%- else -%}
+              {%- assign review_link = '#Reviews-' | append: product.id -%}
+              {%- endif -%}
+              <a href="{{ review_link }}" class="product-single__review-link">
+                <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+              </a>
+              {%- endif -%}
+  
+              {%- if settings.sku_enable -%}
+              <p id="Sku-{{ section_id }}" class="product-single__sku">
+                {%- if current_variant.sku -%}
+                {{ current_variant.sku }}
+                {%- endif -%}
+              </p>
+              {%- endif -%}
+  
+              {%- assign hide_sale_price = true -%}
+              {%- if product.compare_at_price_max > product.price -%}
+              {%- if current_variant.compare_at_price -%}
+              {%- assign hide_sale_price = false -%}
+              {%- endif -%}
+              <span
+                    id="PriceA11y-{{ section_id }}"
+                    class="visually-hidden"
+                    aria-hidden="{{ hide_sale_price }}">
+                {{ 'products.general.regular_price' | t }}
+              </span>
+              <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+                <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                  {%- if current_variant.compare_at_price > current_variant.price -%}
+                  {{ current_variant.compare_at_price | money }}
+                  {%- endif -%}
+                </span>
+              </span>
+              <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+              {%- else -%}
+              <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+              {%- endif -%}
+  
+              <span id="ProductPrice-{{ section_id }}"
+                    class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+                {{ current_variant.price | money }}
+              </span>
+  
+              <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+                {%- capture unit_price_base_unit -%}
+                <span class="product__unit-base--{{ section_id }}">
+                  {%- if current_variant.unit_price_measurement -%}
+                  {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                  {{ current_variant.unit_price_measurement.reference_value }}
+                  {%- endif -%}
+                  {{ current_variant.unit_price_measurement.reference_unit }}
+                  {%- endif -%}
+                </span>
+                {%- endcapture -%}
+  
+                <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+              </div>
+              <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+  
+              {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+              <div class="product__policies rte">
+                <small>
+                  {%- if shop.taxes_included -%}
+                  {{ 'products.product.include_taxes' | t }}
+                  {%- endif -%}
+                  {%- if shop.shipping_policy.body != blank -%}
+                  {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                  {%- endif -%}
+                </small>
+              </div>
+              {%- endif -%}
+  
+              {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+              {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+  
+              <script>
+                // Store inventory quantities in JS because they're no longer
+                // available directly in JS when a variant changes.
+                // Have an object that holds all potential products so it works
+                // with quick view or with multiple featured products.
+                window.inventories = window.inventories || {};
+                window.inventories['{{section_id}}'] = {};
+                                   {%- for variant in variants_with_inventory_tracking -%}
+                                   window.inventories['{{section_id}}'][{{variant.id}}] = {
+                  'quantity': {{ variant.inventory_quantity | default: 0 }},
+                  'incoming': {{ variant.incoming | default: false | json }},
+                  'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+                };
+                {%- endfor -%}
+              </script>
+  
+              {% comment %}
+              If loaded in quick view, it might be from a JS-loaded function
+              that loads recommended products. If that's the case, the above
+              JS will not set the variant inventory. Add it to an accessible
+              data div to read later instead.
+              {% endcomment %}
+              {%- if isModal -%}
+              <div
+                   data-section-id="{{ section_id }}"
+                   class="hide js-product-inventory-data"
+                   aria-hidden="true"
+                   >
+                {%- for variant in variants_with_inventory_tracking -%}
+                <div
+                     class="js-variant-inventory-data"
+                     data-id="{{ variant.id }}"
+                     data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                     data-incoming="{{ variant.incoming | default: false | json }}"
+                     data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                     >
+                </div>
+                {%- endfor -%}
+              </div>
+              {%- endif -%}
+  
+              {%- assign inventory_visible = false -%}
+              {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+              {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+              {%- assign inventory_visible = true -%}
+              {%- endif -%}
+              {%- endif -%}
+              {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+              {%- assign inventory_visible = false -%}
+              {%- endif -%}
+              <div
+                   id="ProductInventory-{{ section_id }}"
+                   class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                   >
+                {%- if current_variant.available -%}
+                {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+                {%- endif -%}
+              </div>
+  
+              {%- if settings.inventory_transfers_enable -%}
+              <div
+                   id="ProductIncomingInventory-{{ section_id }}"
+                   class="product__inventory{% if inventory_visible %} hide{% endif %}">
+                {%- if current_variant.incoming and inventory_visible == false -%}
+                {%- if current_variant.next_incoming_date -%}
+                {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+                {%- if current_variant.available -%}
+                {{ 'products.product.will_not_ship_until' | t: date: date }}
+                {%- else -%}
+                {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+                {%- endif -%}
+                {%- else -%}
+                {{ 'products.product.waiting_for_stock' | t }}
+                {%- endif -%}
+                {%- endif -%}
+              </div>
+              {%- endif -%}
+              {% endif %}
+  
+              <hr class="hr--medium">
+  
+              {% unless isModal %}
+              {% comment %}
+              Shopify's product form attaches a number of tracking
+              scripts that cause slower load times and false statistics.
+              Quick view modals request these on-demand.
+              {% endcomment %}
+              {%- render 'product-form',
+                  section_id: section_id,
+              product: product,
+              current_variant: current_variant
+              -%}
+              {% else %}
+              <div
+                   id="ProductFormHolder-{{ section_id }}"
+                   data-url="{{ product.url }}"
+                   data-template="{{ product.template_suffix }}">
+                {%- if product.options.size > 0 -%}
+                {%- for i in (1..product.options.size) -%}
+                <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+                {%- endfor -%}
+                {%- endif -%}
+                <div class="placeholder-content" style="min-height: 86px;"></div>
+              </div>
+              {% endunless %}
+  
+              {%- unless isModal -%}
+              {%- if settings.surface_pickup_enable -%}
+              <div id="StoreAvailabilityHolder-{{ section_id }}"
+                   data-product-name="{{ product.title | escape }}"
+                   data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                   ></div>
+              {%- endif -%}
+              {%- endunless -%}
+  
+              {%- unless description_style == 'full' -%}
+  
+              {%- unless settings.product_description_collapse -%}
+              <div class="product-single__description rte">
+                {{ product.description }}
+              </div>
+              {%- endunless -%}
+  
+              {%- render 'product-additional-content', product: product, section_id: section_id -%}
+              {%- endunless -%}
+  
+  
+              {% render 'product-accordian' %}
+  
+  
+  
+            </div>
+          </div>
+        </div>
+  
+        {% if description_style == 'full' %}
+        {% unless settings.product_description_collapse %}
+        <div class="product-single__description-full rte">
+          {{ product.description }}
+        </div>
+        {% endunless %}
+  
+        {%- render 'product-additional-content', product: product, section_id: section_id -%}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  {% render 'additional-custom-content' %}
+  
+  <div class="page_wrap">
+    <div class="mobile-hide lazyload" data-animate_images="true">
+      <div class="banner_wrap text" data-animate_text="true">
+        <div class="banner_text page_text">Govee 50ft RGB Wi-Fi+Bluetooth LED Strip Lights</div>
+        <div class="banner_sub_text page_sub_text">Home Lighting Made Smart</div>
+        <div class="banner_sub_img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/264_2x_42d9c960-a491-4cdb-928e-4ff2cdc86191_1.png?v=1627472678" alt="" class="lazyload">
+        </div>
+      </div>
+      <div class="banner_wrap img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/001_0d45362d-6d48-42f8-b6a5-0f89a1836c40.jpg?v=1627472677" alt="" class="lazyload">
+      </div>
+  
+      <div class="scence_wrap">
+        <div class="scence_item text left" data-animate_text="true">
+          <div class="scence_text page_text">Voice Control</div>
+          <div class="scence_sub_text page_sub_text">Control all your lighting with the sound of your own voice. Works with both Alexa and Google assistants.</div>
+        </div>
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/004_d9f04d51-e2ac-4973-b535-c3c7d3a3941a.jpg?v=1627472677" alt="" class="lazyload">
+        </div>
+      </div>
+  
+      <div class="scence_wrap">
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/003_4ad9916e-f6f8-45de-879b-5e5f0985056f.jpg?v=1627472677" alt="" class="lazyload">
+        </div>
+  
+        <div class="scence_item text right" data-animate_text="true">
+          <div class="scence_text page_text">Extra Long Length</div>
+          <div class="scence_sub_text page_sub_text">Unrolling to 50 total feet (25ft x 2), these light strips are equipped with 450 lamp beads that allow you to colorize your entire room. Extra coverage means more design options, more creativity, and more colorized decor in your living space.</div>
+          
+        </div>
+      </div>
+
+      <div class="scence_wrap">
+        <div class="scence_item text left" data-animate_text="true">
+          <div class="scence_text page_text">Smart App Control</div>
+          <div class="scence_sub_text page_sub_text">Customize extensive features in the Govee Home App to maximize your lighting experience and personalization.</div>
+          <div class="product_func_list">
+            <div class="product_func_item">
+              <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_1bb58a0a-22d1-4944-870a-586f8f2d34d3.png?v=1627472678" alt="" class="lazyload">
+              </div>
+              <div class="product_func_text page_sub_text">Music Mode</div>
+            </div>
+            <div class="product_func_item">
+              <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02_04e68541-24ca-4792-b019-4c10b8b81ed3.png?v=1627472677" alt="" class="lazyload">
+              </div>
+              <div class="product_func_text page_sub_text">DIY Mode</div>
+            </div>
+            <div class="product_func_item">
+              <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03_b668c7a7-fc36-4dab-9c86-a9c4e24fb995.png?v=1627472677" alt="" class="lazyload">
+              </div>
+              <div class="product_func_text page_sub_text">Color Option</div>
+            </div>
+            <div class="product_func_item">
+              <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04_ab227454-8a52-49aa-bcf2-f64c209f37d5.png?v=1627472677" alt="" class="lazyload">
+              </div>
+              <div class="product_func_text page_sub_text">Scene Mode</div>
+            </div>
+        
+          </div>
+        </div>
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/004_d9f04d51-e2ac-4973-b535-c3c7d3a3941a.jpg?v=1627472677" alt="" class="lazyload">
+        </div>
+        
+      </div>
+  
+      <div class="feature_wrap">
+        <div class="feature_title page_text">More Exciting Feature</div>
+        <div class="feature_list page-width">
+          <div class="feature_item">
+            <div class="feature_img">
+              <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/005_fcded01a-50ab-4e43-83d1-8c7922bb5208.jpg?v=1627472677" alt="" class="lazyload">
+            </div>
+            <div class="feature_text page_sub_text">
+              <div class="bold">Dimmable Lighting</div>
+              <div>With the highly adjustable brightness of Govee LED lights, always find your most suitable lighting level.</div>
+            </div>
+          </div>
+          <div class="feature_item">
+            <div class="feature_img">
+              <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/006_bbd3f33f-4cb9-4bcb-b4f5-f6234641b8d3.jpg?v=1627472678" alt="" class="lazyload">
+            </div>
+            <div class="feature_text page_sub_text">
+              <div class="bold">Timer Settings</div>
+              <div>Soft lighting gently wakes you up each morning and slowly darkens towards bedtime.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="specification_wrap">
+        <div class="page-width specification_content">
+          <div class="specification_table">
+            <div class="specification_theader page_text">
+              Specs
+            </div>
+            <div class="specification_tbody">
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Brand</span>
+                <span class="specification_td bold">Govee</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Color</span>
+                <span class="specification_td bold">RGB</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Material</span>
+                <span class="specification_td bold">‎Plastic</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Voltage</span>
+                <span class="specification_td bold">‎12 Volts</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Batteries Required</span>
+                <span class="specification_td bold">‎Yes</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Package Includes</span>
+                <span class="specification_td bold">2 Connected Rolls of LED Strip Lights, IR Remote Control, 1 CR2 Battery</span>
+              </div>
+            </div>
+          </div>
+          <div class="spacification_image">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6154.png?v=1627472677" alt="" class="lazyload">
+          </div>
+        </div>
+      </div>
+  
+      <div class="compare_wrap">
+        <div class="page-width compare_content">
+          <div class="compare_header page_text">
+            Compare with Other Models
+          </div>
+          <div class="compare_table">
+            <div class="compare_tr">
+              <div class="compare_td">
+                Preview
+              </div>
+              <div class="compare_td">
+                <div class="compare_td_img">
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cae8227e4dfc2b1b29ada052fe7e26b1.png?v=1627472678" alt="" class="lazyload">
+                </div>
+              </div>
+              <div class="compare_td">
+                <div class="compare_td_img">
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6110_da2c1f81-a1e6-4b81-b77b-392cd5b1a9c7.png?v=1627472677" alt="" class="lazyload">
+                </div>
+              </div>
+            </div>
+            <div class="compare_tr">
+              <div class="compare_td">Product name</div>
+              <div class="compare_td">Govee Wi-Fi + Bluetooth RGB LED Strip Lights (25ft x 2 Rrolls)</div>
+              <a href="#" target="_blank" class="compare_td">Govee Wi-Fi + Bluetooth RGB LED Strip Lights (16.4ft × 2 Rolls)</a>
+            </div>
+            <div class="compare_tr">
+              <div class="compare_td">
+                Mode
+              </div>
+              <div class="compare_td">
+                <span>H6154</span>
+              </div>
+              <div class="compare_td">
+                <span>H6110</span>
+              </div>
+            </div>
+            <div class="compare_tr">
+              <div class="compare_td">Length</div>
+              <div class="compare_td">15m (7.5m × 2 Rolls)/ 50ft (25ft x 2 Rolls)</div>
+              <div class="compare_td">10m (5m × 2 Rolls)/ 32.8ft (16.4ft × 2 Rolls)</div>
+            </div>
+            <div class="compare_tr">
+                <div class="compare_td">Light color</div>
+                <div class="compare_td">RGB</div>
+                <div class="compare_td">RGB</div>
+              </div>
+            <div class="compare_tr">
+              <div class="compare_td">Control method</div>
+              <div class="compare_td">APP, Voice Control, Remote Control</div>
+              <div class="compare_td">APP, Voice Control</div>
+            </div>
+            <div class="compare_tr">
+                <div class="compare_td">Water resistance</div>
+                <div class="compare_td">No</div>
+                <div class="compare_td">Yes</div>
+              </div>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  
+    <div class="mobile-show lazyload" data-animate_images="true">
+      <div class="banner_wrap text" data-animate_text="true">
+        <div class="banner_text page_text">Govee 50ft RGB Wi-Fi+Bluetooth LED Strip Lights</div>
+        <div class="banner_sub_text page_sub_text">Home Lighting Made Smart</div>
+        <div class="banner_sub_img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/264_2x_42d9c960-a491-4cdb-928e-4ff2cdc86191_1.png?v=1627472678" alt="" class="lazyload">
+        </div>
+      </div>
+      <div class="banner_wrap img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_4c4f8fdb-62d1-4c29-9956-110913d55add.jpg?v=1627473212" alt="" class="lazyload">
+      </div>
+  
+      <div class="scence_wrap">
+        <div class="scence_item text left" data-animate_text="true">
+          <div class="scence_text page_text">Voice Control</div>
+          <div class="scence_sub_text page_sub_text">Control all your lighting with the sound of your own voice. Works with both Alexa and Google assistants.</div>
+        </div>
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/002_3e81f69e-267e-4cdb-ba26-886ac9c9faa7.png?v=1627473212" alt="" class="lazyload">
+        </div>
+      </div>
+  
+      <div class="scence_wrap F8f8f8">
+        <div class="scence_item text right" data-animate_text="true">
+          <div class="scence_text page_text">Extra Long Length</div>
+          <div class="scence_sub_text page_sub_text">Unrolling to 50 total feet (25ft x 2), these light strips are equipped with 450 lamp beads that allow you to colorize your entire room. Extra coverage means more design options, more creativity, and more colorized decor in your living space.</div>
+        </div>
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/003_dea599a9-0278-4b2e-ad7b-d861a7ce5a4f.png?v=1627473212" alt="" class="lazyload">
+        </div>
+      </div>
+  
+      <div class="banner_wrap text" data-animate_text="true">
+        <div class="banner_text page_text">Smart App Control</div>
+        <div class="banner_sub_text page_sub_text">Customize extensive features in the Govee Home App to maximize your lighting experience and personalization.</div>
+      </div>
+      <div class="product_func_list">
+        <div class="product_func_item">
+          <div class="product_func_img">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_1bb58a0a-22d1-4944-870a-586f8f2d34d3.png?v=1627472678" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text page_sub_text">Music Mode</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02_04e68541-24ca-4792-b019-4c10b8b81ed3.png?v=1627472677" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text page_sub_text">DIY Mode</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03_b668c7a7-fc36-4dab-9c86-a9c4e24fb995.png?v=1627472677" alt="" class="lazyload">
+    
+          </div>
+          <div class="product_func_text page_sub_text">Color Option</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04_ab227454-8a52-49aa-bcf2-f64c209f37d5.png?v=1627472677" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text page_sub_text">Scene Mode</div>
+        </div>
+    
+      </div>
+      <div class="banner_wrap img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/004_445a9665-80e3-4863-8f32-f7b34200b63d.jpg?v=1627473212" alt="" class="lazyload">
+      </div>
+  
+      <div class="scence_wrap F8f8f8">
+        <div class="scence_item text right" data-animate_text="true">
+          <div class="scence_text page_text">Dimmable Lighting</div>
+          <div class="scence_sub_text page_sub_text">Easily adjust brightness without the need to purchase an additional dimmer.</div>
+        </div>
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/005.png?v=1627473213" alt="" class="lazyload">
+        </div>
+      </div>
+  
+      <div class="scence_wrap">
+        <div class="scence_item text right" data-animate_text="true">
+          <div class="scence_text page_text">Timer Settings</div>
+          <div class="scence_sub_text page_sub_text">Soft lighting gently wakes you up each morning and slowly darkens towards bedtime.</div>
+        </div>
+        <div class="scence_item img">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/006.png?v=1627473212" alt="" class="lazyload">
+        </div>
+      </div>
+
+  
+      <div class="specification_wrap">
+        <div class="page-width specification_content">
+          <div class="specification_table">
+            <div class="specification_theader page_text">
+              Specs
+            </div>
+            <div class="specification_tbody">
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Brand</span>
+                <span class="specification_td bold">Govee</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Color</span>
+                <span class="specification_td bold">RGB</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Material</span>
+                <span class="specification_td bold">‎Plastic</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Voltage</span>
+                <span class="specification_td bold">‎12 Volts</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Batteries Required</span>
+                <span class="specification_td bold">Yes</span>
+              </div>
+              <div class="specification_tr page_sub_text">
+                <span class="specification_td">Package Includes</span>
+                <span class="specification_td bold">2 Connected Rolls of LED Strip Lights, IR Remote Control, 1 CR2 Battery</span>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="spacification_image">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/848d54e497c60fcde373939472b2e8e5.png?v=1626837873" alt="" class="lazyload">
+          </div> -->
+        </div>
+      </div>
+  
+      <div class="compare_wrap">
+        <div class="page-width compare_content">
+          <div class="compare_header page_text">
+            Compare with Other Models
+          </div>
+          <div class="compare_table">
+            <div class="compare_tr">
+              <div class="compare_td">
+                Preview
+              </div>
+              <div class="compare_td">
+                <div class="compare_td_img">
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cae8227e4dfc2b1b29ada052fe7e26b1.png?v=1627472678" alt="" class="lazyload">
+                </div>
+              </div>
+              <div class="compare_td">
+                <div class="compare_td_img">
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6110_da2c1f81-a1e6-4b81-b77b-392cd5b1a9c7.png?v=1627472677" alt="" class="lazyload">
+                </div>
+              </div>
+             
+            </div>
+            <div class="compare_tr">
+              <div class="compare_td">Product name</div>
+              <div class="compare_td">Govee Wi-Fi + Bluetooth RGB LED Strip Lights (25ft x 2 Rrolls)</div>
+              <a href="#" target="_blank" class="compare_td">Govee Wi-Fi + Bluetooth RGB LED Strip Lights (16.4ft × 2 Rolls)</a>
+            </div>
+            <div class="compare_tr">
+              <div class="compare_td">
+                Mode
+              </div>
+              <div class="compare_td">
+                <span>H6154</span>
+              </div>
+              <div class="compare_td">
+                <span>H6110</span>
+              </div>
+            </div>
+            <div class="compare_tr">
+                <div class="compare_td">Length</div>
+                <div class="compare_td">15m (7.5m × 2 Rolls)/ 50ft (25ft x 2 Rolls)</div>
+                <div class="compare_td">10m (5m × 2 Rolls)/ 32.8ft (16.4ft × 2 Rolls)</div>
+              </div>
+            <div class="compare_tr">
+              <div class="compare_td">Light color</div>
+              <div class="compare_td">RGB</div>
+              <div class="compare_td">RGB</div>
+            </div>
+            <div class="compare_tr">
+                <div class="compare_td">Control method</div>
+                <div class="compare_td">APP, Voice Control, Remote Control</div>
+                <div class="compare_td">APP, Voice Control</div>
+              </div>
+            <div class="compare_tr">
+              <div class="compare_td">Water resistance</div>
+              <div class="compare_td">No</div>
+              <div class="compare_td">Yes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+  
+  <style>
+    .page_wrap {
+      background-color: #fff;
+      margin-bottom: 50px;
+    }
+    .page_wrap [data-animate_images=true] .lazyload {
+      opacity:0
+    }
+    .page_wrap [data-animate_images=true] .lazyloaded {
+      opacity:1;
+      animation:0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+      animation-name:zoom-fade-small;
+      transition:none;
+    }
+    .page_wrap [data-animate_text=true] {
+      opacity: 0;
+    }
+    .page_wrap .lazyloaded [data-animate_text=true]{
+      opacity: 1;
+      animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+      animation-name: fade-in;
+    }
+    img {
+      display: block;
+      width: 100%;
+    }
+    .bold {
+      font-weight: bold;
+      font-family: 'Avenir LT Std';
+    }
+    .page_text {
+      font-family: 'Avenir LT Std';
+    }
+    .page_sub_text {
+      font-family: 'Avenir Next';
+    }
+    a.compare_td {
+      text-decoration: underline;
+    }
+  
+    .page_wrap .F8f8f8 {
+      background: #f8f8f8;
+    }
+    @media screen and (min-width: 768px) {
+      .page_text {
+        font-size: 2.3vw;
+        font-weight: bold;
+        line-height: 3.2vw;
+        color: #252525;
+      }
+      .page_sub_text {
+        font-size: 1.2vw;
+        line-height: 1.8vw;
+        color: #252525;
+        padding: .4vw 0 1vw;
+      }
+      .banner_wrap.text {
+        width: 100%;
+        text-align: center;
+        padding: 4.5vw 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .banner_text {
+        width: 52.5vw;
+      }
+      .banner_sub_img {
+        width: 24vw;
+      }
+  
+      .scence_wrap {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        margin: .5vw;
+      }
+      .scence_item {
+        width: 50%;
+      }
+      .scence_item.text.left {
+        padding: 0 4.2vw 0 13vw;
+      }
+      .scence_item.text.right {
+        padding: 0 13vw 0 4.2vw;
+      }
+      .scence_text {
+        width: 100%;
+      }
+      .scence_sub_text {
+        margin-bottom: 1.6vw;
+      }
+      .product_func_list {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .product_func_item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .product_func_img {
+        width: 5vw;
+      }
+      .product_func_text {
+        font-size: .8vw;
+        color: #252525;
+      }
+  
+      .feature_wrap {
+        background: #F7F7F7;
+        padding-bottom: 4vw;
+      }
+      .feature_title {
+        text-align: center;
+        padding: 4.5vw 0 2vw;
+      }
+      .feature_list {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+      }
+      .feature_item {
+        width: calc(50% - 1.2vw);
+        display: flex;
+        flex-direction: column;
+      }
+      .feature_img {
+        margin-bottom: 1.6vw;
+      }
+  
+      .specification_wrap {
+        padding: 4vw 0;
+      }
+      .specification_content {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        max-width: 1200px;
+      }
+      .specification_table {
+        flex: 1;
+        margin-right: 6vw;
+      }
+      .specification_theader {
+        padding: 1vw 0;
+        color: #111;
+      }
+      .specification_tbody {
+        border-top: 1px solid #888888;
+      }
+      .specification_tr {
+        padding: .8vw 0;
+        border-bottom: 1px solid #888888;
+  
+        display: flex;
+        justify-content: flex-start;
+      }
+      .specification_td {
+        color: #111;
+        width: 48%;
+      }
+      .spacification_image {
+        width: 21vw;
+      }
+  
+      .compare_wrap {
+        padding: 0 0 4vw 0;
+      }
+      .compare_content {
+        max-width: 1200px;
+      }
+      .compare_header {
+        color: #111 !important;
+        padding: 2.6vw 0;
+      }
+      .compare_table {
+        border-top: 1px solid #888888;
+      }
+      .compare_tr {
+        display: flex;
+        padding: .8vw 0;
+        border-bottom: 1px solid #888888;
+      }
+      .compare_td {
+        color: #111;
+        flex: 1;
+        padding-right: 1vw;
+      }
+      .compare_td:first-child {
+        font-weight: normal;
+        font-family: "Avenir Next";
+        z-index: 1;
+      }
+      .compare_td:not(:first-child) {
+        font-weight: bold;
+      }
+      .compare_td_img {
+        width: 12vw;
+        display: block;
+      }
+    }
+  
+    @media screen and (max-width: 767px) {
+      .page_text {
+        font-size: 22px;
+        font-weight: bold;
+        line-height: 30px;
+        color: #252525;
+      }
+      .page_sub_text {
+        font-size: 13px;
+        line-height: 18px;
+        color: #252525;
+        padding: 10px 0 12px;
+      }
+      .banner_wrap.text {
+        width: 100%;
+        text-align: left;
+        padding: 42px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .banner_text {
+        width: 100%;
+      }
+      .banner_sub_img {
+        width: 240px;
+      }
+  
+      .scence_wrap {
+        background: #fff;
+        padding: 0 25px 46px;
+      }
+      .scence_item {
+        width: 100%;
+      }
+      .scence_item.text {
+        padding: 38px 0 0;
+      }
+      .scence_item.img, 
+      .scence_item.img img {
+        border-radius: 10px;
+      }
+      .scence_text {
+        width: 100%;
+      }
+      .scence_sub_text {
+        margin-bottom: 14px;
+      }
+      .product_func_list {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: -30px;
+        padding: 0 30px;
+      }
+      .product_func_item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        max-width: calc(100% / 4);
+      }
+      .product_func_img {
+        width: 50px;
+      }
+      .product_func_text {
+        font-size: 12px;
+        color: #252525;
+        white-space: nowrap;
+        transform: scale(.8);
+      }
+  
+      .specification_wrap {
+        padding: 36px 0;
+      }
+      .specification_content {
+        padding: 0 25px;
+      }
+      .specification_theader {
+        padding: 10px 0 20px;
+        color: #111;
+      }
+      .specification_tbody {
+        border-top: 1px solid #888888;
+      }
+      .specification_tr {
+        padding: 6px 0;
+        border-bottom: 1px solid #888888;
+  
+        display: flex;
+        justify-content: flex-start;
+      }
+      .specification_td {
+        color: #111;
+        width: 48%;
+        font-size: 12px;
+      }
+      .spacification_image {
+        width: 160px;
+        margin: 30px auto;
+      }
+  
+      .compare_wrap {
+        padding: 0 0 50px 0;
+      }
+      .compare_content {
+        padding: 0 0 0 25px;
+      }
+      .compare_header {
+        color: #111 !important;
+        padding: 10px 0 30px;
+      }
+      .compare_table {
+        border-top: 1px solid #888888;
+  
+        overflow-x: scroll;
+        padding-bottom: 15px;
+      }
+  
+      .compare_tr {
+        display: flex;
+        justify-content: flex-start;
+        padding: 6px 0;
+        border-bottom: 1px solid #888888;
+        width: fit-content;
+      }
+      .compare_td {
+        color: #111;
+        flex: 1;
+        font-size: 12px;
+  
+        min-width: 180px;
+      }
+      .compare_td:first-child {
+       
+        left: 0;
+        top: 0;
+        min-width: 120px;
+        z-index: 1;
+      }
+      .compare_td:not(:first-child) {
+        font-weight: bold;
+      }
+      .compare_td_img {
+        width: 120px;
+        display: block;
+      }
+    }
+  
+    @media screen and (min-width: 1800px) {
+      .compare_td {
+        font-size: 16px;
+      }
+    }
+  </style>

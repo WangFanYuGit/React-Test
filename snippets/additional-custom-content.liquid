@@ -1,0 +1,758 @@
+<div class="product-features">
+  <div class="feature-section two">
+    
+    {% for block in section.blocks %}
+    
+    {% if block.settings.sliderimg_1 %}
+    <div id="slider-container" class="slider-container-p">
+    <div id="slider-list" class="slider-list-p" >
+      <div class="slide-p lazyload"><img class="slider-img-p" src="{{ block.settings.sliderimg_3 | img_url : 'master'  }}">
+        <h2>{{ block.settings.sliderheading3 }}</h2>
+        <h4>{{ block.settings.slidercontent_3 }}</h4>
+      </div>
+      <div class="slide-p lazyload"><img class="slider-img-p" src="{{ block.settings.sliderimg_1 | img_url : 'master'  }}">
+        <h2>{{ block.settings.sliderheading1 }}</h2>
+        <h4>{{ block.settings.slidercontent_1 }}</h4>
+      </div>
+      <div class="slide-p lazyload"><img class="slider-img-p" src="{{ block.settings.sliderimg_2 | img_url : 'master'  }}">
+        <h2>{{ block.settings.sliderheading2 }}</h2>
+        <h4>{{ block.settings.slidercontent_2 }}</h4>
+      </div>
+      <div class="slide-p lazyload"><img class="slider-img-p" src="{{ block.settings.sliderimg_3 | img_url : 'master'  }}">
+        <h2>{{ block.settings.sliderheading3 }}</h2>
+        <h4>{{ block.settings.slidercontent_3 }}</h4>
+      </div>
+      <div class="slide-p lazyload"><img class="slider-img-p" src="{{ block.settings.sliderimg_1 | img_url : 'master'  }}">
+        <h2>{{ block.settings.sliderheading1 }}</h2>
+        <h4>{{ block.settings.slidercontent_1 }}</h4>
+      </div>
+
+    </div>
+      <div id="slider-buttons">
+      <span index="1" class="on"></span>
+      <span index="2"></span>
+      <span index="3"></span>
+    </div>
+    <div id="p-slider-prev" class="arrow">
+     <svg t="1608692991095" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2738" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><defs><style type="text/css"></style></defs><path d="M358.997 512l311.168-311.168a42.667 42.667 0 1 0-60.33-60.33L268.5 481.834a42.667 42.667 0 0 0 0 60.33L609.835 883.5a42.667 42.667 0 0 0 60.33-60.331L358.997 512z" p-id="2739"></path></svg>
+      </div>
+    <div id="p-slider-next" class="arrow">
+     <svg t="1608693015224" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2868" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><defs><style type="text/css"></style></defs><path d="M665.003 512L353.835 200.832a42.667 42.667 0 0 1 60.33-60.33L755.5 481.834a42.667 42.667 0 0 1 0 60.33L414.165 883.5a42.667 42.667 0 1 1-60.33-60.331L665.003 512z" p-id="2869"></path></svg>  
+      </div>
+
+   </div>
+
+    <script src="{{ 'cusslider1.js' | asset_url | split: '?' | first }}" defer="defer"></script>
+
+    {% endif %}
+    
+
+    
+    {% if block.settings.downimg_1 %}
+<!----------------------------------------------------------------------------   img-with-overtext     ----------------------------------------------------------------------->    
+    <div class="img-with-overtext">
+      
+      {% if block.settings.mobile_downimg %}
+      <picture>
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_downimg | img_url : 'master' }}"> 
+          <source media="(min-width: 769px)" srcset="{{ block.settings.downimg_1 | img_url : 'master' }}"> 
+          <img src="{{ block.settings.downimg_1 | img_url : 'master' }}" alt=""> 
+        </picture>
+      {% else %}
+      <img class="slider-img-p" src="{{ block.settings.downimg_1 | img_url:'master'  }}">
+      {%endif%}
+      
+      {% if block.settings.if_align %}
+      <div class="content-box media769" style="position:absolute; transform:translate(-50%,-50%);text-align:center; top:{{ block.settings.position_top }}%; left:{{ block.settings.position_left }}%; max-width:{{ block.settings.max_width }}%;">
+       <h2>{{ block.settings.overheading1}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left; !important"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left; !important"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.overcontent_1 %}
+      <h4>{{ block.settings.overcontent_1 }}</h4>
+      {%endif%}
+        {%- if block.settings.text_code -%}
+        
+          {{ block.settings.text_code }}
+        
+        {%endif%}
+        {% if block.settings.detail_img %}
+        <div class="detail-img" >
+        <img src="{{ block.settings.detail_img | img_url:'master'  }}">
+          <div class="detail-text" style=" max-width:{{ block.settings.detail_width }}%; margin-top:{{ block.settings.detail_margin_top }}px;">
+            <span style="float:left; font-size:13px;">Brightness 100%</span>
+            <span style="float:right; font-size:13px;">Brightness 0%</span>
+             <div class="clearfix" style="clear:both;"></div>
+          </div>  
+        </div>
+        
+        {%endif%}
+      </div>
+      
+       {% if block.settings.mobile_layout %}
+      
+      <div class="cc media768">
+        <h3>{{ block.settings.overheading1}}</h3>
+        {%- if block.settings.show_color_line -%}
+        
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        
+        {%endif%}
+        {% if block.settings.overcontent_1 %}
+        <p>
+         {{ block.settings.overcontent_1 }}
+        </p>
+        {%endif%}
+        {%- if block.settings.text_code -%}
+        
+          {{ block.settings.text_code }}
+        
+        {%endif%}
+        {% if block.settings.detail_img %}
+        <div class="detail-img" style="margin-top:{{ block.settings.detail_margin_top }}px;" >
+        <img src="{{ block.settings.detail_img | img_url:'master'  }}">
+          <div class="detail-text" style=" max-width:{{ block.settings.detail_width }}%; margin-top:{{ block.settings.detail_margin_top }}px; margin:0 auto;">
+            <span style="float:left; font-size:13px;">Brightness 100%</span>
+            <span style="float:right; font-size:13px;">Brightness 0%</span>
+             <div class="clearfix" style="clear:both;"></div>
+          </div>  
+        </div>
+        
+        {%endif%}
+      </div>
+      
+      {% else %}
+      
+      <div class="content-box media768" style="position:absolute; transform:translate(-50%,-50%);
+                                               {% if block.settings.mobile_align_center %}
+                                               text-align:center; 
+                                               {% else %}
+                                               {%endif%}
+                                               top:{{ block.settings.mobile_position_top }}%; left:{{ block.settings.mobile_position_left }}%; max-width:{{ block.settings.mobile_max_width }}%;">
+      
+      <h2>{{ block.settings.overheading1}}</h2>
+        {%- if block.settings.show_color_line -%}
+         {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="{% if block.settings.mobile_align_center %}
+                                       text-align:center;
+                                       {% else %}        
+                                       text-align:left !important;
+                                       {%endif%}"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        
+        
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="{% if block.settings.mobile_align_center %}
+                                       text-align:center;
+                                       {% else %}        
+                                       text-align:left !important;
+                                       {%endif%}"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.overcontent_1 %}
+      <h4>{{ block.settings.overcontent_1 }}</h4>
+      {%endif%}
+        {%- if block.settings.text_code -%}
+        
+          {{ block.settings.text_code }}
+        
+        {%endif%}
+        {% if block.settings.detail_img %}
+        <div class="detail-img" >
+        <img src="{{ block.settings.detail_img | img_url:'master'  }}">
+          <div class="detail-text" style=" max-width:{{ block.settings.detail_width }}%; margin-top:{{ block.settings.detail_margin_top }}px;">
+            <span style="float:left; font-size:13px;">Brightness 100%</span>
+            <span style="float:right; font-size:13px;">Brightness 0%</span>
+             <div class="clearfix" style="clear:both;"></div>
+          </div>  
+        </div>
+        
+        {%endif%}
+      </div>
+      {%endif%}
+      
+      {% else %}
+      <div class="content-box media769" style="position:absolute; transform:translate(-50%,-50%);
+                                               {% if block.settings.if_align_right %}
+                                               text-align:right;
+                                               {% else %}
+                                               {%endif%}
+                                               top:{{ block.settings.position_top }}%; left:{{ block.settings.position_left }}%; max-width:{{ block.settings.max_width }}%;">
+       <h2>{{ block.settings.overheading1}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.overcontent_1 %}
+      <h4>{{ block.settings.overcontent_1 }}</h4>
+      {%endif%}
+        {%- if block.settings.text_code -%}
+        
+          {{ block.settings.text_code }}
+        
+        {%endif%}
+        {% if block.settings.detail_img %}
+        <div class="detail-img" style=" max-width:{{ block.settings.detail_width }}%; margin-top:{{ block.settings.detail_margin_top }}px;">
+        <img src="{{ block.settings.detail_img | img_url:'master'  }}">
+          <div class="detail-text">
+            <span style="float:left; font-size:13px;">Brightness 100%</span>
+            <span style="float:right; font-size:13px;">Brightness 0%</span>
+             <div class="clearfix" style="clear:both;"></div>
+          </div>  
+        </div>
+        
+        {%endif%}
+      </div>
+      
+      {% if block.settings.mobile_layout %}
+
+      <div class="cc media768">
+        <h3>{{ block.settings.overheading1}}</h3>
+        {%- if block.settings.show_color_line -%}
+        
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        
+       
+        {%endif%}
+        {% if block.settings.overcontent_1 %}
+        <p>
+         {{ block.settings.overcontent_1 }}
+        </p>
+        {%endif%}
+        {%- if block.settings.text_code -%}
+        
+          {{ block.settings.text_code }}
+        
+        {%endif%}
+        {% if block.settings.detail_img %}
+        <div class="detail-img" style="margin-top:{{ block.settings.detail_margin_top }}px;"  >
+        <img src="{{ block.settings.detail_img | img_url:'master'  }}">
+          <div class="detail-text" style=" max-width:{{ block.settings.detail_width }}%; margin-top:{{ block.settings.detail_margin_top }}px; margin:0 auto;">
+            <span style="float:left; font-size:13px;">Brightness 100%</span>
+            <span style="float:right; font-size:13px;">Brightness 0%</span>
+             <div class="clearfix" style="clear:both;"></div>
+          </div>  
+        </div>
+        
+        {%endif%}
+      </div>
+      {% else %}
+<div class="content-box media768" style="position:absolute; transform:translate(-50%,-50%);
+                                               {% if block.settings.mobile_align_center %}
+                                               text-align:center; 
+                                               {% else %}
+                                               {%endif%}
+                                               top:{{ block.settings.mobile_position_top }}%; left:{{ block.settings.mobile_position_left }}%; max-width:{{ block.settings.mobile_max_width }}%;">
+       <h2>{{ block.settings.overheading1}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="{% if block.settings.mobile_align_center %}
+                                       text-align:center;
+                                       {% else %}        
+                                       text-align:left !important;
+                                       {%endif%}"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="{% if block.settings.mobile_align_center %}
+                                       text-align:center;
+                                       {% else %}        
+                                       text-align:left !important;
+                                       {%endif%}"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.overcontent_1 %}
+      <h4>{{ block.settings.overcontent_1 }}</h4>
+      {%endif%}
+  {%- if block.settings.text_code -%}
+        
+          {{ block.settings.text_code }}
+        
+        {%endif%}
+        {% if block.settings.detail_img %}
+        <div class="detail-img" >
+        <img src="{{ block.settings.detail_img | img_url:'master'  }}">
+          <div class="detail-text" style=" max-width:{{ block.settings.detail_width }}%; margin-top:{{ block.settings.detail_margin_top }}px;">
+            <span style="float:left; font-size:13px;">Brightness 100%</span>
+            <span style="float:right; font-size:13px;">Brightness 0%</span>
+             <div class="clearfix" style="clear:both;"></div>
+          </div>  
+        </div>
+        
+        {%endif%}
+      </div>
+      
+      {%endif%}
+      {%endif%}
+    </div>
+    {% endif %}
+    
+    
+    
+    {% if block.settings.titleHeading %}
+<!-------------------------------------------------------------------------------  titleHeading-------------------------------------------------------->       
+    <div class="img-with-toptext" style="background:{{ block.settings.bg_color_A }};">
+      <div class="content-box">
+      <h2>{{ block.settings.titleHeading}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;padding-bottom:20px;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left; padding-bottom:20px;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.titleContent %}
+      <h4 style="text-align:center;">{{ block.settings.titleContent }}</h4>
+      {%endif%}
+      </div>
+      
+    </div>
+    {% endif %}
+
+    
+    
+    {% if block.settings.Abottomimg %}
+<!-------------------------------------------------------------------------------  img-with-toptext   ------------------------------------------------------------->    
+    <div class="img-with-toptext" style="background:{{ block.settings.bg_color_A }};">
+      <div class="content-box media769">
+      <h2>{{ block.settings.Atopheading}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.Atopcontent %}
+      <h4 style="text-align:center;">{{ block.settings.Atopcontent }}</h4>
+      {%endif%}
+      </div>
+      
+        {% if block.settings.mobile_img_Atype %}
+      
+        
+        <picture>
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_img_Atype | img_url : 'master' }}"> 
+          <source media="(min-width: 769px)" srcset="{{ block.settings.Abottomimg | img_url : 'master' }}"> 
+          <img src="{{ block.settings.Abottomimg | img_url : 'master' }}" alt=""> 
+        </picture>
+      
+        {% else %}
+
+        <img class="slider-img-p" src="{{ block.settings.Abottomimg | img_url:'master'  }}">      
+             
+
+        {%endif%}
+      <div class="content-box media768">
+      <h2>{{ block.settings.Atopheading}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left !important;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.Atopcontent %}
+      <h4 style="text-align:center;">{{ block.settings.Atopcontent }}</h4>
+      {%endif%}
+      </div>
+    </div>
+    {% endif %}
+
+
+    
+    {% if block.settings.Atopimg %}
+<!-------------------------------------------------------------------------------  img-with-bottomtext   ------------------------------------------------------------->        
+    <div class="img-with-bottomtext" style="background:{{ block.settings.bg_color_B }};">
+       {% if block.settings.mobile_img_Btype %}
+      
+        
+       <picture>
+         <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_img_Btype | img_url : 'master' }}"> 
+         <source media="(min-width: 769px)" srcset="{{ block.settings.Atopimg | img_url : 'master' }}"> 
+         <img src="{{ block.settings.Atopimg | img_url : 'master' }}" alt=""> 
+       </picture>
+      
+        {% else %}
+
+
+        <img class="slider-img-p" src="{{ block.settings.Atopimg | img_url:'master'  }}">
+
+        {%endif%}
+      <div class="content-box">
+      <h2>{{ block.settings.Abottomheading}}</h2>
+        {%- if block.settings.show_color_line -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left; !important"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        {% if block.settings.color_line_center %}
+        <div class="color-line" style="text-align:center;"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {% else %}
+        <div class="color-line" style="text-align:left; !important"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%endif%}
+      {% if block.settings.Abottomcontent %}
+      <h4 style="text-align:center;">{{ block.settings.Abottomcontent }}</h4>
+      {%endif%}
+      </div>
+      
+    </div>
+    {% endif %}
+    
+
+    
+    {% if block.settings.Formimg %}
+<!-------------------------------------------------------------------------------  img-with-form  -------------------------------------------------------------->    
+    <div class="img-with-form" style="background:{{ block.settings.bg_color_B }}; display:flex;">
+      <div class="form-img media769" style="width:{{ block.settings.img_Maxwidth }}%; display:inline-block;">
+      {% if block.settings.mobile_form_img %}
+      
+        
+        <picture>
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_form_img | img_url : 'master' }}"> 
+          <source media="(min-width: 769px)" srcset="{{ block.settings.Formimg | img_url : 'master' }}"> 
+          <img src="{{ block.settings.Formimg | img_url : 'master' }}" alt=""> 
+        </picture>
+      
+        {% else %}
+
+       <img src="{{ block.settings.Formimg | img_url:'master' }}">      
+             
+
+        {%endif%}
+      </div>
+      <div class="form-img media768" style="width:{{ block.settings.mobile_img_Maxwidth }}%;">
+      {% if block.settings.mobile_form_img %}
+      
+        
+        <picture>
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_form_img | img_url : 'master' }}"> 
+          <source media="(min-width: 769px)" srcset="{{ block.settings.Formimg | img_url : 'master' }}"> 
+          <img src="{{ block.settings.Formimg | img_url : 'master' }}" alt=""> 
+        </picture>
+      
+        {% else %}
+
+       <img src="{{ block.settings.Formimg | img_url:'master' }}">      
+             
+
+        {%endif%}
+      </div>
+      
+      {% if block.settings.form_code %}
+      
+        <div class="form-form media769" style="width:{{ block.settings.form_Maxwidth }}%; display:inline-block; ">
+          {{ block.settings.form_code }}
+          
+        </div>  
+        <div class="form-form media768" style="width:{{ block.settings.mobile_form_Maxwidth }}%;">
+          {{ block.settings.form_code }}
+          
+        </div> 
+
+        {%endif%}
+      
+    </div>
+    <div class="clearfix" style="clear:both;"></div>
+    {% endif %}
+    
+
+    
+    {% if block.settings.form_code_w %}
+<!-----------------------------------------------------------------------------------------   whole form     ------------------------------------------------------->
+    <div class="whole-form" style="background:{{ block.settings.bg_color_B }}">
+    {% if block.settings.FormTitle %}  
+    <h5><span>{{ block.settings.FormTitle }}</span></h5>
+      {% endif %}
+      <div class="whole-form-form">
+       {{ block.settings.form_code_w }} 
+      </div>  
+      
+    </div>
+    
+    {% endif %}
+    
+ <!-----------------------------------------------------------------------------------------   img-with-text     ------------------------------------------------------->   
+    
+    {% if block.settings.image_position_2 == 'img_left' %}
+    {% if block.settings.img != blank %}
+    <div class="img-with-text right-img" style="background:{{ block.settings.bg_color }}">
+      
+      <div class="img">
+        
+        {% if block.settings.mobile_img_IAT %}
+      
+        
+        <picture>
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_img_IAT | img_url : 'master' }}"> 
+          <source media="(min-width: 769px)" srcset="{{ block.settings.img | img_url : 'master' }}"> 
+          <img src="{{ block.settings.img | img_url : 'master' }}" alt=""> 
+        </picture>
+      
+        {% else %}
+
+       <img src="{{ block.settings.img | img_url:'master' }}">      
+             
+
+        {%endif%}
+
+        
+
+      </div>
+      <div class="cc mobile-hide">
+        <h3>{{ block.settings.heading }}</h3>
+        {%- if block.settings.show_color_line -%}
+         <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.para -%}
+        <p>
+          {{ block.settings.para }}
+        </p>
+        {%endif%}
+        
+        {%- if block.settings.detail_img -%}
+        <img src="{{ block.settings.detail_img | img_url:'master' }}" alt="detail-img" style="width:33%; margin:15px 0;">
+        {%endif%}
+      </div>
+      <div class="cc desktop-hide">
+        <h3>{{ block.settings.heading }}</h3>
+        {%- if block.settings.show_color_line -%}
+         <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.para -%}
+        <p>
+          {{ block.settings.para }}
+        </p>
+        {%endif%}
+        
+        {%- if block.settings.detail_img -%}
+        <img src="{{ block.settings.detail_img | img_url:'master' }}" alt="detail-img" style="width:33%; margin:15px 0;">
+        {%endif%}
+      </div>
+    </div>
+    {% endif %}
+    {% else %}
+    {% if block.settings.img != blank %}
+    <div class="img-with-text left-img" style="background:{{ block.settings.bg_color }}">
+      <div class="cc mobile-hide">
+        <h3>{{ block.settings.heading }}</h3>
+        {%- if block.settings.show_color_line -%}
+         <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.para -%}
+        <p>
+          {{ block.settings.para }}
+        </p>
+        {%endif%}
+        
+        {%- if block.settings.detail_img -%}
+        <img src="{{ block.settings.detail_img | img_url:'master' }}" alt="detail-img" style="width:33%; margin:15px 0;">
+        {%endif%}
+      </div>
+      
+      <div class="img">
+
+      {% if block.settings.mobile_img_IAT %}
+      
+        
+        <picture>
+          <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_img_IAT | img_url : 'master' }}"> 
+          <source media="(min-width: 769px)" srcset="{{ block.settings.img | img_url : 'master' }}"> 
+          <img src="{{ block.settings.img | img_url : 'master' }}" >
+        </picture>
+      
+        {% else %}
+
+       <img src="{{ block.settings.img | img_url:'master' }}">      
+             
+
+        {%endif%}
+
+      </div>
+      <div class="cc desktop-hide">
+        <div style="width:100%; height:100%;">
+        <h3>{{ block.settings.heading }}</h3>
+        {%- if block.settings.show_color_line -%}
+         <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/color-line.png?v=1617248925" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.show_color_line_blue -%}
+        <div class="color-line"><img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/20210414111638.jpg?v=1618370958" alt="color-line"></div>
+        {%endif%}
+        {%- if block.settings.para -%}
+        <p>
+          {{ block.settings.para }}
+        </p>
+        {%endif%}
+        
+        {%- if block.settings.detail_img -%}
+        <img src="{{ block.settings.detail_img | img_url:'master' }}" alt="detail-img" style="width:33%; margin:15px 0;">
+        {%endif%}
+        </div>  
+      </div>
+      
+
+    </div>
+    {% endif %}
+    {% endif %}
+
+
+    {% if block.settings.img_single != blank %}
+    <div class="single-full-image">
+      {% if block.settings.img_link %}
+       <a href="{{ block.settings.img_link }}" aria-expanded="false">
+<!--         <img src="{{ block.settings.img_single | img_url:'master' }}"> -->
+          
+           
+           <picture>
+               <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_img_single | img_url : 'master' }}"> 
+               <source media="(min-width: 769px)" srcset="{{ block.settings.img_single | img_url : 'master' }}"> 
+               <img src="{{ block.settings.img_single | img_url : 'master' }}" alt=""> 
+           </picture>
+           
+           
+
+      </a>
+      {% else %}
+     
+           
+           <picture>
+               <source media="(max-width: 768px)" srcset="{{ block.settings.mobile_img_single | img_url : 'master' }}"> 
+               <source media="(min-width: 769px)" srcset="{{ block.settings.img_single | img_url : 'master' }}"> 
+               <img src="{{ block.settings.img_single | img_url : 'master' }}" alt=""> 
+           </picture>
+           
+      {%endif%}
+    </div>
+    {% endif %}
+    {% if block.settings.img_1 %}
+    <div class="three-img-section" style="margin:30px 0px">
+      <div class="page-width">
+        <div class="grid grid-uniform">
+          <div class="grid__item medium-up--one-third text-center aos-init aos-animate">
+
+            <img src="{{ block.settings.img_1 | img_url:'large'  }}">
+            <h2>{{ block.settings.heading1 }}</h2>
+			{{ block.settings.content_1 }}
+          </div>
+          <div class="grid__item medium-up--one-third text-center aos-init aos-animate">
+
+            <img src="{{ block.settings.img_2 | img_url:'large'  }}">
+            <h2>{{ block.settings.heading2 }}</h2>
+			{{ block.settings.content_2 }}
+          </div>
+          <div class="grid__item medium-up--one-third text-center aos-init aos-animate">
+
+            <img src="{{ block.settings.img_3 | img_url:'large'  }}">
+            <h2>{{ block.settings.heading3 }}</h2>
+			{{ block.settings.content_3 }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+     
+
+      {%- if block.settings.vid contains 'youtu.be/' -%}
+      {%- assign video_id = block.settings.vid | split: '.be/' -%}
+      {%- assign video_id = video_id[1] | split: '&' | first -%}
+
+    <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&loop=1&playlist={{ video_id }}&mute=1" frameborder="0" allow="accelerometer; autoplay=1; encrypted-media; gyroscope; picture-in-picture" allowfullscreen allowtransparency='yes' allow="autoplay"></iframe>
+    </div>
+    {% endif %}
+    
+    
+        {%- if block.settings.video_url contains 'youtube.com/watch' -%}
+      {%- assign video_id2 = block.settings.video_url | split: 'v=' -%}
+      {%- assign video_id2 = video_id[1] | split: '&' | first -%}
+      <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&loop=1&playlist={{ video_id }}&mute=1" frameborder="0" allow="accelerometer; autoplay=1; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    {%- endif -%}
+    
+    
+
+
+    {% endfor %}
+  </div>
+
+
+
+</div>

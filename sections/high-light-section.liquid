@@ -1,0 +1,154 @@
+<section class="intro_icons_wrap">
+  <div class="intro_list" data-animate_images="true">
+    <div class="intro_item">
+      <div class="intro_icon">
+        <img data-src="https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/138_2x_87e8eed4-07b5-4172-8814-508b3177c64c.png?v=1622713714" alt="" class="lazyload">
+      </div>
+      <div class="intro_text">
+        <div class="intro_title ellipsis lazyload" data-animate_text="true">RGBICWW Technology</div>
+        <div class="intro_sub_title"></div>
+      </div>
+    </div>
+    <div class="intro_item">
+      <div class="intro_icon">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/136_2x_4e0d63d9-b69a-4a1c-ac4c-2661cdb0d3a0.png?v=1622713714" alt="" class="lazyload">
+      </div>
+      <div class="intro_text">
+        <div class="intro_title ellipsis lazyload" data-animate_text="true">Adjustable Color Temperature</div>
+        <div class="intro_sub_title"></div>
+      </div>
+    </div>
+    <div class="intro_item">
+      <div class="intro_icon">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/135_2x_04dbdc26-990d-4934-8b92-2e7d9bec6474.png?v=1622713714" alt="" class="lazyload">
+      </div>
+      <div class="intro_text">
+        <div class="intro_title ellipsis lazyload" data-animate_text="true">25 Scene Modes</div>
+        <div class="intro_sub_title"></div>
+      </div>
+    </div>
+    <div class="intro_item">
+      <div class="intro_icon">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/26_2x_d780f947-2950-4dd3-b152-49691dd2981b.png?v=1622713714" alt="" class="lazyload">
+      </div>
+      <div class="intro_text">
+        <div class="intro_title ellipsis lazyload" data-animate_text="true">Creative DIY Mode</div>
+        <div class="intro_sub_title"></div>
+      </div>
+    </div>
+    <div class="intro_item">
+      <div class="intro_icon">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/28_2x_769da751-eab6-40f4-b0fc-c80a3d2a7e1b.png?v=1622713714" alt="" class="lazyload">
+      </div>
+      <div class="intro_text">
+        <div class="intro_title ellipsis lazyload" data-animate_text="true">Audio Visualization Modes</div>
+        <div class="intro_sub_title"></div>
+      </div>
+    </div>
+    <div class="intro_item">
+      <div class="intro_icon">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/20_2x_952d20de-4487-48fa-af01-7033bedfbde2.png?v=1622713714" alt="" class="lazyload">
+      </div>
+      <div class="intro_text">
+        <div class="intro_title ellipsis lazyload" data-animate_text="true">Voice Control</div>
+        <div class="intro_sub_title"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<style>
+  @media screen and (max-width: 768px) {
+    .intro_icons_wrap {
+      background: #fff;
+    }
+    .intro_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 50px 20px 0;
+    }
+    .intro_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 46%;
+      height: 90px;
+      margin-bottom: 25px;
+    }
+    .intro_icon {
+      width: 40px;
+      margin-bottom: 10px;
+    }
+    .intro_title {
+      font-size: 12px;
+      color: #707070;
+      text-align: center;
+    }
+  }
+
+  @media screen and (min-width: 769px) {
+    .intro_icons_wrap {
+      background: #fff;
+    }
+    .intro_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 6vw 24vw 2vw;
+    }
+    .intro_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 32%;
+      height: 9vw;
+      margin-bottom: 5vw;
+    }
+    .intro_icon {
+      width: 4vw;
+      margin-bottom: 1vw;
+    }
+    .intro_title {
+      font-size: 1.3vw;
+      color: #707070;
+      text-align: center;
+    }
+  }
+</style>
+
+{% schema %}
+  {
+    "name": "High Light Block",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "high_light_icon",
+        "name": "High Light Block",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "high_light_icon",
+            "label": "Upload High Light Image"
+          },
+          {
+            "type": "image_picker",
+            "id": "high_light_icon_mobile",
+            "label": "Upload High Light Image for Mobile"
+          },
+          {
+            "type": "text",
+            "id": "high_light_title",
+            "label": "Input High Light Title"
+          },
+          {
+            "type": "text",
+            "id": "high_light_sub_title",
+            "label": "Input High Light Sub Title"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

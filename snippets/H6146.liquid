@@ -1,0 +1,735 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% render 'additional-custom-content' %}
+
+
+<div id="H6146">
+  <div class="mobile-hide ipad-show">
+    <section class="video_iframe">
+      <video
+      width="100%"
+      height="750"
+      src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/6146-48s.mp4?v=1617958813"
+      loop muted playsinline autoplay controls></video>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1.jpg?v=1617678521" alt="banner_1">
+      <div class="view_wrap">
+        <div class="view_wrap_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/7362.png?v=1617682331" alt="">
+        </div>
+        <div class="view_wrap_text">
+          <div class="title">
+            Strip Lights
+          </div>
+          <div class="sub_title">
+            Unlike traditional RGB strip lights, Govee RGBIC strip lights display multiple colors simultaneously, all on one strip. With more colorful lighting and creative freedom, you can showcase your life with unique style.
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="space_wrap">
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/769.png?v=1617678521" alt="">
+        </div>
+        <div>Segmented Color Control</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/770.png?v=1617678521" alt="">
+        </div>
+        <div>4 Music Modes</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/771.png?v=1617678521" alt="">
+        </div>
+        <div>RGBIC Technology</div>
+      </div>
+      <div class="space_item">
+        <div class="space_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/772.png?v=1617678521" alt="">
+        </div>
+        <div>Smart App Control</div>
+      </div>
+    </section>
+    <section class="scenes_wrap H6146">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/2_80107123-9e36-4050-bddd-0b8cb9f4cba7.jpg?v=1617766891" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">More Colors.<br >Better Control</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">Tired of the same dull routine? Energize your home with stunning vibrance! Customize your light segments to display 15 different colors in the Govee Home app. Over 16 million colors to create the ideal ambiance for you house parties or romantic dinners.</div>
+          </div>
+        </section>
+      </div>
+      <div class="scenes_item">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">Light Up Your Music</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">With an ultrasensitive mic you can sync any music to your RGBIC strip lights. 4 different music modes: Energetic, Rhythm, Rolling, and Spectrum, are suitable for any occasion. Liven up parties with Dynamic mode or enjoy relaxing music with soft colors from Mild mode.</div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/3_839f579d-5701-4fca-b749-ee05b3e8c949.jpg?v=1617766891" alt="">
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/4_b7468586-0019-4095-b50e-480ae32b96f3.jpg?v=1617766891" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">RGBIC Technology</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">Our RGBIC strip lights are equipped with over 50 IC (independent control) chips, a major upgrade from one chip controlling RGB strip lights. Witness vivid rainbow-like colors constantly flowing. Reinvent your indoor decor with lighting effects that are sure to impress.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+    <section class="slider_title page_text_important">One App for All</section>
+    <section class="slider hero" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
+      <div class="slider_item">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_76ddeb2a-7d23-418f-8870-6fe976d3cd50.jpg?v=1617678521" />
+      </div>
+      <div class="slider_item slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_4e94b386-65b6-4187-8141-e6031b429e33.jpg?v=1617678521" />
+      </div>
+      <div class="slider_item slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_6b0e36e7-0b4c-4af4-8dd7-5669bac96e7e.jpg?v=1617678521" />
+      </div>
+    </section>
+    <section class="slider_handle">
+      <div class="handle_item active" data-index="0">
+        <div class="title">DIY Mode</div>
+        <div class="sub_title">
+          Have a specific look in mind? Then you’ll love our DIY mode. With over 16 million colors and 9 lighting styles, you can customize colors to display dynamically.
+        </div>
+      </div>
+      <div class="handle_item" data-index="1">
+        <div class="title">Multiple Scenes</div>
+        <div class="sub_title">
+          Enjoy 12 scene modes for various occasions, adding vibrance and color to your favorite indoor activities.
+        </div>
+      </div>
+      <div class="handle_item" data-index="2">
+        <div class="title">Color Recognition</div>
+        <div class="sub_title">
+          Upload your favorite photos to Govee Home, and the app will identify the colors and apply them to your strip light, allowing you to bring the outdoors inside.
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div class="mobile-show ipad-hide">
+    <section class="video_iframe">
+      <video
+      width="100%"
+      height="375"
+      src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/6146-48s.mp4?v=1617958813"
+      loop muted playsinline autoplay controls></video>
+      
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_0398d03f-c37f-4e18-9104-73cc38c7f8d9.jpg?v=1617694818" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">RGBIC Strip</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Unlike traditional RGB strip lights, Govee RGBIC strip lights display multiple colors simultaneously, all on one strip. With more colorful lighting and creative freedom, you can showcase your life with unique style.</div>
+    </section>
+    <section class="mobile_space">
+      <section class="space_wrap">
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/769.png?v=1617678521" alt="">
+          </div>
+          <div class="sub_title">Segmented Color <br> Control</div>
+        </div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/770.png?v=1617678521" alt="">
+          </div>
+          <div class="sub_title">4 Music Modes</div>
+        </div>
+      </section>
+      <section class="space_wrap">
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/771.png?v=1617678521" alt="">
+          </div>
+          <div class="sub_title">RGBIC Technology</div>
+        </div>
+        <div class="space_item">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/772.png?v=1617678521" alt="">
+          </div>
+          <div class="sub_title">Smart App Control</div>
+        </div>
+      </section>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_b14aad75-bf3c-45be-8a7e-660aaee2bc95.jpg?v=1617694818" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">More Colors.<br >Better Control</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important" >Tired of the same dull routine? Energize your home with stunning vibrance! Customize your light segments to display 15 different colors in the Govee Home app. Over 16 million colors to create the ideal ambiance for you house parties or romantic dinners.</div>
+    </section>
+    <section class="banner_wrap banner_3">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_f9d8c373-aab1-4a10-bc68-882492107ed5.jpg?v=1617694818" alt="banner_3">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">Light Up Your Music</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">With an ultrasensitive mic you can sync any music to your RGBIC strip lights. 4 different music modes: Energetic, Rhythm, Rolling, and Spectrum, are suitable for any occasion. Liven up parties with Dynamic mode or enjoy relaxing music with soft colors from Mild mode.</div>
+    </section>
+    <section class="banner_wrap banner_4">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_2119e9fd-4446-4b3f-b61b-d4620899617b.jpg?v=1617694818" alt="banner_4">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">RGBIC Technology</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Our RGBIC strip lights are equipped with over 50 IC (independent control) chips, a major upgrade from one chip controlling RGB strip lights. Witness vivid rainbow-like colors constantly flowing. Reinvent your indoor decor with lighting effects that are sure to impress.</div>
+    </section>
+    <section class="slider_title page_text_important">One App for All</section>
+    <section class="slider hero" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
+      <div class="slider_item">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_8ee30853-7338-4ab3-885c-7f8138e7aee3.jpg?v=1617694818" />
+      </div>
+      <div class="slider_item slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_859d2c16-1f56-4cac-9db3-b33520011de8.jpg?v=1617694818" />
+      </div>
+      <div class="slider_item slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_57975886-01cb-48df-a4d4-47dd08d52a38.jpg?v=1617694818" />
+      </div>
+    </section>
+    <section class="slider_bar_wrap">
+      <div class="slider_bar active" data-index="0"></div>
+      <div class="slider_bar" data-index="1"></div>
+      <div class="slider_bar" data-index="2"></div>
+    </section>
+    <section class="slider_handle">
+      <div class="handle_item active" data-index="0">
+        <div class="title">Data Storage & Export</div>
+        <div class="sub_title">
+          Have a specific look in mind? Then you’ll love our DIY mode. With over 16 million colors and 9 lighting styles, you can customize colors to display dynamically.
+        </div>
+      </div>
+      <div class="handle_item" data-index="1">
+        <div class="title">Multiple Scenes</div>
+        <div class="sub_title">
+          Enjoy 12 scene modes for various occasions, adding vibrance and color to your favorite indoor activities.
+        </div>
+      </div>
+      <div class="handle_item" data-index="2">
+        <div class="title">Color Recognition</div>
+        <div class="sub_title">
+          Upload your favorite photos to Govee Home, and the app will identify the colors and apply them to your strip light, allowing you to bring the outdoors inside.
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+{% render 'product-page-style' %}
+
+
+<style>
+
+  .mobile-show .hero .slick-arrow {
+    display: block !important;;
+    color: #fff;
+  }
+  .view_wrap {
+    position: absolute;
+    right: 10%;
+    top: 24%;
+    width: 30%;
+    padding: 20px;
+    background: rgba(0,0,0,.3);
+  }
+  .view_wrap_img {
+    width: 120px;
+  }
+  .view_wrap_text .title {
+    font-weight: bold;
+    font-size: 40px;
+    font-style: italic;
+  }
+  .view_wrap_text .sub_title {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .scenes_wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  .scenes_wrap .scenes_item {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .scenes_wrap .scenes_item:last-child {
+    margin-right: 0;
+  }
+  .scenes_wrap.H6146 {
+    display: block;
+  }
+  .space_wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 20px 120px 0;
+  }
+  .space_item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .space_item_img {
+    width: 120px;
+  }
+  .scenes_wrap .scenes_item {
+    display: flex;
+    align-items: center;
+  }
+  .scenes_item .scenes_item_img {
+    flex: 1;
+  }
+  .scenes_item .scenes_item_img img {
+    display: block;
+  }
+  .scenes_item_desc {
+    text-align: left;
+    padding: 30px 40px;
+    flex: 1;
+  }
+  .scenes_item_desc .title {
+    font-weight: bold;
+    font-size: 26px;
+  }
+  .scenes_item_desc .sub_title {
+    font-size: 16px;
+  }
+
+  .slider_title {
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px 0;
+  }
+  .slider_handle {
+    display: flex;
+    justify-content: center;
+    padding: 30px 200px 0;
+  }
+  .handle_item {
+    margin-right: 40px;
+    flex: 1;
+    border-top: 2px solid #fff;
+    padding-top: 16px;
+  }
+  .handle_item:hover {
+    cursor: pointer;
+  }
+  .handle_item.active {
+    border-image: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff) 30 30;
+  }
+  .handle_item .title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .handle_item .sub_title {
+    font-size: 12px;
+    color: #afafaf;
+  }
+  .handle_item.active .title {
+    color: #00ace7;
+  }
+  .handle_item.active .sub_title {
+    color: #fff;
+  }
+
+
+  .mobile_space {
+    margin-bottom: 40px;
+  }
+  .mobile-show  .space_wrap {
+    padding: 10px 0;
+    align-items: flex-start;
+  }
+  .mobile-show .space_item .sub_title {
+    font-size: 12px;
+    text-align: center;
+  }
+  .mobile-show .space_item_img {
+    width: 60px;
+  }
+  .mobile-show .slider_title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+  }
+  .mobile-show .slider_handle {
+    display: block;
+    padding: 0 10px;
+  }
+  .mobile-show .handle_item.active {
+    display: block;
+  }
+  .mobile-show .handle_item {
+    display: none;
+    border: none;
+    margin: 0;
+  }
+  .mobile-show .slider_bar_wrap {
+    padding: 0 10px;
+
+  }
+  .mobile-show .slider_bar {
+    width: 30%;
+    height: 2px;
+    border-top: 2px solid #fff;
+    display: inline-block;
+  }
+  .mobile-show .slider_bar.active {
+    border-image: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff) 30 0;
+  }
+
+
+</style>

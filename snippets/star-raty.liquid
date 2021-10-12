@@ -1,0 +1,99 @@
+{% liquid 
+   assign stars_number = stars_number | divided_by : 1.0
+   assign stars_reviews = show_reviews | default: true
+%}
+
+<div class="author_star">
+    {% style %}
+        .no_stars {
+          {% if stars_color %}
+            color: {{ stars_color }};
+          {% else %}
+            color: #fac114;
+          {% endif %}
+        }
+    {% endstyle %}
+  {% if stars_number >= 0 and stars_number < 0.5 %}
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 0.5 and stars_number < 1 %}
+  <span class="iconfont1 icon-star-half no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  {% endif %} {%if stars_number >= 1 and stars_number < 1.5 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  {% endif %} {%if stars_number >= 1.5 and stars_number < 2 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-half no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 2 and stars_number < 2.5 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 2.5 and stars_number < 3 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-half no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 3 and stars_number < 3.5 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 3.5 and stars_number < 4 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-half no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 4 and stars_number < 4.5 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star no_stars mr"></span>
+
+  {% endif %} {%if stars_number >= 4.5 and stars_number < 5 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-half no_stars mr"></span>
+
+  {% endif %} {%if stars_number == 5 %}
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  <span class="iconfont1 icon-star-full no_stars mr"></span>
+  {% endif %}
+
+  <span class="iconfont1" style="margin-left: 4px;">
+    {% if show_reviews %}
+    {{ stars_number }}
+    ({{ stars_reviews | append: ' Reviews'}})
+    {% endif %}
+  </span>
+
+</div>

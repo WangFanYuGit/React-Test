@@ -1,0 +1,689 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+  <video 
+      id="{{ section_id }}_video"
+      style="object-fit: fill;width: 100%;" 
+      x5-video-player-type="h5"
+      webkit-playsinline 
+      playsinline
+      proload="metadata"
+      type="webm" 
+      autoplay 
+      controls
+      loop
+      muted
+      src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/SBV.mp4?v=1613959385"
+    >
+    </video>
+</div>
+{% render 'additional-custom-content' %}
+{% render 'product-page-style' %}
+<div id="H6199">
+  <div class="mobile-hide ipad-show">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/1_91c4b769-b8a4-48eb-94b4-427d55f99460.jpg?v=1618309295" alt="banner_1">
+      <div class="banner_text">
+        <div class="title">Your Ultimate Gaming Experience </div>
+      </div>
+    </section>
+    <section class="middle_wrap">
+      <div class="title">ColorSense Technology</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Our ColorSense camera intelligently recognizes and captures the colors on your TV screen and applies then to your backlights automatically. Extend your playing universe beyond the four corners of your TV screen. </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/3_28a94828-0740-4f92-96ad-83d6dc7de076.jpg?v=1618309295" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Your Voice Has Power</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Enjoy hands-free control? We’ve got you covered. Use Siri, Alexa, or Google Assistant to power your lights on/off, change their colors, or increase/lower the brightness to your desired level. With simple voice commands, you’ll save time while setting the mood you want.</div>
+    </section>
+    <section class="scenes_wrap">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/4_247063f7-129f-4b60-baba-a9c4c8e1af65.jpg?v=1618309295" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title">Light Up Your Music</div>
+            <div class="color_bar"></div>
+            <div class="sub_title">It’s time you fully immerse in your favorite songs. Sync the dynamic sounds of that live concert or karaoke night with vivid colors, greatly enhancing your musical experience.</div>
+          </div>
+        </section>
+      </div>
+      <div class="scenes_item">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title">Every Side Covered</div>
+            <div class="color_bar"></div>
+            <div class="sub_title">Govee Immersion TV backlights are perfect for most 55-56inch flatscreens Reinvent how you binge-watch your favorite Netflix shows with dynamic colors emitting from every corner of your TV.</div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/5_add547ea-3011-4627-b225-385bf5f44472.jpg?v=1618309295" alt="">
+        </div>
+      </div>
+    </section>
+    <section class="scenes_wrap H6199">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/6_22ef9763-1aae-4c69-b405-76bf8e3161e0.jpg?v=1618309295" alt="">
+        </div>
+        <div class="scenes_item_desc">
+          <div class="title">12 Scene Modes</div>
+          <div class="sub_title">Create your epic gaming or casual movie night ambiance with 12 dynamic scene modes to choose from. </div>
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/7_170ef403-85e9-427b-afc6-4bc85162999a.jpg?v=1618309295" alt="">
+        </div>
+        <div class="scenes_item_desc">
+          <div class="title">Segmented Color</div>
+          <div class="sub_title">For those who want more color, you'll love our segmented color control feature, made possible by our RGBIC technology. Personalize every segment on a single strip light for a more vibrant viewing experience. </div>
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/8_fcb841eb-f7d9-4b4f-bbfd-273e536c9fc8.jpg?v=1618309295" alt="">
+        </div>
+        <div class="scenes_item_desc">
+          <div class="title">Smart APP Control</div>
+          <div class="sub_title">Use the Govee Home app to power your lights on/off or select light modes from anywhere with a Wi-Fi connection.</div>
+        </div>
+      </div>
+    </section>
+    <section class="specification_wrap">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item col-1-2">
+            <div class="top">70cm(left/right)+120cm(top/bottom)</div>
+            <div class="bottom">Length</div>
+        </div>
+          <div class="spacification_td_item col-1-4">
+            <div class="top">55-65in</div>
+            <div class="bottom">Suitable TV Size</div>
+          </div>
+          <div class="spacification_td_item col-1-4">
+            <div class="top">1080p</div>
+            <div class="bottom">Camera Resolution</div>
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item col-1-2">
+            <div class="top">Daily-life Water Resistance</div>
+            <div class="bottom">Water Resistant</div>
+          </div>
+          <div class="spacification_td_item col-1-4">
+            <div class="top">DC 12V</div>
+            <div class="bottom">Working Voltage</div>
+          </div>
+          <div class="spacification_td_item col-1-4">
+            <div class="top">12V 2A</div>
+            <div class="bottom">Power Output</div>
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item col-1-1">
+            <div class="top">Voice Control(Siri/Alexa/Google Assistant)+App+Control Box</div>
+            <div class="bottom">Control-Methods</div>
+          </div>
+        </div>
+      </div>
+      <div class="product_img col-1-3">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/cec4c8e35a07b695b6eb340d263bc10c.png?v=1618309295" alt="">
+      </div>
+    </section>
+  </div>
+
+  <div class="mobile-show ipad-hide">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/b1.jpg?v=1618315282" alt="banner_1">
+      <div class="banner_text">
+        <div class="title">Your Ultimate Gaming Experience </div>
+      </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/2_7a821b99-e639-4fd6-9f7d-5aeb224e92f2.jpg?v=1618315282" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">ColorSense Technology</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Our ColorSense camera intelligently recognizes and captures the colors on your TV screen and applies then to your backlights automatically. Extend your playing universe beyond the four corners of your TV screen. </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/5_25a62abb-0984-4642-a0df-4f06132d1129.jpg?v=1618315282" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Your Voice Has Power</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Enjoy hands-free control? We’ve got you covered. Use Siri, Alexa, or Google Assistant to power your lights on/off, change their colors, or increase/lower the brightness to your desired level. With simple voice commands, you’ll save time while setting the mood you want.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/4_aeb8a00f-8c3a-4e36-8a6a-f833883e9d6f.jpg?v=1618192495" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Light Up Your Music</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">It’s time you fully immerse in your favorite songs. Sync the dynamic sounds of that live concert or karaoke night with vivid colors, greatly enhancing your musical experience.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/5_9a736467-3a8c-4364-8b95-829c12398af1.jpg?v=1618193171" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Every Side Covered</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Govee Immersion TV backlights are perfect for most 55-56inch flatscreens Reinvent how you binge-watch your favorite Netflix shows with dynamic colors emitting from every corner of your TV.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/8_b5455428-a5d8-467a-98e4-c8998f2841fa_large.jpg?v=1607739195" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">12 Scene Modes</div>
+      <div class="sub_title">Create your epic gaming or casual movie night ambiance with 12 dynamic scene modes to choose from. </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/7_73ea1f62-9580-4b30-bf59-c8df4cae1802_large.jpg?v=1608718632" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Segmented Color</div>
+      <div class="sub_title">For those who want more color, you'll love our segmented color control feature, made possible by our RGBIC technology. Personalize every segment on a single strip light for a more vibrant viewing experience. </div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/8_333e95ef-556b-441b-85c4-3c8e7c93fc9d_large.jpg?v=1608718636" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Smart APP Control</div>
+      <div class="sub_title">Use the Govee Home app to power your lights on/off or select light modes from anywhere with a Wi-Fi connection.</div>
+    </section>
+    <section class="banner_wrap banner_1" style="padding: 0 100px;">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/cec4c8e35a07b695b6eb340d263bc10c.png?v=1618196837" alt="banner_1">
+    </section>
+
+    <section class="specification_wrap">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">70cm(left/right)+120cm(top/bottom)</div>
+          <div class="spacification_td_item">Length</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Suitable TV Size</div>
+          <div class="spacification_td_item">55-56in</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Camera Resolution</div>
+          <div class="spacification_td_item">1080p</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Water Resistant</div>
+          <div class="spacification_td_item">Daily-life Water Resistance</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Working Voltage</div>
+          <div class="spacification_td_item">DC 12V</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Power Output</div>
+          <div class="spacification_td_item">12V 2A</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Control Methods</div>
+          <div class="spacification_td_item">Voice Control(Siri/Alexa/Google Assistant)+App+control Box</div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+</div>
+<style>
+  .H6199.scenes_wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  .H6199.scenes_wrap .scenes_item {
+    margin-right: 30px;
+    display: block;
+    width: 30%;
+  }
+  .H6199.scenes_wrap .scenes_item:last-child {
+    margin-right: 0;
+  }
+  .H6199 .scenes_item .scenes_item_img img {
+    display: block;
+  }
+  .H6199 .scenes_item_desc {
+    text-align: center;
+    padding: 30px 40px;
+  }
+  .H6199 .scenes_item_desc .title {
+    font-weight: bold;
+    font-size: 1.625vw;
+  }
+  .H6199 .scenes_item_desc .sub_title {
+    font-size: 1vw;
+  }
+
+  .specification_wrap {
+    padding: 0 4vw;
+  }
+  .specification_table_td.title .spacification_td_item {
+    font-size: 3vw;
+    line-height: 3vw;
+  }
+  .specification_table_td > .spacification_td_item:first-child {
+    font-weight: normal;
+  }
+  .specification_wrap .product_img.col-1-3 {
+    width: 33%;
+    height: auto;
+  }
+  .specification_wrap .product_img img {
+    height: auto;
+  }
+  .specification_table_td {
+    border-bottom: 0;
+    border-bottom: 1px solid #ccc;
+  }
+  .spacification_td_item.col-1-2{
+    width: 50%;
+  }
+  .spacification_td_item.col-1-4{
+    width: 25%;
+  }
+  .spacification_td_item.col-1-1{
+    width: 100%;
+  }
+  .spacification_td_item .top {
+    font-size: 1.4vw;
+    line-height: 1.6vw;
+  }
+  .spacification_td_item .bottom {
+    font-size: .9vw;
+    line-height: .9vw;
+  }
+
+  .mobile-show .banner_wrap {
+    margin-bottom: 0;
+  }
+  .mobile-show .banner_text {
+    bottom: auto;
+    top: 10vw;
+    left: 0;
+    transform: none;
+    width: 100vw;
+    text-align: center;
+  }
+  .mobile-show .banner_text .title {
+    font-size: 28px;
+    line-height: 30px;
+  }
+  .mobile-show .middle_wrap .sub_title {
+    font-size: 12px;
+    line-height: normal;
+  }
+  .mobile-show .color_bar {
+    margin: 6px auto;
+  }
+  .mobile-show .specification_wrap {
+    padding-bottom: 40px;
+  }
+  .mobile-show .specification_table {
+    padding: 0 10px;
+  }
+  .mobile-show .specification_table_td.title .spacification_td_item {
+    font-size: 24px;
+    line-height: 24px;
+    margin-left: 0;
+  }
+  .mobile-show .spacification_td_item {
+    width: fit-content;
+    word-break: break-word;
+  }
+  .mobile-show .spacification_td_item:last-child {
+    width: fit-content;
+    text-align: right;
+    margin-left: 20px;
+  }
+  .mobile-show .spacification_td_item .top {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .mobile-show .spacification_td_item .bottom {
+    font-size: 12px;
+    line-height: 18px;
+  }
+</style>
+
+<script>
+  console.log(` {{ current_variant.taxable }} `)
+</script>

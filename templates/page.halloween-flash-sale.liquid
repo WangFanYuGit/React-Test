@@ -1,0 +1,686 @@
+<div class="page_wrap">
+  <div class="banner" data-animate_image="true">
+    <img data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/PC_2880-1440.jpg?v=1633681700" alt="" class="mobile-hide lazyload">
+    <img data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/banner_08ff75ce-926e-421d-859e-6221b48780bf.jpg?v=1633681699" alt="" class="mobile-show lazyload">
+  </div>
+
+  {% section 'halloween-seckill' %}
+
+  <div class="lights_background">
+    <div class="page-width">
+      <div class="header_img">
+        <div class="header_img_mark">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/10d36daf750d3b1732c5aa264a24c3eb.png?v=1632917559" alt="" class="lazyload">
+        </div>
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cbc9a9dba03ba19db452dc43ba13993b_0b3de74d-0c0f-402e-946b-60f75e3f8374.png?v=1632817910" alt="" class="lazyload">
+        <div class="header_text bold">UP TO 30% OFF {{ header }}</div>
+      </div>
+      {% section 'halloween-indoor-lights' %}
+      {% section 'halloween-outdoor-lights' %}
+      {% section 'halloween-car-lights' %}
+    </div>
+  </div>
+
+  <div class="student_exclusive_background">
+    {% section 'halloween-winner-list' %}
+  </div>
+</div>
+<style>
+  img {
+    display: block;
+    width: 100%;
+  }
+  .page_text {
+    font-family: 'Avenir LT Std';
+  }
+  .page_wrap [data-animate_images=true] .lazyload {
+    opacity:0
+  }
+  .page_wrap [data-animate_images=true] .lazyloaded {
+    opacity:1;
+    animation:0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+    animation-name:zoom-fade-small;
+    transition:none;
+  }
+  .page_wrap [data-animate_text=true] {
+    opacity: 0;
+  }
+  .page_wrap .lazyloaded [data-animate_text=true]{
+    opacity: 1;
+    animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+    animation-name: fade-in;
+  }
+  .page_wrap .page-width {
+    max-width: 1200px;
+  }
+
+  .ellipsis {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .flex_between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .product_shop_now {
+    background: linear-gradient(90deg, #FF7390, #A876FC, #00DDF3);
+    color: #fff;
+    display: inline-block;
+    text-align: center;
+  }
+  .sale_end {
+    background: #E0E0E0;
+    color: #888;
+    display: inline-block;
+    text-align: center;
+  }
+  .sale {
+    color:#FF4E25;
+  }
+  .sale_not_start {
+    opacity: .6;
+  }
+  .virtual {
+    color: #a8a8a8;
+    text-decoration: line-through;
+  }
+  .bold {
+    font-weight: bold;
+  }
+  a:hover {
+    color: #fff;
+  }
+  .halloween-sekill {
+    background: #151751;
+  }
+  .lights_background {
+    background: #34226E;
+    padding: 6vw 0;
+  }
+  .student_exclusive_background {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/f31bc95f51806971e4342216d62d9f03.jpg?v=1632829546') no-repeat;
+    background-size: cover;
+  }
+  .jdgm-prev-badge__text {
+    color: #070707;
+    opacity: .7;
+  }
+  .header_img_mark {
+    position: absolute;
+    right: -12%;
+    top: -40%;
+  }
+  .winner_list_mark {
+    position: absolute;
+    right: 0;
+    top: -100px;
+  }
+  .winner_list_bg {
+    position: relative;
+  }
+  .sub_header_text {
+    color: #fff;
+    text-align: center;
+  }
+
+  @media screen and (min-width: 768px) and (max-width: 1920px){
+    .banner {
+      min-height: 45vw;
+      display: block;
+    }
+    .header_img {
+      width: 35vw;
+      margin: 0 auto;
+      position: relative;
+    }
+    .header_text {
+      font-size: 2.4vw;
+      color: #fff;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+    }
+    .header_img_mark {
+      width: 10vw;
+    }
+    .sub_header_img,
+    .sub_header_text {
+      padding: 4vw 0 2vw;
+    }
+    .product_list_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .product_wrap:not(:last-child) {
+      margin: 0 1.2vw 1.2vw 0;
+    }
+    .main_product {
+      width: calc(50% - 1.2vw);
+    }
+    .foot_product {
+      width: calc(25% - 1.2vw);
+    }
+    .main_product .product_info,
+    .foot_product .product_info {
+      background: #fff;
+      padding: 1.5vw;
+    }
+    .foot_product .product_info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5vw .5vw;
+    }
+    .main_product .product_title {
+      color: #323C47;
+      font-size: 1.3vw;
+      line-height: 1.6vw;
+      height: 3.4vw;
+    }
+    .foot_product .product_title {
+      color: #323C47;
+      font-size: 1vw;
+      line-height: 1.3vw;
+      height: 2.6vw;
+      text-align: center;
+    }
+    .main_product .product_price.sale {
+      color: #FF6825;
+      font-size: 1.6vw;
+      line-height: 1.8vw;
+    }
+    .foot_product .product_price.sale {
+      color: #FF6825;
+      font-size: 1.3vw;
+      line-height: 1.6vw;
+    }
+    .main_product .product_button,
+    .foot_product .product_button {
+      width: 8.6vw;
+      line-height: 2vw;
+      border-radius: 2vw;
+      font-size: .8vw;
+    }
+    .product_img {
+      position: relative;
+    }
+    .discount_wrap {
+      position: absolute;
+      width: 3.2vw;
+      right: 5%;
+      top: 0;
+    }
+    .discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.1vw;
+      line-height: 1.2vw;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+    }
+    .foot_product .discount_wrap {
+      width: 2.5vw;
+    }
+    .foot_product .discount_text {
+      font-size: .8vw;
+      line-height: 1.1vw;
+    }
+    .winner_list_wrap {
+      /* 暂时固定高度 */
+      border-bottom: 1px dotted rgba(255, 255, 255, .26);
+    }
+    .student_discount_wrap {
+      padding: 5vw 0;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .student_discount_title {
+      font-size: 2.7vw;
+      line-height: 3vw;
+      color: #fff;
+    }
+    .student_discount_sub_title {
+      font-size: 1.4vw;
+      line-height: 1.7vw;
+      color: rgba(255, 255, 255, .6);
+      padding: 1.8vw 0;
+    }
+    .view_more_products {
+      margin: 1vw auto 0;
+      display: block;
+    }
+    .view_more_products,
+    .student_discount_button {
+      width: 33vw;
+      line-height: 4vw;
+      border-radius: 2vw;
+    }
+    .winner_table {
+      position: absolute;
+      left: 6.3vw;
+      top: 3.4vw;
+      width: calc(100% - 12.6vw);
+    }
+    .winner_table span {
+      flex: 1;
+      display: block;
+      padding-bottom: 1.1vw;
+    }
+    .winner_table_header {
+      font-size: 1.3vw;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+    .winner_table_list {
+      font-size: .9vw;
+      padding-top: 1vw;
+    }
+
+    .jdgm-prev-badge {
+      padding: .8vw 0 0 0;
+    }
+
+  }
+  @media screen and (min-width: 1921px){
+    .header_img {
+      width: 700px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .header_text {
+      font-size: 48px;
+      color: #fff;
+
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+    }
+    .header_img_mark {
+      width: 200px;
+    }
+    .sub_header_img,
+    .sub_header_text {
+      padding: 80px 0 40px;
+    }
+    .product_list_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .product_wrap:not(:last-child) {
+      margin: 0 24px 24px 0;
+    }
+    .main_product {
+      width: calc(50% - 24px);
+    }
+    .foot_product {
+      width: calc(25% - 24px);
+    }
+    .main_product .product_info,
+    .foot_product .product_info {
+      background: #fff;
+      padding: 30px;
+    }
+    .foot_product .product_info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 15px;
+    }
+    .main_product .product_title {
+      color: #323C47;
+      font-size: 26px;
+      line-height: 32px;
+      height: 68px;
+    }
+    .foot_product .product_title {
+      color: #323C47;
+      font-size: 20px;
+      line-height: 26px;
+      height: 52px;
+      text-align: center;
+    }
+    .main_product .product_price.sale {
+      color: #FF6825;
+      font-size: 32px;
+      line-height: 36px;
+    }
+    .foot_product .product_price.sale {
+      color: #FF6825;
+      font-size: 26px;
+      line-height: 32px;
+    }
+    .main_product .product_button,
+    .foot_product .product_button {
+      width: 172px;
+      line-height: 40px;
+      border-radius: 40px;
+    }
+    .product_img {
+      position: relative;
+    }
+    .discount_wrap {
+      position: absolute;
+      width: 64px;
+      right: 5%;
+      top: 0;
+    }
+    .discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 22px;
+      line-height: 24px;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+    }
+    .foot_product .discount_wrap {
+      width: 50px;
+    }
+    .foot_product .discount_text {
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .winner_list_wrap {
+      border-bottom: 1px dotted rgba(255, 255, 255, .26);
+    }
+    .student_discount_wrap {
+      padding: 100px 0;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .student_discount_title {
+      font-size: 54px;
+      line-height: 60px;
+      color: #fff;
+    }
+    .student_discount_sub_title {
+      font-size: 24px;
+      line-height: 34px;
+      color: rgba(255, 255, 255, .6);
+      padding: 36px 0;
+    }
+    .view_more_products {
+      margin: 20px auto 0;
+      display: block;
+    }
+    .view_more_products,
+    .student_discount_button {
+      width: 660px;
+      line-height: 80px;
+      border-radius: 40px;
+    }
+    .jdgm-prev-badge {
+      padding: 10px 0 0 0;
+    }
+    .winner_table {
+      position: absolute;
+      left: 126px;
+      top: 68px;
+      width: calc(100% - 252px);
+    }
+    .winner_table span {
+      flex: 1;
+      display: block;
+      padding-bottom: 22px;
+    }
+    .winner_table_header {
+      font-size: 26px;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+    .winner_table_list {
+      font-size: 18px;
+      padding-top: 20px;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .banner {
+      min-height: 100px;
+      display: block;
+    }
+    .header_img {
+      width: 300px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .header_img_mark {
+      width: 80px;
+    }
+    .header_text {
+      font-size: 17px;
+      color: #fff;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      text-align: center;
+    }
+    .sub_header_img,
+    .sub_header_text {
+      padding: 18px 0 11px;
+    }
+    .product_list_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .main_product.product_wrap:not(:last-child),
+    .foot_product.product_wrap:not(:last-child) {
+      margin: 0 0 10px 0;
+    }
+    .foot_product.product_wrap:nth-child(2n + 1) {
+      margin-right: 10px;
+    }
+    .main_product {
+      width: 100%;
+    }
+    .foot_product {
+      width: calc(50% - 5px);
+    }
+    .main_product .product_info,
+    .foot_product .product_info {
+      background: #fff;
+      padding: 13px;
+    }
+    .foot_product .product_info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 13px 18px;
+    }
+    .main_product .product_title {
+      color: #323C47;
+      font-size: 14px;
+      line-height: 14px;
+      height: 32px;
+    }
+    .foot_product .product_title {
+      color: #323C47;
+      font-size: 14px;
+      line-height: 16px;
+      height: 32px;
+      text-align: center;
+    }
+    .main_product .product_price.sale {
+      color: #FF6825;
+      font-size: 16px;
+      line-height: 18px;
+    }
+    .foot_product .product_price.sale {
+      color: #FF6825;
+      font-size: 16px;
+      line-height: 17px;
+    }
+    .main_product .product_button,
+    .foot_product .product_button {
+      width: 94px;
+      line-height: 22px;
+      border-radius: 11px;
+      font-size: 13px;
+    }
+    .product_img {
+      position: relative;
+    }
+    .discount_wrap {
+      position: absolute;
+      width: 38px;
+      right: 5%;
+      top: 0;
+    }
+    .discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 13px;
+      line-height: 14px;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+    }
+    .foot_product .discount_wrap {
+      width: 30px;
+    }
+    .foot_product .discount_text {
+      font-size: 12px;
+      line-height: 13px;
+    }
+    .winner_list_wrap {
+      display: none;
+      /* 暂时固定高度 */
+      height: 480px; 
+      border-bottom: 1px dotted rgba(255, 255, 255, .26);
+    }
+    .student_discount_wrap {
+      padding: 50px 0;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .student_discount_title {
+      font-size: 21px;
+      line-height: 24px;
+      color: #fff;
+    }
+    .student_discount_sub_title {
+      font-size: 12px;
+      line-height: 13px;
+      color: rgba(255, 255, 255, .6);
+      padding: 14px 0;
+    }
+    .student_discount_button {
+      width: 270px;
+      line-height: 40px;
+      border-radius: 20px;
+    }
+    .winner_list_bg {
+      margin-top: 40px;
+    }
+    .winner_list_mark {
+      right: 2px;
+      top: -73px;
+      width: 100px;
+    }
+    .winner_table {
+      position: absolute;
+      left: 10px;
+      top: 14px;
+      width: calc(100% - 20px);
+    }
+    .winner_table span {
+      flex: 1;
+      display: block;
+      padding-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .winner_table_header {
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+    .winner_table_list {
+      font-size: 12px;
+      padding-top: 10px;
+    }
+
+    .halloween-indoor-lights,
+    .halloween-outdoor-lights,
+    .halloween-car-lights {
+      padding: 0 0 12px 0;
+    }
+
+
+
+    .jdgm-prev-badge {
+      padding: 4px 0 0 0;
+    }
+    .foot_product .jdgm-prev-badge {
+      text-align: center;
+    }
+    .foot_product .jdgm-prev-badge__stars {
+      display: block;
+    }
+
+    .view_more_products {
+      display: block;
+      line-height: 40px;
+      border-radius: 20px;
+    }
+  }
+
+</style>
+<script>
+  $(function() {
+    let more = 1;
+    initShow(more);
+    $('.halloween-car-lights .view_more_products').attr('href', '#');
+    $('.halloween-car-lights .view_more_products').on('click', function() {
+      console.log('2323')
+      event.preventDefault();
+      viewMore();
+    })
+    function initShow(more) {
+      $('.halloween-car-lights .product_wrap').each((index, item)=> {
+        if ($(item).index() + 1 > 8 * more) {
+          $(item).hasClass('hide') ? '' : $(item).addClass('hide')
+        }else {
+          $(item).hasClass('hide') && $(item).removeClass('hide')
+        }
+      })
+      $('.halloween-car-lights .product_wrap').last().index()+1 > 8*more ?
+      $('.halloween-car-lights .view_more_product').show(): $('.halloween-car-lights .view_more_product').hide()
+    }
+    function viewMore() {
+      more++;
+      initShow(more)
+    }
+  })
+</script>

@@ -1,0 +1,192 @@
+<div class="summer_sale_category {% if section.blocks.length == blank %} hide {% endif %}">
+  <div class="category_title">All Categories</div>
+  <div class="tree_wrap">
+    <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8c1848e601160999a4f036755ed8f558.png?v=1625747138" alt="" class="tree_decorate lazyload mobile-hide">
+    <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8c1848e601160999a4f036755ed8f558_acdc5012-9807-4880-b2af-06b1db5d8bea.png?v=1625803020" alt="" class="tree_decorate lazyload mobile-show">
+  </div>
+  <div class="category_list">
+    {% for block in section.blocks %}
+    {% assign categories_title = block.settings.categories_title %}
+    {% assign categories_img = block.settings.categories_img %}
+    {% assign categories_img_mobile = block.settings.categories_img_mobile %}
+    <a href="{{ categories_url }}" target="_blank" class="category_item">
+      <div class="category_info">
+        <div class="category_text">{{ categories_title }}</div>
+        <button class="category_shop_now">
+          Shop Now
+        </button>
+      </div>
+      <div class="category_img">
+        <img data-src="{{ categories_img | img_url: 'master' }}" alt="{{ categories_img.alt }}" class="tree_decorate lazyload mobile-hide">
+        <img data-src="{{ categories_img_mobile | img_url: 'master' }}" alt="{{ categories_img_mobile.alt }}" class="tree_decorate lazyload mobile-hide">
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .summer_sale_category {
+      background: #4863fa;
+      padding: 10px;
+    }
+    .category_title {
+      text-align: center;
+      font-size: 24px;
+      padding: 10px 0;
+      font-weight: bold;
+    }
+    .category_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .category_item {
+      width: calc(50% - 10px);
+      background: #2940fd;
+      border-radius: 10px;
+
+      display: flex;
+      flex-wrap: wrap-reverse;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      margin: 5px;
+      position: relative;
+    }
+    .category_img {
+      width: 90px;
+      margin-bottom: 6px;
+    }
+    .category_text {
+      font-size: 18px;
+      margin-bottom: 4px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .category_shop_now {
+      width: 120px;
+      border-radius: 15px;
+      line-height: 26px;
+      text-align: center;
+      color: #fff;
+      background: #5265fd;
+      font-size: 14px;
+    }
+    .tree_wrap {
+      position: relative;
+      height: 0;
+      width: 100%;
+    }
+    .tree_decorate {
+      position: absolute;
+      top: -48px;
+      right: -4px;
+      width: 120px;
+      z-index: 99;
+    }
+  }
+
+  @media screen and (min-width: 769px) {
+    .summer_sale_category {
+      background: #4863fa;
+      padding: 1vw 18vw 0;
+    }
+    .category_title {
+      text-align: center;
+      font-size: 2.1vw;
+      padding: 2vw 0 1.6vw;
+      font-weight: bold;
+    }
+    .category_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+
+    }
+    .category_item {
+      width: calc(50% - 2.2vw);
+      background: #2940fd;
+      border-radius: 1vw;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1vw 2vw;
+      margin: 1vw;
+      position: relative;
+    }
+    .category_text {
+      font-size: 1.7vw;
+      margin-bottom: .8vw;
+    }
+    .category_shop_now {
+      width: 10vw;
+      border-radius: 1vw;
+      line-height: 2vw;
+      text-align: center;
+      color: #fff;
+      background: #5265fd;
+      font-size: 1vw;
+    }
+    .conditions_wrap {
+      padding-left: 6vw;
+      padding-bottom: 6vw;
+    }
+    .conditions_text {
+      font-size: 1.2vw;
+      color: #cccff0;
+    }
+    .tree_wrap {
+      position: relative;
+      height: 0;
+      width: 100%;
+    }
+    .tree_decorate {
+      position: absolute;
+      top: -5.1vw;
+      right: .2vw;
+      width: 17vw;
+      z-index: 99;
+    }
+  }
+</style>
+
+
+{% schema %}
+  {
+    "name": "Summer Sale Categories",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "categories",
+        "name": "Categories Products",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "categories_img",
+            "label": "Upload Categories Products Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "categories_img_mobile",
+            "label": "Upload Categories Products Image of Moblie"
+          },
+          {
+            "type": "text",
+            "id": "categories_title",
+            "label": "Categories Title"
+          },
+          {
+            "type": "url",
+            "id": "categories_url",
+            "label":"Categories Url" 
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

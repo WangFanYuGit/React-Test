@@ -1,0 +1,1107 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% render 'additional-custom-content' %}
+<div class="page_wrap" data-animate_images="true">
+  <div class="mobile-hide page_width lazyload">
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Govee Smart Humidifier</div>
+      <div class="banner_sub_text page_sub_text">Safety And Comfort Every Time</div>
+      <div class="product_func_list">
+        <img style="width:400px" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/264_2x_7e542e1e-9399-4001-a5df-93b3e1311028.png?v=1633665513" alt="" class="lazyload">
+      </div>
+  </div>
+  <div class="banner_wrap img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_08557ee7-cd80-4685-8c3e-d7adfa318b7f.jpg?v=1632990255" alt="" class="lazyload">
+  </div>
+
+  <div class="scence_wrap">
+    <div class="scence_item img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02_b3659d4b-2c9d-4cd2-9b9f-c99cb41ffb8c.jpg?v=1632990255" alt="" class="lazyload">
+    </div>
+    <div class="scence_item text right" data-animate_text="true">
+      <div class="scence_text page_text">Custom Mode</div>
+      <div class="scence_sub_text page_sub_text">The Govee Smart Humidifier creates mists that fit your preferences. Access Custom Mode on the Govee Home App to set up your times and mist amount throughout the day.</div>
+    </div>
+  </div>
+
+  <div class="scence_wrap">
+    <div class="scence_item text left" data-animate_text="true">
+      <div class="scence_text page_text">360° Rotation</div>
+      <div class="scence_sub_text page_sub_text">The 360° nozzle of the humidifier rotates, allowing you to customize the direction of the mist. The Govee Smart Humidifier easily adapts to your environment and preferences.</div>
+    </div>
+    <div class="scence_item img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03_220a7625-481a-451f-9a9a-ac6c57f12cb9.jpg?v=1632990255" alt="" class="lazyload">
+    </div>
+  </div>
+
+  <div class="scence_wrap">
+    <div class="scence_item img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04_9078d7c1-3892-4a0d-bfde-c834ac85a523.jpg?v=1632990255" alt="" class="lazyload">
+    </div>
+    <div class="scence_item text right" data-animate_text="true">
+      <div class="scence_text page_text">Enhance Your Quality Of Life</div>
+      <div class="scence_sub_text page_sub_text"> Your Govee Smart Humidifier is designed with a multitude of features to fit your needs. Breathe easier, sleep better, keep your skin moisturized and nourish your plants to help maintain a healthy lifestyle.</div>
+    </div>
+  </div>
+
+  <div class="specification_wrap">
+    <div class="specification_content">
+      <div class="specification_table">
+        <div class="specification_theader page_text">
+          Specs
+        </div>
+        <div class="specification_tbody">
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Product Dimensions</span>
+            <span class="specification_td bold">17 x 17 x 29.5cm
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Tank Capacity</span>
+            <span class="specification_td bold">0.65 gal/ 3 L
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Volume of Mist Output	</span>
+            <span class="specification_td bold"> 200 ml/ h
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Working Hours</span>
+            <span class="specification_td bold">15-30 hours
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Applicable Area</span>
+            <span class="specification_td bold">107-290ft²/10-27m²
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Wattage</span>
+            <span class="specification_td bold">20 W
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Recommended Thermo-Hygrometers</span>
+            <span class="specification_td bold">H5179, H5177, H5174
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Working Modes</span>
+            <span class="specification_td bold">Auto Model, Custom Model & Mannual Model
+            </span>
+          </div>
+          <div class="specification_tr page_sub_text">
+            <span class="specification_td">Mist control</span>
+            <span class="specification_td bold">Stepless
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="spacification_image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_355efc41-b45a-4c24-85d5-2ab69746dafd.png?v=1632996182" alt="" class="lazyload">
+      </div>
+    </div>
+  </div>
+
+
+  </div>
+  <div class="mobile-show lazyload">
+    <div class="scence_wrap" data-animate_text="true">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Govee Smart Humidifier</div>
+        <div class="scence_sub_text page_sub_text">Safety And Comfort Every Time</div>
+        <div class="product_func_list">
+          <img style="width:250px" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/264_2x_7e542e1e-9399-4001-a5df-93b3e1311028.png?v=1633665513" alt="" class="lazyload">
+        </div>
+      </div>
+    </div>
+    <div class="banner img mt-20">
+          <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_3ad9c8e8-bf5b-4419-a7aa-8ccae0035458.jpg?v=1633665828" alt="" class="lazyload">
+    </div>
+    <div class="scence_wrap">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Custom Mode</div>
+        <div class="scence_sub_text page_sub_text">The Govee Smart Humidifier creates mists that fit your preferences. Access Custom Mode on the Govee Home App to set up your times and mist amount throughout the day.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02_0daa5d0d-3ca7-4725-8f1f-baa42dea12e4.png?v=1632996234" alt="" class="lazyload">
+      </div>
+    </div>
+    <div class="scence_wrap F8F8F8">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">360° Rotation</div>
+        <div class="scence_sub_text page_sub_text">The 360° nozzle of the humidifier rotates, allowing you to customize the direction of the mist. The Govee Smart Humidifier easily adapts to your environment and preferences.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03_5e5ba276-153f-4564-a8bb-71c0024f37a9.png?v=1632996234" alt="" class="lazyload">
+      </div>
+    </div>
+    <div class="scence_wrap">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Enhance Your Quality Of Life</div>
+        <div class="scence_sub_text page_sub_text">Your Govee Smart Humidifier is designed with a multitude of features to fit your needs. Breathe easier, sleep better, keep your skin moisturized and nourish your plants to help maintain a healthy lifestyle.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04_78338778-9a8c-4b15-8ef9-8115386aa4e2.png?v=1632996234" alt="" class="lazyload">
+      </div>
+    </div>
+    <div class="specification_wrap">
+      <div class="specification_content">
+        <div class="specification_table">
+          <div class="specification_theader page_text">
+            Specs
+          </div>
+          <div class="specification_tbody">
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Product Dimensions</span>
+              <span class="specification_td bold">17 x 17 x 29.5cm
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Tank Capacity</span>
+              <span class="specification_td bold">0.65 gal/ 3 L
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Volume of Mist Output	</span>
+              <span class="specification_td bold"> 200 ml/ h
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Working Hours</span>
+              <span class="specification_td bold">15-30 hours
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Applicable Area</span>
+              <span class="specification_td bold">107-290ft²/10-27m²
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Wattage</span>
+              <span class="specification_td bold">20 W
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Recommended Thermo-Hygrometers</span>
+              <span class="specification_td bold">H5179, H5177, H5174
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Working Modes</span>
+              <span class="specification_td bold">Auto Model, Custom Model & Mannual Model
+              </span>
+            </div>
+            <div class="specification_tr page_sub_text">
+              <span class="specification_td">Mist control</span>
+              <span class="specification_td bold">Stepless
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<style>
+  .padding-lr-150{
+    padding-left: 140px;
+    padding-right: 140px;
+  }
+  .page_wrap {
+    background-color: #fff;
+    margin-bottom: 50px;
+  }
+  .page_wrap [data-animate_images=true] .lazyload {
+    opacity:0
+  }
+  .page_wrap [data-animate_images=true] .lazyloaded {
+    opacity:1;
+    animation:0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+    animation-name:zoom-fade-small;
+    transition:none;
+  }
+  .page_wrap [data-animate_text=true] {
+    opacity: 0;
+  }
+  .page_wrap .lazyloaded [data-animate_text=true]{
+    opacity: 1;
+    animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+    animation-name: fade-in;
+  }
+  img {
+    display: block;
+    width: 100%;
+  }
+  .bold {
+    font-weight: bold;
+    font-family: 'Avenir LT Std';
+  }
+  .mt-20{
+    margin-top: -20px;
+  }
+  a.compare_td {
+    text-decoration: underline;
+  }
+  .F8F8F8{
+    background: #f8f8f8 !important;
+  }
+  .page_wrap .F8f8f8 {
+    background: #f8f8f8;
+  }
+  .mobile-hide.page_width {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media screen and (min-width: 768px) and (max-width: 1920px) {
+    .banner {
+      position: relative;
+      min-height: 100px;
+    }
+    .mobile-hide.page_width {
+      padding: 0 20px;
+    }
+    .banner_wrap.text {
+      width: 100%;
+      text-align: center;
+      padding: 4vw 0 2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .banner_text {
+      width: 52.5vw;
+    }
+    .banner_sub_img {
+      width: 24vw;
+    }
+
+    .scence_wrap {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      margin: .5vw 0;
+    }
+    .scence_item {
+      width: 50%;
+    }
+    .scence_item.text.left {
+      padding: 0 4.2vw 0 1vw;
+    }
+    .scence_item.text.right {
+      padding: 3vw 1vw 0vw 4.2vw;
+    }
+    .scence_text {
+      width: 100%;
+    }
+    .scence_sub_text {
+      margin-bottom: 1.6vw;
+    }
+    .three_wrap {
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      margin: .5vw 0;
+    }
+    .three_wrap .scence_wrap_three{
+      width: calc(33.33% - 0.5vw);
+    }
+    .three_wrap .three_title{
+      font-weight: bold;
+      padding-top: 30px;
+    }
+    .three_wrap .three_content{
+      padding-right: 30px;
+    }
+    .product_func_list {
+      display: flex;
+      justify-content: space-between;
+    }
+    .product_func_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 25%;
+    }
+    .fix_width{
+      margin-top: 1.0vw;
+      min-width: 115px;
+    }
+    .product_func_img {
+      width: 3.5vw;
+    }
+    .product_func_text {
+      font-size: .7vw;
+      color: #252525;
+      line-height: 1.2vw;
+      text-align: center;
+    }
+    .feature_title {
+      text-align: center;
+      padding: 4.5vw 0 2vw;
+    }
+    .feature_list {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+    }
+    .feature_item {
+      width: calc(32% - 1.2vw);
+      display: flex;
+      flex-direction: column;
+    }
+    .feature_img {
+      margin-bottom: 1.6vw;
+    }
+
+    .specification_wrap {
+      padding: 4vw 0;
+    }
+    .specification_content {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      max-width: 1200px;
+    }
+    .specification_table {
+      flex: 1;
+      margin-right: 6vw;
+    }
+    .specification_theader {
+      padding: 1vw 0;
+      color: #111;
+    }
+    .specification_tbody {
+      border-top: 1px solid #888888;
+    }
+    .specification_tr {
+      padding: .8vw 0;
+      border-bottom: 1px solid #888888;
+
+      display: flex;
+      justify-content: flex-start;
+    }
+    .specification_td {
+      color: #111;
+      width: 48%;
+    }
+    .spacification_image {
+      width: 21vw;
+    }
+
+    .compare_wrap {
+      padding: 0 0 4vw 0;
+    }
+    .compare_content {
+      max-width: 1200px;
+    }
+    .compare_header {
+      color: #111 !important;
+      padding: 2.6vw 0;
+    }
+    .compare_table {
+      border-top: 1px solid #888888;
+    }
+    .compare_tr {
+      display: flex;
+      padding: .8vw 0;
+      border-bottom: 1px solid #888888;
+    }
+    .compare_td {
+      color: #111;
+      flex: 1;
+      font-size: .8vw;
+    }
+    .compare_td:first-child {
+      font-weight: normal;
+      font-family: "Avenir Next";
+    }
+    .compare_td:not(:first-child) {
+      font-weight: bold;
+    }
+    .compare_td_img {
+      display: block;
+    }
+    .compare_td_img img{
+      
+    }
+    .compare_td_img_left{
+      height: 6.5vw;
+      width: auto;
+    }
+    .compare_td_img_right{
+      width: 6vw;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .banner {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .page_text {
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 30px;
+      color: #252525;
+    }
+    .page_sub_text {
+      font-size: 13px;
+      line-height: 18px;
+      color: #252525;
+      padding: 10px 0 12px;
+    }
+    .product_func_img{
+        width: 25px;
+    }
+    .banner_wrap.text {
+      width: 100%;
+      text-align: left;
+      padding: 42px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .banner_text {
+      width: 100%;
+    }
+    .banner_sub_img {
+      width: 240px;
+    }
+
+    .scence_wrap {
+      background: #fff;
+      padding: 0 25px 46px;
+    }
+    .scence_item {
+      width: 100%;
+    }
+    .product_func_list.fix_width{
+      margin-top: 2.0vw;
+      min-width: 54px;
+    }
+    .product_func_text.page_sub_text.cancel_no_wrap{
+      text-align: center;
+    }
+    .scence_item.text {
+      padding: 38px 0 0;
+    }
+    .scence_item.img, 
+    .scence_item.img img {
+      border-radius: 10px;
+    }
+    .scence_text {
+      width: 100%;
+    }
+    .scence_sub_text {
+      margin-bottom: 14px;
+    }
+    .product_func_list {
+      display: flex;
+      justify-content: space-between;
+    }
+    .product_func_list.flex_start{
+      align-items: start !important;
+      margin-left: -6%;
+    }
+    .product_func_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: calc(100% / 3);
+    }
+    
+    .product_func_img img {
+      height: 25px;
+      width: 25px;
+    }
+    .product_func_text {
+      font-size: 12px;
+      color: #252525;
+    }
+
+    .specification_wrap {
+      padding: 36px 0;
+    }
+    .specification_content {
+      padding: 0 25px;
+    }
+    .specification_theader {
+      padding: 10px 0 20px;
+      color: #111;
+    }
+    .specification_tbody {
+      border-top: 1px solid #888888;
+    }
+    .specification_tr {
+      padding: 6px 0;
+      border-bottom: 1px solid #888888;
+
+      display: flex;
+      justify-content: flex-start;
+    }
+    .specification_td {
+      color: #111;
+      width: 48%;
+      font-size: 12px;
+    }
+    .spacification_image {
+      width: 160px;
+      margin: 30px auto;
+    }
+
+    .compare_wrap {
+      padding: 0 0 50px 0;
+    }
+    .compare_content {
+      padding: 0 0 0 25px;
+    }
+    .compare_header {
+      color: #252525 !important;
+      padding: 10px 0 30px;
+    }
+    .compare_table {
+      border-top: 1px solid #888888;
+
+      overflow-x: scroll;
+      padding-bottom: 15px;
+    }
+
+    .compare_tr {
+      display: flex;
+      justify-content: flex-start;
+      padding: 6px 0;
+      border-bottom: 1px solid #888888;
+      width: fit-content;
+    }
+    .compare_td {
+      color: #252525;
+      flex: 1;
+      font-size: 12px;
+
+      min-width: 180px;
+    }
+    .compare_td:first-child {
+      position: sticky;
+      position: -webkit-sticky;
+      left: 0;
+      top: 0;
+      min-width: 120px;
+      background: #fff;
+    }
+    .compare_td:not(:first-child) {
+      font-weight: bold;
+    }
+    .compare_td_img {
+      width: 160px;
+      display: block;
+    }
+    .compare_td_img_right{
+      width: auto;
+      height: 160px;
+    }
+  }
+
+  @media screen and (min-width: 1921px){
+    
+    .banner_wrap.text {
+      width: 100%;
+      text-align: center;
+      padding: 90px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .banner_text {
+      width: 1050px;
+    }
+    .banner_sub_img {
+      width: 480px;
+    }
+
+    .scence_wrap {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      margin: 10px;
+    }
+    .scence_item {
+      width: 50%;
+    }
+    .scence_item.text.left {
+      padding: 0 80px 0 20px;
+    }
+    .scence_item.text.right {
+      padding: 20px 20px 20px 80px;
+    }
+    .scence_text {
+      width: 100%;
+    }
+    .scence_sub_text {
+      margin-bottom: 32px;
+    }
+    .three_wrap {
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      margin: 10px;
+    }
+    .three_wrap .scence_wrap_three{
+      width: calc(33.33% - 10px);
+    }
+    .three_wrap .three_title{
+      font-weight: bold;
+      padding-top: 30px;
+    }
+    .three_wrap .three_content{
+      padding-right: 30px;
+    }
+    .product_func_list {
+      display: flex;
+      justify-content: space-between;
+    }
+    .product_func_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 25%;
+    }
+    .fix_width{
+      margin-top: 40px;
+      min-width: 115px;
+    }
+    .product_func_img {
+      width: 50px;
+    }
+    .product_func_text {
+      font-size: 14px;
+      line-height: 20px;
+      color: #252525;
+    }
+    .feature_title {
+      text-align: center;
+      padding: 50px 0 40px;
+    }
+    .feature_list {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+    }
+    .feature_item {
+      width: calc(32% - 24px);
+      display: flex;
+      flex-direction: column;
+    }
+    .feature_img {
+      margin-bottom: 32px;
+    }
+
+    .specification_wrap {
+      padding: 80px 0;
+    }
+    .specification_content {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      max-width: 1200px;
+    }
+    .specification_table {
+      flex: 1;
+      margin-right: 120px;
+    }
+    .specification_theader {
+      padding: 20px 0;
+      color: #111;
+    }
+    .specification_tbody {
+      border-top: 1px solid #888888;
+    }
+    .specification_tr {
+      padding: 16px 0;
+      border-bottom: 1px solid #888888;
+
+      display: flex;
+      justify-content: flex-start;
+    }
+    .specification_td {
+      color: #111;
+      width: 48%;
+    }
+    .spacification_image {
+      width: 420px;
+    }
+
+    .compare_wrap {
+      padding: 0 0 80px 0;
+    }
+    .compare_content {
+      max-width: 1200px;
+    }
+    .compare_header {
+      color: #111 !important;
+      padding: 52px 0;
+    }
+    .compare_table {
+      border-top: 1px solid #888888;
+    }
+    .compare_tr {
+      display: flex;
+      padding: 16px 0;
+      border-bottom: 1px solid #888888;
+    }
+    .compare_td {
+      color: #111;
+      flex: 1;
+      font-size: 16px;
+    }
+    .compare_td:first-child {
+      font-weight: normal;
+      font-family: "Avenir Next";
+    }
+    .compare_td:not(:first-child) {
+      font-weight: bold;
+    }
+    .compare_td_img img{
+      
+    }
+    .compare_td_img_left{
+      height: 190px;
+      width: auto;
+      
+    }
+    .compare_td_img_right{
+      width: 180px;
+    }
+  }
+
+</style>

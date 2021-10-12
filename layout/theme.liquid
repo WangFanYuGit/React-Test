@@ -1,0 +1,313 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}" dir="{{ settings.text_direction }}">
+  <head>
+    <meta name="google-site-verification" content="f5HH7pc1iGA_JryDVzX-0YVes7RxMLWkZEmRBfPW1cU" />
+    <meta name="google-site-verification" content="IRQ2vka2MKVfBmHHTlleQojW7alhSxIPVT0wWXea_1A" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_button }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com">
+    <link rel="preconnect" href="https://fonts.shopifycdn.com">
+    <link rel="dns-prefetch" href="https://productreviews.shopifycdn.com">
+    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+    <link rel="dns-prefetch" href="https://maps.googleapis.com">
+    <link rel="dns-prefetch" href="https://maps.gstatic.com">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+    {%- if settings.favicon != blank -%}
+      <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" type="image/png" />
+    {%- endif -%}
+  
+    {%- render 'seo-title' -%}
+  
+    {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+  
+    {%- render 'social-meta-tags' -%}
+  
+    {%- render 'font-face' -%}
+    <link rel="stylesheet" href="{{ 'theme.css' | asset_url  }}" rel="preload" as="style">
+
+    <!-- 新增 UI动效 库 -->
+    <!-- <link rel="stylesheet" href="https://cdn.rawgit.com/tiaanduplessis/wenk/master/dist/wenk.css" rel="preload" as="style"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/wingcss" rel="preload" as="style"/> -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" media="all" />
+
+    <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" media="all" as="style" /> -->
+
+    {%- render 'css-variables' -%}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" rel="preload" />
+    <link rel="stylesheet" href="{{ 'swiper.min.css' | asset_url | split: '?' | first }}" rel="preload" as="style">
+    <!-- hover.css -->
+    <link rel="stylesheet" href="{{ 'hover.css' | asset_url | split: '?' | first }}" rel="preload" as="style">
+    <!-- 新版样式表 start -->
+    <link rel="stylesheet" href="{{ 'theme-css.css' | asset_url | split: '?' | first }}" rel="preload" as="style">
+    <!-- 新版样式表 end -->
+
+    <script>
+      // 判断是否移动端
+      if ((navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i))) {
+        window.isMobile = true;
+      }else {
+        window.isMobile = false;
+      }
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+  
+      window.theme = window.theme || {};
+      theme.routes = {
+        home: "{{ routes.root_url }}",
+        cart: "{{ routes.cart_url }}",
+        cartAdd: "{{ routes.cart_add_url | append: '.js'}}",
+        cartChange: "{{ routes.cart_change_url }}"
+      };
+      theme.strings = {
+        soldOut: {{ 'products.product.sold_out' | t | json }},
+        unavailable: {{ 'products.product.unavailable' | t | json }},
+        stockLabel: {{ 'products.product.stock_label' | t: count: '[count]' | json }},
+        willNotShipUntil: {{ 'products.product.will_not_ship_until' | t: date: '[date]' | json }},
+        willBeInStockAfter: {{ 'products.product.will_be_in_stock_after' | t: date: '[date]' | json }},
+        waitingForStock: {{ 'products.product.waiting_for_stock' | t | json }},
+        cartSavings: {{ 'cart.general.savings_html' | t: savings: '[savings]' | json }},
+        cartEmpty: {{ 'cart.general.empty' | t | json }},
+        cartTermsConfirmation: {{ 'cart.general.terms_confirm' | t | json }}
+      };
+      theme.settings = {
+        dynamicVariantsEnable: true,
+        dynamicVariantType: {{ settings.variant_type | json }},
+        cartType: {{ settings.cart_type | json }},
+        moneyFormat: {{ shop.money_format | json }},
+        predictiveSearch: {{ settings.predictive_search_enabled }},
+        predictiveSearchType: {{ settings.search_type | json }},
+        inventoryThreshold: {{ settings.inventory_threshold }},
+        quickView: {{ settings.quick_shop_enable }},
+        themeName: 'Motion',
+        themeVersion: "6.2.1"
+      };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js" defer="defer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="{{ 'swiper.min.js '| asset_url }}"></script>
+
+  {{ content_for_header }}
+  
+    <script src="{{ 'vendor-scripts-v10.js' | asset_url | split: '?' | first }}" defer="defer"></script>
+  
+    {%- if shop.enabled_currencies.size > 1 -%}
+      <link rel="preload" as="style" href="{{ 'currency-flags.css' | asset_url | split: '?' | first }}" onload="this.onload=null;this.rel='stylesheet'">
+      <link rel="stylesheet" href="{{ 'currency-flags.css' | asset_url | split: '?' | first }}">
+      {%- endif -%}
+  
+    <script src="{{ 'theme.min.js' | asset_url }}" defer="defer"></script>
+    <!-- <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script> -->
+    <script src="{{ 'coco-modal.min.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'govee.js' | asset_url }}" defer="defer"></script>
+    
+    {%- if request.page_type contains 'customers/' -%}
+      <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer="defer"></script>
+    {%- endif -%}
+    
+  
+    {% include 'qikify-navigator' %}
+    
+    {{ 'ndnapps-easyfaqs.css' | asset_url | stylesheet_tag }}
+
+    {% include 'qikify-smartmenu' %}
+    
+    
+    <!-- Impact Page load start -->
+    <script type="text/javascript">
+
+    (async function(){
+
+      let customerId = '', emailHash = '';
+      {% if customer %}
+        {% assign email_hash = {{customer.email}} | sha1 %}
+        emailHash = "{{email_hash}}";
+        customerId = "{{ customer.id }}";
+      {% endif %}
+      
+      
+      function getVisitorId() {
+        const visitorKey = 'impact-visitor-profile';
+        let profileId = getCookie(visitorKey)
+        if (!profileId) {
+          profileId = uuid();
+          setCookie(visitorKey, profileId);
+        }
+        return profileId;
+      }
+
+      function uuid() {
+          var s = [];
+          var hexDigits = "0123456789abcdef";
+          for (var i = 0; i < 36; i++) {
+              s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+          }
+          s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+          s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+          s[8] = s[13] = s[18] = s[23] = "-";
+
+          var uuid = s.join("");
+          return uuid;
+      }
+
+      function getCookie(objName){
+        var arrStr = document.cookie.split("; ");
+        for(var i = 0;i < arrStr.length;i ++){
+            var temp = arrStr[i].split("=");
+            if(temp[0] == objName) return unescape(temp[1]);
+        }
+      }
+
+      function setCookie(name, value) {
+        document.cookie=`${name}=${value};domain=.govee.com;path=/`;
+      }
+
+      async function getIpAddress() {
+          const res = await fetch('https://api.myip.la/en?json', {
+            method: 'GET',
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }).catch(err => console.error(err));
+          const data = await res.json();
+          return data.ip;
+      }
+
+      async function impactPageLoad(params) {
+        const res = await fetch('https://trkapi.impact.com/PageLoad', {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(params)
+          })
+          .catch(err => console.error(err));
+        const data = await res.json();
+        return data.clickId;
+      }
+
+      async function customProfileClick(params) {
+          fetch('https://dev-trade-api.govee.com/rest/v1/impact/page-load', {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(params)
+          })
+          .then(res => res.json())
+          .catch(err => console.error(err));
+      }
+
+      /**
+       * 休眠
+       * @param {*} time 
+       * @returns 
+       */
+      async function sleep(time) {
+          return new Promise((resolve) => {
+              setTimeout(() => {
+                  resolve(true);
+              }, time)
+          });
+      }
+
+      // This is the visitor identifier:
+      const visitorId = getVisitorId();
+      
+      const ipAddress = await getIpAddress();
+      
+      // request Page Load API
+      const params = {
+          "CampaignId": 12845,
+          "PageUrl": document.URL,
+          "ReferringUrl": document.referrer,
+          "CustomProfileId": visitorId,
+          "CustomerId": customerId,
+          "CustomerEmail": emailHash,
+          "EventDate":new Date().toISOString(),
+          "UserAgent":navigator.userAgent,
+          "IpAddress": ipAddress
+      }
+      const clickId = await impactPageLoad(params);
+      
+      // store clickid
+      const paramData = {
+        site: '{{shop.name}}',
+        customProfileId: visitorId,
+        clickId: clickId
+      }
+      customProfileClick(paramData);
+      
+    })();
+
+      
+    </script>
+    <!-- Impact Page load end -->
+    
+  </head>
+
+<body class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if request.path == '/challenge' %} template-challange{% endif %}" data-transitions="{{settings.animate_page_transitions}}" data-type_header_capitalize="{{settings.type_header_capitalize}}" data-type_base_accent_transform="{{settings.type_base_accent_transform}}" data-type_header_accent_transform="{{settings.type_header_accent_transform}}" data-animate_sections="{{settings.animate_sections}}" data-animate_underlines="{{settings.animate_underlines}}" data-animate_buttons="{{settings.animate_buttons}}" data-animate_images="{{settings.animate_images}}" data-animate_page_transition_style="{{settings.animate_page_transition_style}}" data-type_header_text_alignment="{{settings.type_headers_align_text}}" data-animate_images_style="{{settings.animate_images_style | default: "zoom-fade"}}">
+
+  {% if settings.animate_page_transitions %}
+    <script type="text/javascript">window.setTimeout(function() { document.body.className += " loaded"; }, 25);</script>
+  {% endif %}
+
+  <a class="in-page-link visually-hidden skip-link" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+  <div id="PageContainer" class="page-container">
+    <div class="transition-body">
+
+    {%- section 'header' -%}
+      <main class="main-content" id="MainContent">
+        {{ content_for_layout }}
+      </main>
+
+      {%- section 'footer-promotions' -%}
+      {%- section 'footer' -%}
+
+    </div>
+  </div>
+
+  {% section 'newsletter-popup' %}
+  {%- if settings.cart_type == 'drawer' -%}
+    {%- render 'ajax-cart-template' -%}
+  {%- endif -%}
+
+  {%- if settings.predictive_search_enabled -%}
+    {%- render 'predictive-template' -%}
+  {%- endif -%}
+
+  {% comment %}
+    Custom markup for slider arrows using theme icons
+  {% endcomment %}
+  <div class="hide">
+    <button data-id="prevArrowTemplate" class="slick-prev" aria-label="{{ 'general.pagination.previous' | t }}" type="button">
+      <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-left" viewBox="0 0 284.49 498.98"><path d="M249.49 0a35 35 0 0 1 24.75 59.75L84.49 249.49l189.75 189.74a35.002 35.002 0 1 1-49.5 49.5L10.25 274.24a35 35 0 0 1 0-49.5L224.74 10.25A34.89 34.89 0 0 1 249.49 0z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.previous' | t }}</span>
+    </button>
+    <button data-id="nextArrowTemplate" class="slick-next" aria-label="{{ 'general.pagination.next' | t }}" type="button">
+      <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-right" viewBox="0 0 284.49 498.98"><path d="M35 498.98a35 35 0 0 1-24.75-59.75l189.74-189.74L10.25 59.75a35.002 35.002 0 0 1 49.5-49.5l214.49 214.49a35 35 0 0 1 0 49.5L59.75 488.73A34.89 34.89 0 0 1 35 498.98z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.next' | t }}</span>
+    </button>
+  </div>
+
+  {%- render 'video-modal' -%}
+  {%- render 'photoswipe-template' -%}
+
+
+  
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.lazyload/1.9.1/jquery.lazyload.min.js" defer="defer"></script>
+  {% include 'th-product-review' %}
+
+  <script src='{{ 'ndnapps-easyfaqs.js' | asset_url }}' defer='defer'></script>
+  {% include 'getresponse' %}
+
+</body>
+
+</html>
+

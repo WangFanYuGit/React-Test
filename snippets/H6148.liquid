@@ -1,0 +1,1035 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% render 'additional-custom-content' %}
+
+
+
+<div id="H6148">
+  <div class="mobile-hide">
+    <section class="banner">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__01.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights indoor">
+      <div class="banner_text_wrap over_top">
+        <div class="banner_text page_text_important color_white_important lazyload" data-animate_text="true">
+          Govee RGBWW Wi-Fi <br>+ Bluetooth LED Strip Lights
+        </div>
+        <div class="banner_sub_text page_sub_text_important color_white_important lazyload" data-animate_sub_text="true">
+          Vibrant lighting for a colorful experience
+        </div>
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text page_text_important lazyload" data-animate_text="true">
+          Voice Control
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="banner_sub_text page_sub_text_important lazyload" data-animate_sub_text="true">
+          Do more with less. Bind with Alexa, Google Assistant, for simple yet powerful voice control of colors, brightness, dynamic scenes, and lighting modes.
+        </div>
+      </div>
+      <div class="banner">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__02.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights led strip lights voice control">
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text page_text_important  lazyload" data-animate_text="true">
+          Advanced RGBWW strip lights create a brighter lighting environment
+        </div>
+        <div class="color_bar lazyload"></div>
+      </div>
+      <div class="banner">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__03.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights rgbww">
+      </div>
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__04.jpg?v=1623226847" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights  music sync alexa" class="lazyload">
+      </div>
+
+      <div class="wrap_item text">
+        <div class="title  page_text_important lazyload" data-animate_text="true">
+          Sync Your Music
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="sub_title page_sub_text_important lazyload" data-animate_sub_text="true">
+          Enjoy unique musical experiences with your family, friends, and even pets with our dynamic Rainbow and Mixing mode.
+        </div> 
+      </div>
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="wrap_item text">
+        <div class="title page_text_important lazyload" data-animate_text="true">
+          Incredible Scene Modes
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="sub_title page_sub_text_important lazyload" data-animate_sub_text="true">
+          Enjoy a diversity of preset dynamic or calming ambiances so you can always set the mood right with a simple tap of the finger. Choose from scenes based on nature, holiday, life, and emotions. 
+        </div> 
+      </div>
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__05.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights changing colour" class="lazyload">
+      </div>
+
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__06.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights room decor" class="lazyload">
+      </div>
+      <div class="wrap_item text">
+        <div class="title page_text_important lazyload" data-animate_text="true">
+          Decorate Your Way
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="sub_title  page_sub_text_important lazyload" data-animate_sub_text="true">
+          Smart color picking allows you to bring the colors of the outdoors inside. Simply upload a photo and Govee Home App will intelligently pick out the photo's most beautiful colors for you to apply to your lights. 
+        </div> 
+      </div>
+    </section>
+
+    <section class="control_scenes_wrap bgc_white_important">
+      <div class="control_item">
+        <div class="control_image">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__07.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights vcontrol" class="lazyload">
+        </div>
+        <div class="control_text_wrap">
+          <div class="text">Convenient Voice Control</div>
+          <div class="sub_text">Manage your strip lights using simple voice commands with Alexa or Google Assistant.</div>
+        </div>
+      </div>
+      <div class="control_item">
+        <div class="control_image">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__08.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights  app control" class="lazyload">
+        </div>
+        <div class="control_text_wrap">
+          <div class="text">Wi-Fi/Bluetooth App Control</div>
+          <div class="sub_text">Power on your strip lights or adjust colors remotely. Return home to a colorful and vibrant atmosphere. (Range of 30m, 5G Wi-Fi not supported)</div>
+        </div>
+      </div>
+      <div class="control_item">
+        <div class="control_image">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__09.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights IR Remote Controller" class="lazyload">
+        </div>
+        <div class="control_text_wrap">
+          <div class="text">IR Remote Controller</div>
+          <div class="sub_text">Choose the color and lighting effect you want, quickly and easily.</div>
+        </div>
+      </div>
+      <div class="control_item">
+        <div class="control_image">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6148-PC__10.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights Simple Button Control" class="lazyload">
+        </div>
+        <div class="control_text_wrap">
+          <div class="text">Simple Button Control</div>
+          <div class="sub_text">Adjust brightness or cycle through scene modes at the touch of a button.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="specification_wrap H6148">
+      <div class="specification_table">
+        <div class="specification_table_td header">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item">
+              <div class="top">Model</div>
+              <div class="bottom">H6148</div>
+            </div>  
+            <div class="H6148_spacification_item">
+              <div class="top">Length</div>
+              <div class="bottom">9.84 Ft</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item">
+              <div class="top">Light Color</div>
+              <div class="bottom">RGBWW</div>
+            </div>  
+            <div class="H6148_spacification_item">
+              <div class="top">Water Resistance</div>
+              <div class="bottom">Yes</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item" style="width: 100%;">
+              <div class="top">Contol Method</div>
+              <div class="bottom">Wi-Fi, Bluetooth, Smart App, Remote Controller</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item" style="width: 100%;">
+              <div class="top">Wattage</div>
+              <div class="bottom">24 watts</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item" style="width: 100%;">
+              <div class="top">Batteries</div>
+              <div class="bottom">1 CR2 Batteries Required. (included)</div>
+            </div>  
+          </div>
+        </div>
+        
+      </div>
+      <div class="product_img" data-animate_images="true">
+        <img class="govee_image lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3f89305fb1dabad87b9b93324e3c25cd.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights specs">
+      </div>
+    </section>
+  </div>
+
+  <div class="mobile-show">
+    <section class="banner">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p1.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights indoor">
+      <div class="banner_text_wrap over_top">
+        <div class="banner_text  lazyload page_text_important color_white_important" data-animate_text="true">
+          Govee RGBWW Wi-Fi <br>+ Bluetooth LED Strip Lights
+        </div>
+        <div class="banner_sub_text page_sub_text_important color_white_important lazyload" data-animate_sub_text="true">
+          Vibrant lighting for a colorful experience
+        </div>
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text page_text_important lazyload" data-animate_text="true">
+          Voice Control
+        </div>
+        <div class="banner_sub_text page_sub_text_important lazyload" data-animate_sub_text="true">
+          Do more with less. Bind with Alexa, Google Assistant, for simple yet powerful voice control of colors, brightness, dynamic scenes, and lighting modes.
+        </div>
+      </div>
+      <div class="banner">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p2.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights led strip lights voice control">
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text  page_text_important lazyload" data-animate_text="true">
+          Advanced RGBWW strip lights create a brighter lighting environment
+        </div>
+      </div>
+      <div class="banner">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p3.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights rgbww">
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text lazyload page_text_important" data-animate_text="true">
+          Sync Your Music
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="banner_sub_text page_sub_text_important lazyload">Enjoy unique musical experiences with your family, friends, and even pets with our dynamic Rainbow and Mixing mode.</div>
+      </div>
+      <div class="banner">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p4.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights  music sync alexa" class="lazyload">
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text lazyload page_text_important" data-animate_text="true">
+          Incredible Scene Modes
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="banner_sub_text page_sub_text_important lazyload">
+          Enjoy a diversity of preset dynamic or calming ambiances so you can always set the mood right with a simple tap of the finger. Choose from scenes based on nature, holiday, life, and emotions. 
+        </div>
+      </div>
+      <div class="banner">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p5.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights changing colour" class="lazyload">
+      </div>
+    </section>
+
+    <section class="banner_wrap bgc_white_important">
+      <div class="banner_text_wrap bgc_white_important on_top">
+        <div class="banner_text lazyload page_text_important" data-animate_text="true">
+          Decorate Your Way
+        </div>
+        <div class="color_bar lazyload"></div>
+        <div class="banner_sub_text  page_sub_text_important lazyload">
+          Smart color picking allows you to bring the colors of the outdoors inside. Simply upload a photo and Govee Home App will intelligently pick out the photo's most beautiful colors for you to apply to your lights. 
+        </div>
+      </div>
+      <div class="banner">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p6.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights room decor" class="lazyload">
+      </div>
+    </section>
+    
+    <section class="scenes_wrap">
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p7.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights vcontrol" class="lazyload">
+      </div>
+      <div class="wrap_item text">
+        <div class="title page_text_important lazyload" data-animate_text="true">
+          Convenient Voice Control
+        </div>
+        <div class="sub_title page_sub_text_important lazyload" data-animate_sub_text="true">
+          Manage your strip lights using simple voice commands with Alexa or Google Assistant.
+        </div> 
+      </div>
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="wrap_item page_text_important text" style="text-align: right;">
+        <div class="title page_text_important lazyload" data-animate_text="true">
+          Wi-Fi/Bluetooth App Control
+        </div>
+        <div class="sub_title page_sub_text_important lazyload" data-animate_sub_text="true">
+          Power on your strip lights or adjust colors remotely. Return home to a colorful and vibrant atmosphere. (Range of 30m, 5G Wi-Fi not supported)
+        </div> 
+      </div>
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p8.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights  app control" class="lazyload">
+      </div>
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p9.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights IR Remote Controller" class="lazyload">
+      </div>
+      <div class="wrap_item text">
+        <div class="title page_text_important lazyload" data-animate_text="true">
+          IR Remote Controller
+        </div>
+        <div class="sub_title page_sub_text_important lazyload" data-animate_sub_text="true">
+          Choose the color and lighting effect you want, quickly and easily.
+        </div> 
+      </div>
+    </section>
+
+    <section class="scenes_wrap">
+      <div class="wrap_item text" style="text-align: right;">
+        <div class="title page_text_important lazyload" data-animate_text="true">
+          Simple Button Control
+        </div>
+        <div class="sub_title page_sub_text_important lazyload" data-animate_sub_text="true">
+          Adjust brightness or cycle through scene modes at the touch of a button.
+        </div> 
+      </div>
+      <div class="wrap_item image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/p10.jpg?v=1623233025" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights Simple Button Control" class="lazyload">
+      </div>
+    </section>
+
+    <section class="specification_wrap H6148">
+      <div class="product_img" data-animate_images="true">
+        <img class="govee_image lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3f89305fb1dabad87b9b93324e3c25cd.jpg?v=1623226846" alt="Govee RGBWW Wi-Fi + Bluetooth LED Strip Lights specs">
+      </div>
+      <div class="specification_table">
+        <div class="specification_table_td header">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item">
+              <div class="top">Model</div>
+              <div class="bottom">H6148</div>
+            </div>  
+            <div class="H6148_spacification_item">
+              <div class="top">Length</div>
+              <div class="bottom">9.84 Ft</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item">
+              <div class="top">Light Color</div>
+              <div class="bottom">RGBWW</div>
+            </div>  
+            <div class="H6148_spacification_item">
+              <div class="top">Water Resistance</div>
+              <div class="bottom">Yes</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item" style="width: 100%;">
+              <div class="top">Contol Method</div>
+              <div class="bottom">Wi-Fi, Bluetooth, Smart App, Remote Controller</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item" style="width: 100%;">
+              <div class="top">Wattage</div>
+              <div class="bottom">24 watts</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6148_spacification_item" style="width: 100%;">
+              <div class="top">Batteries</div>
+              <div class="bottom">1 CR2 Batteries Required. (included)</div>
+            </div>  
+          </div>
+        </div>
+        
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+  img {
+    display: block;
+    width: 100%;
+  }
+  @media screen and (max-width: 768px) {
+    #H6148 {
+      padding-bottom: 20px;
+    }
+    .banner {
+      position: relative;
+      min-height: 100px;
+    }
+    .banner_text_wrap.on_top {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #000;
+      padding:30px  20px;
+    }
+    .banner_text_wrap.on_top .banner_text {
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 30px;
+      margin-bottom: 5px;
+    }
+    .banner_text_wrap.on_top .banner_sub_text {
+      font-size: 12px;
+      line-height: 16px;
+    }
+    .banner_text_wrap.on_top .color_bar {
+      height: 2px;
+      width: 50px;
+      background: linear-gradient(60deg, #ff00ff, #00ffc0, #ffff00);
+      margin-bottom: 10px;
+    }
+    
+    .banner_text_wrap.over_top {
+      width: 100%;
+      text-align: left;
+      position: absolute;
+      top: 28%;
+      left: 6%;
+    }
+    .banner_text_wrap.over_top .banner_text {
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 30px;
+      margin-bottom: 5px;
+    }
+    .banner_text_wrap.over_top .banner_sub_text {
+      font-size: 14px;
+      line-height: 20px;
+    }
+    
+    .scenes_wrap {
+      display: flex;
+      align-items: center;
+      padding: 0;
+    }
+    .wrap_item.image {
+      flex: 1;
+    }
+    .wrap_item.text {
+      flex: 1;
+      padding: 0 10px;
+      max-width: 50%;
+    }
+    .wrap_item.text .title {
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 24px;
+      margin-bottom: 10px;
+    }
+    .wrap_item.text .sub_title {
+      font-size: 12px;
+      line-height: 14px;
+    }
+
+    .specification_wrap {
+      background: #000;
+      padding: 20px;
+      width: 100%;
+    }
+    .specification_wrap .product_img {
+      /* height: 35vw; */
+    }
+    .specification_wrap .product_img img {
+      height: 100%;
+    }
+    .specification_table {
+      width: 100%;
+    }
+    .specification_table_td {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #4d4d4d;
+    }
+    .specification_table_td.header {
+      border-bottom: 0;
+      padding-top: 0;
+    }
+    .specification_table_td.header .spacification_td_item {
+      font-size: 24px;
+      line-height: 28px;
+      border-bottom: 2px solid #fff;
+      font-weight: bolder;
+      width: auto;
+    }
+    .spacification_td_item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+    }
+    .H6148_spacification_item:nth-child(n) {
+      width: 60%;
+    }
+    .H6148_spacification_item:nth-child(2n) {
+      width: 40%;
+    }
+    .H6148_spacification_item .top {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .6);
+      word-break: break-word;
+    }
+    .H6148_spacification_item .bottom {
+      color: #fff;
+      font-size: 13px;
+      word-break: break-word;
+    }
+    .specification_table_td .title {
+      font-size: 12px;
+      color: #fff;
+      width: 30%;
+      font-weight: bolder;
+    }
+    .specification_table_td .sub_title {
+      font-size: 12px;
+      width: 40%;
+    }
+  }
+  @media screen and (min-width: 769px) {
+    #H6148 {
+      padding-bottom: 20px;
+    }
+    .banner {
+      position: relative;
+      min-height: 400px;
+    }
+    .banner_text_wrap.on_top {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4vw 10vw 2vw;
+      background: #000;
+    }
+    .banner_text_wrap.on_top .banner_text {
+      font-size: 3.75vw;
+      font-weight: bold;
+      line-height: 4vw;
+      margin-bottom: 1.5vw;
+    }
+    .banner_text_wrap.on_top .banner_sub_text {
+      font-size: 1.5vw;
+      line-height: 2vw;
+    }
+    .banner_text_wrap.on_top .color_bar {
+      height: 4px;
+      width: 5vw;
+      background: linear-gradient(60deg, #ff00ff, #00ffc0, #ffff00);
+      margin-bottom: 2vw;
+    }
+    
+    .banner_text_wrap.over_top {
+      width: 100%;
+      text-align: left;
+      position: absolute;
+      top: 20%;
+      left: 6%;
+    }
+    .banner_text_wrap.over_top .banner_text {
+      font-size: 3.75vw;
+      font-weight: bold;
+      line-height: 4.5vw;
+    }
+    .banner_text_wrap.over_top .banner_sub_text {
+      font-size: 2vw;
+      line-height: 3vw;
+    }
+    
+    .scenes_wrap {
+      display: flex;
+      align-items: center;
+      padding: 0;
+    }
+    .wrap_item.image {
+      flex: 1;
+    }
+    .wrap_item.text {
+      flex: 1;
+      padding: 0 4vw;
+      max-width: 50%;
+    }
+    .wrap_item.text .title {
+      font-size: 3.75vw;
+      font-weight: bold;
+      line-height: 4.5vw;
+      margin-bottom: 2.5vw;
+    }
+    .wrap_item.text .sub_title {
+      font-size: 1.5vw;
+      line-height: 2vw;
+    }
+    .wrap_item.text .color_bar {
+      height: 4px;
+      width: 5vw;
+      background: linear-gradient(60deg, #ff00ff, #00ffc0, #ffff00);
+      margin-bottom: 2vw;
+    }
+
+    .specification_wrap {
+      background: #000;
+      padding: 2vw 4vw;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .specification_wrap .product_img {
+      /* height: 35vw; */
+    }
+    .specification_wrap .product_img img {
+      height: 100%;
+    }
+    .specification_table {
+      width: 100%;
+    }
+    .specification_table_td {
+      display: flex;
+      justify-content: space-between;
+      padding: 1vw;
+      border-bottom: 1px solid #4d4d4d;
+    }
+    .specification_table_td.header {
+      border-bottom: 0;
+      padding-top: 0;
+    }
+    .specification_table_td.header .spacification_td_item {
+      font-size: 2.2vw;
+      font-weight: bolder;
+      line-height: 3.5vw;
+      border-bottom: 2px solid #fff;
+      width: auto;
+    }
+    .spacification_td_item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+    }
+    .H6148_spacification_item:nth-child(n) {
+      width: 60%;
+    }
+    .H6148_spacification_item:nth-child(2n) {
+      width: 40%;
+    }
+    .H6148_spacification_item .top {
+      font-size: 1vw;
+      color: rgba(255, 255, 255, .6);
+      word-break: break-word;
+    }
+    .H6148_spacification_item .bottom {
+      color: #fff;
+      font-size: 1.25vw;
+      word-break: break-word;
+    }
+    .specification_table_td .title {
+      font-size: 1vw;
+      color: #fff;
+      width: 30%;
+      font-weight: bolder;
+    }
+    .specification_table_td .sub_title {
+      font-size: 1vw;
+      width: 40%;
+    }
+
+    .control_scenes_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 3vw 0;
+    }
+    .control_item {
+      width: calc(25% - 1vw);
+    }
+    .control_image {
+      min-height: 10vw;
+    }
+    .control_text_wrap {
+      padding: 1.5vw;
+      text-align: center;
+    }
+    .control_text_wrap .text {
+      font-size: 1.4vw;
+      font-weight: bolder;
+      line-height: 2vw;
+    }
+    .control_text_wrap .sub_text {
+      font-size: 1vw;
+      line-height: 1.2vw;
+    }
+  }
+</style>

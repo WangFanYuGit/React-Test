@@ -1,0 +1,744 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% render 'additional-custom-content' %}
+
+
+<div id="H6054">
+  <div class="mobile-hide ipad-show">
+    <section class="middle_wrap">
+      <div class="title">ColorSense Technologie</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Unsere ColorSense Kamera erkennt und fängt auf intelligente Weise die Farben auf Ihrem TV Bildschirm ein und wendet automatisch das passende Hintergrundlicht aus. Darüber hinaus bietet die Govee Home App einen unglaublichen Video Modus, welcher sowohl eine Gaming als auch eine Film Option enthält. Fügen Sie dynamische Belichtung in Ihr Spielabenteuer oder peppen Sie Ihren Lieblingsfilm mit weichen entspannenden Farben auf.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1103.jpg?v=1617344312" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">Handfreie Steuerung</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Vorbei sind die Tage an denen Sie Ihre Lichter per Hand steuern mussten. Nun können Sie die Power von Govee Flow Pro erleben und ein-/ausschalten, Änderung der Helligkeit, oder Änderung der Farben einfach per Alexa oder Google Assistant steuern. Indem einfache Stimmbefehle verwendet werden, können Sie Govee Flow Pro einfach von Ihrem Sofa oder Bett steuern.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2.jpg?v=1617329812" alt="banner_2">
+    </section>
+    <section class="scenes_wrap">
+      <div class="scenes_item">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title">IHRE MUSIK ERLEUCHTET</div>
+            <div class="color_bar"></div>
+            <div class="sub_title">Dank des intuitiven Musikmodus können die Geräusche Ihres TVs oder Ihre Lieder perfekt in Synchronisation mit Ihren Lichtern leuchten. Mögen Sie Indoor Konzerte? Ergänzen Sie Ihre Live Shows mit lebendigen Farben und haben Sie eine gute Zeit. Oder erleben Sie eine komplett neue Gaming Experience mit unglaublichen Effekten. </div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3.jpg?v=1617329812" alt="">
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4.jpg?v=1617329812" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title">VIELSEITIGE INSTALLATION</div>
+            <div class="color_bar"></div>
+            <div class="sub_title">Diese Lichter bieten viele Design Optionen. Display Ständer und Wandhalterungen erlauben es Ihnen diese auf einer flachen Oberfläche zu platzieren oder an Ihren PC/TV anzubringen. </div>
+          </div>
+        </section>
+      </div>
+    </section>
+    <section class="scenes_wrap H6054">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5.jpg?v=1617329811" alt="">
+        </div>
+        <div class="scenes_item_desc">
+          <div class="title">Unabhängige Funktionalität</div>
+          <div class="sub_title">Managen Sie jede Lichtstange unabhängig voneinander für bessere Steuerung Ihres Lichterlebnisses.</div>
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6.jpg?v=1617329812" alt="">
+        </div>
+        <div class="scenes_item_desc">
+          <div class="title">Dreifache Steuerung</div>
+          <div class="sub_title">Erleben Sie mehr kreative Freiheit und Komfort mit Ihrer Stimme, der Govee Home App und der Steuerungsbox.</div>
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/7.jpg?v=1617329812" alt="">
+        </div>
+        <div class="scenes_item_desc">
+          <div class="title">Erschaffen Sie die Ideale Szene</div>
+          <div class="sub_title">12 dynamische Szenenmodi bieten die perfekte Lösung für jede Gelegenheit. Fügen Sie neue Farbtiefe zu Ihrer nächsten Party die beeindruckt. </div>
+        </div>
+      </div>
+    </section>
+    <section class="video_iframe">
+      <iframe width="100%" height="720" src="https://www.youtube.com/watch?list=TLGGPwfj3OjpoAcwMjA0MjAyMQ&v=KrUWaHaVMp8&feature=emb_imp_woyt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </section>
+    <section class="specification_wrap H6054">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          
+          <div class="spacification_td_item">
+            <div class="H6054_spacification_item">RGBICWW</div>  
+            <div class="H6054_spacification_item">Netzadapter<br> 
+              <span class="small_text">Stromversorgung</span>
+            </div> 
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6054_spacification_item auto">
+              Voice Control (Siri/Alexa/Google Assistant) + App+ Steuerungsbox <br><span class="small_text">Stromversorgung</span>
+            </div>
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6054_spacification_item">AC 100-240V<br><span class="small_text">Betriebsspannung</span></div>  
+            <div class="H6054_spacification_item">12V/2A<br><span class="small_text">Input</span></div>
+            <div class="H6054_spacification_item">400lm<br><span class="small_text">Lumen</span></div>
+            <div class="H6054_spacification_item">26,6*8,4*8,4in<br><span class="small_text">Maße</span></div>
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6054_spacification_item">2200-6500K<br><span class="small_text">Farbtemperatur</span></div>  
+            <div class="H6054_spacification_item">2M<br><span class="small_text">Camera Pixel</span></div>  
+            <div class="H6054_spacification_item">-10° bis 45°C <br><span class="small_text">Betriebstemperatur</span></div>  
+          </div>
+        </div>
+      </div>
+      <div class="product_img">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/pd.png?v=1617347437" alt="">
+      </div>
+    </section>
+  </div>
+  <div class="mobile-show ipad-hide">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6052-02.jpg?v=1617262229" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">SETZEN SIE IHRE KREATIVITÄT FREI</div>
+      <div class="sub_title">Passen Sie die Farbpalette in der App aus über 16 Millionen Farboptionen im DIY Modus an. Mit unserem einzigartigen Finger Sketch Feature können Sie Ihre eigenen Farbprofile erstellen und diese direkt auf Ihre Tischlampen für ein schönes Display anwenden.</div>
+      <div class="color_bar"></div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6052-03.jpg?v=1617262229" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">SIRI, ALEXA & GOOGLE ASSISTANT UNTERSTÜTZUNG</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Fan der Freisprecheinrichtung.</div>
+    </section>
+    <section class="banner_wrap banner_3">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6052-04.jpg?v=1617262229" alt="banner_3">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">SMARTE APP STEUERUNG</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Managen Sie Ihre Tischlampe mit der Govee Home APP. Zugang zu unglaublichen Lichteffekten, Millionen Farben und Automatisierung auf Ihrem Handy. </div>
+    </section>
+    <section class="banner_wrap banner_4">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6052-05.jpg?v=1617262229" alt="banner_4">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">BRINGEN SIE IHRE MUSIK ZUM LEUCHTEN</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Dank des hochsensiblen eingebauten Mikrofons welches im Wi-Fi Modul eingebaut ist, kann Govee Aura sich leicht mit jeder Art von Musik synchronisieren. Wählen Sie aus 4 Musikmodi und erleben Sie wie Ihre Lichter zum Rhythmus Ihrer Lieblingslieder tanzen und Ihre Stimmung mit Leichtigkeit heben.</div>
+    </section>
+    <section class="banner_wrap banner_5">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6052-06.jpg?v=1617262229" alt="banner_5">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">AUTOMATISCHE TIMER EINSTELLEN</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Programmieren Sie Ihre Tischlampen um sie allmählich automatisch auf 100% angehen zu lassen oder allmählich auf 0% zu dimmen, bevor sie sich ausschaltet. Wachen Sie friedlich auf oder gehen Sie mit sanfter, warmer Beleuchtung schlafen.</div>
+      <div class="brightness_wrap">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Brightness.png?v=1617248797" alt="">
+        <div class="brightness_text">
+          <span>Helligkeit 100%</span>
+          <span>Helligkeit 0%</span>
+        </div>
+      </div>
+    </section>
+    <section class="banner_wrap banner_6">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6052-07.jpg?v=1617262229" alt="banner_6">
+    </section>
+    <section class="middle_wrap">
+      <div class="title">FEATURES DIE AUFREGEND SIND</div>
+      <div class="color_bar"></div>
+      <div class="sub_title">Genießen Sie über 16 Millionen Farben und die bequeme App Steuerung, was Ihnen dabei hilft Ihre Aktivitäten im Innenbereich aufzupeppen. Mit den dimmbaren, warmen und kalten weißen Lichten können Sie das entspannende Ambiente schaffen, das Sie schon immer haben wollten.</div>
+    </section>
+    <section class="video_iframe">
+      <iframe width="100%" height="375" src="https://www.youtube.com/embed/V1fGC1Y6ZsU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </section>
+    <section class="compare_table">
+      <div class="compare_table_title">
+        Vergleichen Sie Aura mit Glow
+      </div>
+      <div class="compare_table_wrap">
+        <div class="compare_table_item">
+          <div class="compare_table_td">Produkt name</div>
+          <div class="compare_table_td">Modell</div>
+          <div class="compare_table_td">Preis</div>
+          <div class="compare_table_td adjust">Aussehen</div>
+          <div class="compare_table_td">Materialien</div>
+          <div class="compare_table_td">Steuerungsmethoden</div>
+          <div class="compare_table_td">Kommunikationsmethode</div>
+          <div class="compare_table_td">Maße</div>
+          <div class="compare_table_td">LED Kugel</div>
+          <div class="compare_table_td">Empfohlene Anwendungsszenarien</div>
+          <div class="compare_table_td">Musikmodus</div>
+          <div class="compare_table_td">Szenenmodus</div>
+        </div>
+        <div class="compare_table_item pd_lf_10">
+          <div class="compare_table_td">Aura Smart Tischlampe</div>
+          <div class="compare_table_td">H6052</div>
+          <div class="compare_table_td">59,99 USD</div>
+          <div class="compare_table_td img"><img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/PC-2.jpg?v=1617187081" alt=""></div>
+          <div class="compare_table_td">ABS+PC</div>
+          <div class="compare_table_td">Voice+App Control+Entity Steuerung</div>
+          <div class="compare_table_td">WIFI+BLE</div>
+          <div class="compare_table_td">4.1*4.1*7.9in</div>
+          <div class="compare_table_td">RGBIC</div>
+          <div class="compare_table_td">Schlafzimmertisch</div>
+          <div class="compare_table_td">√</div>
+          <div class="compare_table_td">√</div>
+        </div>
+        <div class="compare_table_item pd_lf_10">
+          <div class="compare_table_td">Glow Smart Tischlampe</div>
+          <div class="compare_table_td">H6050</div>
+          <div class="compare_table_td">69,99 USD </div>
+          <div class="compare_table_td img"><img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/PC-1.jpg?v=1617187081" alt=""></div>
+          <div class="compare_table_td">Metall+ABS+PC </div>
+          <div class="compare_table_td">Voice+App+Touch Steuerung</div>
+          <div class="compare_table_td">WIFI+BLE</div>
+          <div class="compare_table_td">6.1*6.1*15.4in</div>
+          <div class="compare_table_td">RGB</div>
+          <div class="compare_table_td">Wohnzimmertisch</div>
+          <div class="compare_table_td">√</div>
+          <div class="compare_table_td">√</div>
+        </div>
+      </div>
+    </section>
+  
+    <section class="specification_wrap">
+      <div class="product_img">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/specifiction.jpg?v=1617260585" alt="">
+      </div>
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Modell</div>
+          <div class="spacification_td_item">H6052</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Betriebsspannung</div>
+          <div class="spacification_td_item">AC 100-240V</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Input</div>
+          <div class="spacification_td_item">12V/1A</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Lumen</div>
+          <div class="spacification_td_item">350lm</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Farbe</div>
+          <div class="spacification_td_item">RGBWW</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Farbtemperatur</div>
+          <div class="spacification_td_item">2200k-6500k</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Betriebstemperatur</div>
+          <div class="spacification_td_item">-10°to 45°(14°to 113°F)</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Maße</div>
+          <div class="spacification_td_item">7.87×4.06in</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Gewicht</div>
+          <div class="spacification_td_item">31.75oz</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+{% render 'product-page-style' %}
+
+
+<style>
+  .H6054.scenes_wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  .H6054.scenes_wrap .scenes_item {
+    margin-right: 30px;
+    display: block;
+    width: 30%;
+  }
+  .H6054.scenes_wrap .scenes_item:last-child {
+    margin-right: 0;
+  }
+  .H6054 .scenes_item .scenes_item_img img {
+    display: block;
+  }
+  .H6054 .scenes_item_desc {
+    text-align: center;
+    padding: 30px 40px;
+  }
+  .H6054 .scenes_item_desc .title {
+    font-weight: bold;
+    font-size: 26px;
+  }
+  .H6054 .scenes_item_desc .sub_title {
+    font-size: 16px;
+  }
+
+  .H6054 .specification_table_td {
+    display: block;
+    border: 0;
+  }
+  .H6054 .specification_table_td > .spacification_td_item:first-child {
+    font-weight: normal;
+  }
+  .H6054 .specification_table_td.title > .spacification_td_item {
+    font-weight: bold;
+  }
+  .H6054.specification_wrap {
+    padding: 0 20px;
+  }
+  .H6054.specification_wrap .product_img {
+    height: 600px;
+  }
+  .H6054 .spacification_td_item {
+    width: 100%;
+    display: inline-block;
+    vertical-align: top;
+  }
+  .H6054 .small_text {
+    font-size: 13px;
+  }
+  .H6054_spacification_item {
+    display: inline-block;
+    width: 170px;
+    vertical-align: top;
+  }
+  .H6054_spacification_item.auto {
+    width: 100%;
+  }
+
+  @media screen and (max-width: 1365px) {
+    .specification_table {
+      padding: 0 20px;
+    }
+    .H6054.specification_wrap .product_img {
+      height: 400px;
+    }
+    .spacification_td_item {
+      font-size: 22px;
+    }
+    .H6054_spacification_item {
+      width: 150px;
+      font-size: 18px;
+    }
+    .H6054 .small_text {
+      font-size: 13px;
+    }
+  }
+  @media screen and (min-width: 1366px) {
+    .specification_table {
+      padding: 0 20px;
+    }
+    .H6054.specification_wrap .product_img {
+      height: 600px;
+    }
+    .spacification_td_item {
+      font-size: 26px;
+    }
+    .H6054_spacification_item {
+      width: 180px;
+      font-size: 22px;
+    }
+    .H6054 .small_text {
+      font-size: 15px;
+    }
+  }
+  @media screen and (min-width: 1500px) {
+    .specification_table {
+      padding: 0 20px;
+    }
+    .H6054.specification_wrap .product_img {
+      height: 600px;
+    }
+    .spacification_td_item {
+      font-size: 26px;
+    }
+    .H6054_spacification_item {
+      width: 210px;
+      font-size: 24px;
+    }
+    .H6054 .small_text {
+      font-size: 15px;
+    }
+  }
+  @media screen and (min-width: 1920px) {
+    .specification_table {
+      padding: 0 40px;
+    }
+    .H6054.specification_wrap .product_img {
+      height: 800px;
+    }
+    .spacification_td_item {
+      font-size: 30px;
+    }
+    .H6054_spacification_item {
+      width: 220px;
+      font-size: 26px;
+    }
+    .H6054 .small_text {
+      font-size: 16px;
+    }
+  }
+
+</style>

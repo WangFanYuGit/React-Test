@@ -1,0 +1,1380 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+            
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+        {% unless settings.product_description_collapse %}
+        <div class="product-single__description-full rte">
+          {{ product.description }}
+        </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% render 'additional-custom-content' %}
+
+
+<div id="H6050">
+  <div class="mobile-hide ipad-show">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/PC-_banner01.gif?v=1617865448" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">RELAXENDES LICHTAMBIENTE</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Mit 16 Millionen Farben und dem 1800-3000K Farbtemperaturbereich ist es nun extrem einfach eine beruhigende<br> Atmosphäre zu erschaffen. Entspannen Sie sich nach einem langen tag mit warmen Farben welche süße Ruhe stimulieren.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/6050-banner02.jpg?v=1617157636" alt="banner_2">
+      <div class="banner_text">
+        <div class="title  page_text_important color_white_important">EINZIGARTIG HOHL</div>
+        <div class="color_bar"></div>
+        <div class="sub_title  page_sub_text_important color_white_important">Das moderne Design erlaubt es das Glühen der Lampe zum perfekten dekorativen Teil in Ihrem Schlafzimmer, Spielzimmer oder Wohnzimmer werden zu lassen. Vergessen Sie traditionelle Lampen und stylen Sie Ihren Raum mit noch mehr Einzigartigkeit. </div>
+      </div>
+    </section>
+    <section class="scenes_wrap">
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/PC-_banner03.jpg?v=1617865448" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">STEUERN SIE MIT IHRER STIMME</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">Die Govee Gloe Kampe unterstützt SIRI, Alexa und Google Assistant. Freihändige Bedienung indem Sie Ihre Lampe einfach per Stimmkommandos steuern. </div>
+          </div>
+        </section>
+      </div>
+      <div class="scenes_item">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">SMARTE APP STEUERUNG</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">Die Govee Home App bietet moderne Steuerung und Features, konfigurierbare DIY Lichteffekte, einen Musikmodus und Millionen an Farben. Holen Sie das meiste aus Ihrer Glow Lampe heraus mit Ihrem Smartphone. </div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/6050-banner04.jpg?v=1617157636" alt="">
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6050-banner05.jpg?v=1617157636" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">TOUCH STEUERUNG</div>
+            <div class="color_bar"></div>
+            <div class="sub_title page_sub_text_important">Bevorzugen Sie traditionelle Steuerungsmöglichkeiten? Schalten Sie die Glow Lampe an/aus, ändern Sie das Helligkeitslevel, oder ändern Sie Farben per Knopfdruck.</div>
+          </div>
+        </section>
+      </div>
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">FÄRBEN SIE IHRE LIEBSTEN SONGS</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Die bereitgestellte Steuerungsbox verfügt über ein sensibles eingebautes Mikrofon welches garantiert, dass die Glow Lampe sich leicht mit jeder Musik synchronisiert. Geben Sie Ihren Dinnerpartys die richtige Würze mit Farben die sich im Tempo Ihrer Songs bewegen.</div>
+    </section>
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6050-banner06.jpg?v=1617157636" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">WARME BELEUCHTUNG FÜR IHR HERZ & HEIM</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Entworfen um Ihre Welt zu erwärmen.</div>
+    </section>
+    <section class="slider hero" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
+      <div class="banner banner2">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6050-banner07-1.jpg?v=1617157636" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6050-banner07-3.jpg?v=1617157636" />
+      </div>
+    </section>
+  
+    <section class="compare_table bgc_white_important">
+      <div class="compare_table_title page_text_important">
+        Vergleich Glow mit Aura
+      </div>
+      <div class="compare_table_wrap bgc_white_important">
+        <div class="compare_table_item bgc_white_important">
+          <div class="compare_table_td">Produkt name</div>
+          <div class="compare_table_td">Modell</div>
+          <div class="compare_table_td">Preis</div>
+          <div class="compare_table_td adjust">Aussehen</div>
+          <div class="compare_table_td">Materialien</div>
+          <div class="compare_table_td">Steuerungsmethoden</div>
+          <div class="compare_table_td">Kommunikationsmethode</div>
+          <div class="compare_table_td">Maße</div>
+          <div class="compare_table_td">LED Kugel</div>
+          <div class="compare_table_td">Empfohlene Anwendungsszenarien</div>
+          <div class="compare_table_td">Musikmodus</div>
+          <div class="compare_table_td">Szenenmodus</div>
+        </div>
+        <div class="compare_table_item pd_lf_10 bgc_white_important">
+          <div class="compare_table_td">Glow Smart Tischlampe</div>
+          <div class="compare_table_td">H6050</div>
+          <div class="compare_table_td">69,99 USD </div>
+          <div class="compare_table_td img"><img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/PC-1.jpg?v=1617187081" alt=""></div>
+          <div class="compare_table_td">Metall+ABS+PC </div>
+          <div class="compare_table_td">Voice+App+Touch Steuerung</div>
+          <div class="compare_table_td">WIFI+BLE</div>
+          <div class="compare_table_td">6.1*6.1*15.4in</div>
+          <div class="compare_table_td">RGB</div>
+          <div class="compare_table_td">Wohnzimmertisch</div>
+          <div class="compare_table_td">√</div>
+          <div class="compare_table_td">√</div>
+        </div>
+        <div class="compare_table_item pd_lf_10 bgc_white_important">
+          <div class="compare_table_td">Aura Smart Tischlampe</div>
+          <div class="compare_table_td">H6052</div>
+          <div class="compare_table_td">59,99 USD</div>
+          <div class="compare_table_td img"><img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/PC-2.jpg?v=1617187081" alt=""></div>
+          <div class="compare_table_td">ABS+PC</div>
+          <div class="compare_table_td">Voice+App Control+Entity Steuerung</div>
+          <div class="compare_table_td">WIFI+BLE</div>
+          <div class="compare_table_td">4.1*4.1*7.9in</div>
+          <div class="compare_table_td">RGBIC</div>
+          <div class="compare_table_td">Schlafzimmertisch</div>
+          <div class="compare_table_td">√</div>
+          <div class="compare_table_td">√</div>
+        </div>
+      </div>
+    </section>
+    <section class="specification_wrap" style="background-color: black;">
+      <div class="product_img">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/table_lamp.jpg?v=1617241829" alt="">
+      </div>
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Modell</div>
+          <div class="spacification_td_item">H6050</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Adapter Input</div>
+          <div class="spacification_td_item">AC 100-240V</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Lampen Input</div>
+          <div class="spacification_td_item">12V/1A</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Farbe</div>
+          <div class="spacification_td_item">RGBWW</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Farbtemperatur</div>
+          <div class="spacification_td_item">1800k-3000k</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Steuerungsmethode</div>
+          <div class="spacification_td_item">Berühren Sie + APP + Sprachsteuerung</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Betriebstemperatur</div>
+          <div class="spacification_td_item">-10°to 40°(4°to 104°F)</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Maße</div>
+          <div class="spacification_td_item">6.1×15.4in</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">Gewicht</div>
+          <div class="spacification_td_item">35.98oz</div>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="mobile-show ipad-hide">
+    <section class="banner_wrap banner_1">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/banner01.gif?v=1617865448" alt="banner_1">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">RELAXENDES LICHTAMBIENTE</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Mit 16 Millionen Farben und dem 1800-3000K Farbtemperaturbereich ist es nun extrem einfach eine beruhigende<br> Atmosphäre zu erschaffen. Entspannen Sie sich nach einem langen tag mit warmen Farben welche süße Ruhe stimulieren.</div>
+    </section>
+    <section class="banner_wrap banner_2">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02.jpg?v=1617181464" alt="banner_2">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important color_black_important">EINZIGARTIG HOHL</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important color_black_important">Das moderne Design erlaubt es das Glühen der Lampe zum perfekten dekorativen Teil in Ihrem Schlafzimmer, Spielzimmer oder Wohnzimmer werden zu lassen. Vergessen Sie traditionelle Lampen und stylen Sie Ihren Raum mit noch mehr Einzigartigkeit. </div>
+    </section>
+    <section class="banner_wrap banner_3">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/banner03_482ddb0b-8892-4710-8f32-dfc170419650.jpg?v=1617865447" alt="banner_3">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">STEUERN SIE MIT IHRER STIMME</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Die Govee Gloe Kampe unterstützt SIRI, Alexa und Google Assistant. Freihändige Bedienung indem Sie Ihre Lampe einfach per Stimmkommandos steuern. </div>
+    </section>
+    <section class="banner_wrap banner_4">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0558/5433/4115/files/banner04_06a9ca90-f2df-4e6e-b318-890a8afd4e0a.jpg?v=1617865447" alt="banner_4">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">WARME BELEUCHTUNG FÜR IHR HERZ & HEIM</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Entworfen um Ihre Welt zu erwärmen.</div>
+    </section>
+    <section class="banner_wrap banner_5">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/05.jpg?v=1617181464" alt="banner_5">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">TOUCH STEUERUNG</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Bevorzugen Sie traditionelle Steuerungsmöglichkeiten? Schalten Sie die Glow Lampe an/aus, ändern Sie das Helligkeitslevel, oder ändern Sie Farben per Knopfdruck.</div>
+    </section>
+    <section class="banner_wrap banner_6">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/06.jpg?v=1617181464" alt="banner_6">
+    </section>
+    <section class="middle_wrap">
+      <div class="title page_text_important">WARME BELEUCHTUNG FÜR IHR HERZ & HEIM</div>
+      <div class="color_bar"></div>
+      <div class="sub_title page_sub_text_important">Entworfen um Ihre Welt zu erwärmen.</div>
+    </section>
+  
+    <section class="slider hero" data-slick='{"slidesToShow": 1, "slidesToScroll": 1}'>
+      <div class="banner banner2">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07-1.jpg?v=1617181464" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07-2.jpg?v=1617181464" />
+      </div>
+      <div class="banner banner2 slick-slide">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07-3.jpg?v=1617181464" />
+      </div>
+    </section>
+  
+    <div class="whole-form">
+      
+      <h5><span>Compare Glow with Aura</span></h5>
+        
+        <div class="whole-form-form">
+         <div class="cus_form_form">
+  
+  
+      <div class="items">
+          <div class="col-1-3  bgc_white_important">
+          Produce name
+          </div>
+          <div class="col-1-3  bgc_white_important">
+          Glow Smart Table Lamp
+          </div>
+          <div class="col-1-3  bgc_white_important">
+          Aura Smart Table Lamp
+          </div>
+      </div>
+      <div class="items">
+          <div class="col-1-3  bgc_white_important">
+          Model 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          H6050 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          H6052  
+          </div>
+      </div>
+      <div class="items">
+          <div class="col-1-3 bgc_white_important">
+          Price
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          $69.99
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          $59.99 
+          </div>
+      </div>
+      
+      <div class="items items-img">
+          <div class="col-1-3 bgc_white_important">
+          Appearance 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          <img class="items-img-img" src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/form6052-1.png?v=1617766325">     
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          <img class="items-img-img" src="https://cdn.shopifycdn.net/s/files/1/0512/3489/8105/files/form6052-2.png?v=1617766324">
+          </div>
+      </div>
+      <div class="items">
+         <div class="col-1-3 bgc_white_important">
+         Materials
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          ABS+PC 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Metal+ABS+PC
+          </div>
+      </div>
+      <div class="items">
+          <div class="col-1-3 bgc_white_important">
+          Control Method
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Voice +App+Touch control    
+          
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Voice+App Control +Entity control
+          </div>
+      </div>
+      <div class="items">
+     
+          <div class="col-1-3 bgc_white_important">
+          Communication Method
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Wi-fi+BLE 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Wi-fi+BLE
+          </div>
+      </div>
+      <div class="items">
+      
+          <div class="col-1-3 bgc_white_important">
+          Size  
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          6.1*6.1*15.4in    
+          
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          4.1*4.1*7.9in
+          </div>
+      </div>
+      <div class="items">
+       
+          <div class="col-1-3 bgc_white_important">
+          LED Bead
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          RGB 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          RGBIC 
+          </div>
+      </div>
+      <div class="items">
+      
+          <div class="col-1-3 bgc_white_important">
+          Recommended Application Scenarios
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Living room desk 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          Bedroom bedside table
+          </div>
+      </div>
+      <div class="items">
+          <div class="col-1-3 bgc_white_important">
+          Music mode  
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          ✓ 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          ✓
+          </div>
+      </div>
+      <div class="items">
+          <div class="col-1-3 bgc_white_important">
+          Scene mode 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          ✓ 
+          </div>
+          <div class="col-1-3 bgc_white_important">
+          ✓
+          </div>
+      </div>
+  
+  
+  </div> 
+        </div>  
+        
+      </div>
+  
+    <section class="specification_wrap" style="background-color: #101010;">
+      <div class="product_img" style="width: 100%; height: auto;">
+        <img class="lazyload width_auto_important" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/table_lamp.jpg?v=1617241829" alt="">
+      </div>
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item color_white_important">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Modell</div>
+          <div class="spacification_td_item color_white_important">H6050</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Adapter Input</div>
+          <div class="spacification_td_item color_white_important">AC 100-240V</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Lampen Input</div>
+          <div class="spacification_td_item color_white_important">12V/1A</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Farbe</div>
+          <div class="spacification_td_item color_white_important">RGBWW</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Farbtemperatur</div>
+          <div class="spacification_td_item color_white_important">1800k-3000k</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Steuerungsmethode</div>
+          <div class="spacification_td_item color_white_important">Berühren Sie + APP + Sprachsteuerung</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Betriebstemperatur</div>
+          <div class="spacification_td_item color_white_important">-10°to 40°(4°to 104°F)</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Maße</div>
+          <div class="spacification_td_item color_white_important">6.1×15.4in</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item color_white_important">Gewicht</div>
+          <div class="spacification_td_item color_white_important">35.98oz</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+
+<style>
+  .specification_wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .specification_wrap .product_img {
+    height: 700px;
+  }
+  .specification_wrap .product_img img {
+    display: block;
+    height: 100%;
+  }
+  .specification_table {
+    flex: 1;
+  }
+  .specification_table_td {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid #ccc;
+  }
+  .specification_table_td.title {
+    border-bottom: 0;
+  }
+  .spacification_td_item {
+    width: 400px;
+    font-size: 16px;
+    padding: 15px 0;
+    color: white;
+  }
+  .specification_table_td.title .spacification_td_item {
+    width: auto;
+    border-bottom: 1px solid #ccc;
+  }
+
+
+  .hero:hover .slick-arrow {
+    display: block !important; 
+  }
+  .hero .slick-arrow {
+    display: none !important;;
+    color: #fff;
+  }
+  .banner_wrap {
+    position: relative;
+  }
+  .banner_wrap img {
+    display: block;
+  }
+  .banner_2 .banner_text {
+    position: absolute;
+    top: 18%;
+    right: 10%;
+    width: 50%;
+  }
+  .banner_text .color_bar {
+    height: 4px;
+    width: 80px;
+    margin: 30px 0 10px;
+    background: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff);
+  }
+
+  .banner_text .title {
+    font-size: 66px;
+    line-height: 66px;
+    font-weight: bold;
+  }
+  .banner_text .sub_title {
+    font-size: 46px;
+  }
+  .scenes_item_wrap {
+    flex: 1;
+  }
+  .scenes_item_wrap_inner {
+    text-align: left;
+    padding: 0 120px;
+  }
+  .scenes_item_wrap_inner .title {
+    font-size: 66px;
+    line-height: 66px;
+    font-weight: bold;
+  }
+  .scenes_item_wrap_inner .color_bar {
+    height: 2px;
+    width: 80px;
+    margin: 30px 0 10px;
+    background: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff);
+  }
+  .scenes_item_wrap_inner .sub_title {
+    font-size: 22px;
+  } 
+  .middle_wrap {
+    text-align: center;
+    padding: 40px 6%;
+  }
+  .middle_wrap .color_bar {
+    height: 4px;
+    width: 100px;
+    margin: 20px auto 30px;
+    background: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff);
+  }
+  .middle_wrap .title {
+    font-size: 66px;
+    font-weight: bold;
+  }
+  .middle_wrap .sub_title {
+    font-size: 22px;
+  }
+  .scenes_wrap .scenes_item {
+    display: flex;
+    align-items: center;
+  }
+  .scenes_item .scenes_item_img {
+    flex: 1;
+  }
+  .scenes_item .scenes_item_img img {
+    display: block;
+  }
+  .scenes_item_desc {
+    text-align: left;
+    padding: 30px 40px;
+    flex: 1;
+  }
+  .scenes_item_wrap_inner .title {
+    font-weight: bold;
+    font-size: 26px;
+  }
+  .scenes_item_wrap_inner .sub_title {
+    font-size: 16px;
+  }
+
+  .compare_table {
+    padding: 30px 80px 0;
+    background: #000;
+  }
+  .compare_table_title {
+    font-size: 30px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    margin-bottom: 30px;
+  }
+  .compare_table_wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .compare_table_item {
+    background: #0c0c0c;
+  }
+  .compare_table_item:last-child {
+    margin: 0;
+  }
+  .compare_table_td {
+    border-bottom: 1px solid #ccc;
+    font-size: 16px;
+    line-height: 40px;
+    font-weight: bold;
+  }
+  .pd_lf_10 .compare_table_td{
+    padding-left: 10px;
+  }
+  .compare_table_td:last-child {
+    border: none;
+  }
+  .compare_table_td.img {
+    padding: 10px 20px;
+  }
+  .compare_table_td img {
+    display: block;
+  }
+  .compare_table_td.adjust {
+    height: 150px;
+    line-height: 150px;
+  }
+  /* mobile 样式 */
+  .mobile-show .hero .slick-arrow {
+    display: block !important;
+  }
+  .mobile-show .banner_wrap {
+    margin-bottom: 15px;
+  }
+  .mobile-show .banner_text {
+    position: absolute;
+    left: 4%;
+    bottom: 4%;
+  }
+  .mobile-show .banner_text .title {
+    font-size: 18px;
+    line-height: 18px;
+  }
+  .mobile-show .banner_text .sub_title {
+    font-size: 18px;
+    line-height: 18px;
+    font-weight: bold;
+  }
+  .mobile-show .scenes_wrap {
+    display: block;
+    padding: 0;
+  }
+  .mobile-show .scenes_wrap .scenes_item {
+    margin: 0;
+  }
+  .mobile-show .middle_wrap {
+    padding: 20px;
+  }
+  .mobile-show .color_bar {
+    margin: 10px auto;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff);
+  }
+  .mobile-show .middle_wrap .title {
+    font-size: 24px;
+    line-height: 26px;
+  }
+  .mobile-show .middle_wrap .sub_title {
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  .mobile-show .compare_table {
+    padding: 10px 10px 0;
+    background: #000;
+  }
+  .mobile-show .compare_table_title {
+    font-size: 20px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .mobile-show .compare_table_wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mobile-show .compare_table_item {
+    background: #0c0c0c;
+  }
+  .mobile-show .compare_table_item:last-child {
+    margin: 0;
+  }
+  .mobile-show .compare_table_td {
+    border-bottom: 1px solid #3b3b3b;
+    font-size: 14px;
+    font-weight: bold;
+    width: 116px;
+    height: 70px;
+    line-height: 35px;
+    display: flex;
+    align-items: center;
+  }
+  .mobile-show .pd_lf_10 .compare_table_td{
+    padding-left: 6px;
+  }
+  .mobile-show .compare_table_td:last-child {
+    border: none;
+  }
+  .mobile-show .compare_table_td.img {
+    padding: 4px 10px;
+  }
+  .mobile-show .compare_table_td img {
+    display: block;
+  }
+
+  .mobile-show .specification_wrap {
+    display: block;
+  }
+  .mobile-show .specification_table {
+    padding: 0 20px;
+  }
+  .mobile-show .specification_table_td {
+    justify-content: space-between;
+  }
+  .mobile-show .spacification_td_item {
+    width: 100px;
+    font-size: 12px;
+    padding: 8px 0;
+    word-break: break-all;
+  }
+
+  @media screen and (min-width: 1200px) {
+    .banner_text .title {
+      font-size: 42px;
+      line-height: 42px;
+    }
+    .banner_text .sub_title {
+      font-size: 26px;
+    }
+    .middle_wrap .title {
+      font-size: 46px;
+    }
+    .middle_wrap .sub_title {
+      font-size: 20px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 46px;
+      line-height: 46px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 20px;
+    }
+
+    .compare_table {
+      padding: 30px 60px 0;
+      background: #000;
+    }
+    .compare_table_title {
+      font-size: 30px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .compare_table_wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .compare_table_item {
+      background: #0c0c0c;
+      flex: 1;
+      margin-right: 20px;
+    }
+    .compare_table_td {
+      border-bottom: 1px solid #3b3b3b;
+      font-size: 16px;
+      line-height: 36px;
+      font-weight: bold;
+    }
+    .pd_lf_10 .compare_table_td{
+      padding-left: 10px;
+    }
+    .compare_table_td.adjust {
+      height: 140px;
+      line-height: 140px;
+    }
+    .pd_lf_10 .compare_table_td{
+      padding-left: 10px;
+    }
+    .compare_table_td.img {
+      padding: 5px 10px;
+      min-height: 130px;
+    }
+
+    .specification_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .specification_wrap .product_img {
+      height: 700px;
+    }
+    .specification_wrap .product_img img {
+      display: block;
+      height: 100%;
+    }
+    .specification_table {
+      flex: 1;
+    }
+    .specification_table_td {
+      display: flex;
+      justify-content: flex-start;
+      border-bottom: 1px solid #3d3d3d;
+    }
+    .specification_table_td.title {
+      border-bottom: 0;
+    }
+    .spacification_td_item {
+      width: 400px;
+      font-size: 16px;
+      padding: 15px 0;
+    }
+    .specification_table_td.title .spacification_td_item {
+      width: auto;
+      border-bottom: 1px solid #ccc;
+    }
+  }
+  @media screen and (min-width: 1366px) {
+    .banner_text .title {
+      font-size: 42px;
+      line-height: 42px;
+    }
+    .banner_text .sub_title {
+      font-size: 26px;
+    }
+    .middle_wrap .title {
+      font-size: 46px;
+    }
+    .middle_wrap .sub_title {
+      font-size: 20px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 46px;
+      line-height: 46px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 20px;
+    }
+
+    .compare_table {
+      padding: 30px 60px 0;
+      background: #000;
+    }
+    .compare_table_title {
+      font-size: 40px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .compare_table_wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .compare_table_item {
+      background: #0c0c0c;
+      flex: 1;
+      margin-right: 30px;
+    }
+    .compare_table_td {
+      border-bottom: 1px solid #3b3b3b;
+      font-size: 16px;
+      line-height: 46px;
+      font-weight: bold;
+    }
+    .pd_lf_10 .compare_table_td{
+      padding-left: 20px;
+    }
+    .compare_table_td.adjust {
+      height: 150px;
+      line-height: 150px;
+    }
+    .compare_table_td.img {
+      padding: 10px 20px;
+    }
+    .compare_table_title {
+      font-size: 40px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .compare_table_wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .compare_table_item {
+      background: #0c0c0c;
+      flex: 1;
+      margin-right: 50px;
+    }
+    .compare_table_td {
+      border-bottom: 1px solid #3b3b3b;
+      font-size: 16px;
+      line-height: 46px;
+      font-weight: bold;
+    }
+    .pd_lf_10 .compare_table_td{
+      padding-left: 20px;
+    }
+    .compare_table_td.adjust {
+      height: 150px;
+      line-height: 150px;
+    }
+    .compare_table_td.img {
+      padding: 10px 20px;
+      min-height: 130px;
+    }
+  }
+  @media screen and (min-width: 1600px) {
+    .banner_text .title {
+      font-size: 56px;
+      line-height: 56px;
+    }
+    .banner_text .sub_title {
+      font-size: 38px;
+    }
+    .middle_wrap .title {
+      font-size: 56px;
+    }
+    .middle_wrap .sub_title {
+      font-size: 20px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 56px;
+      line-height: 56px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 20px;
+    }
+
+    .compare_table_title {
+      font-size: 40px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .compare_table_wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .compare_table_item {
+      background: #0c0c0c;
+      flex: 1;
+      margin-right: 50px;
+    }
+    .compare_table_td {
+      border-bottom: 1px solid #3b3b3b;
+      font-size: 16px;
+      line-height: 46px;
+      font-weight: bold;
+    }
+    .pd_lf_10 .compare_table_td{
+      padding-left: 20px;
+    }
+    .compare_table_td.adjust {
+      height: 150px;
+      line-height: 150px;
+    }
+    .compare_table_td.img {
+      padding: 10px 20px;
+      min-height: 130px;
+    }
+  }
+  @media screen and (min-width: 1920px) {
+    .banner_text .title {
+      font-size: 66px;
+      line-height: 66px;
+    }
+    .banner_text .sub_title {
+      font-size: 40px;
+    }
+    .middle_wrap .title {
+      font-size: 66px;
+    }
+    .middle_wrap .sub_title {
+      font-size: 20px;
+    }
+    .scenes_item_wrap_inner .title{
+      font-size: 66px;
+      line-height: 66px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 20px;
+    }
+
+    .compare_table_title {
+      font-size: 40px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .compare_table_wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .compare_table_item {
+      background: #0c0c0c;
+      flex: 1;
+      margin-right: 50px;
+    }
+    .compare_table_td {
+      border-bottom: 1px solid #3b3b3b;
+      font-size: 16px;
+      line-height: 46px;
+      font-weight: bold;
+    }
+    .pd_lf_10 .compare_table_td{
+      padding-left: 40px;
+    }
+    .compare_table_td.adjust {
+      height: 150px;
+      line-height: 150px;
+    }
+    .compare_table_td.img {
+      padding: 10px 40px;
+      min-height: 130px;
+    }
+    
+    .spacification_td_item {
+      width: 600px;
+      font-size: 16px;
+      padding: 15px 0;
+    }
+  }
+</style>
+
+<script>
+  window.onload = function () {
+    $(".slider").slick({
+      infinite: true,
+      lazyLoad: "progressive",
+      fade: true,
+      speed: 500,
+      arrows: true,
+    });
+
+    $(`<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-left" viewBox="0 0 284.49 498.98"><path d="M249.49 0a35 35 0 0 1 24.75 59.75L84.49 249.49l189.75 189.74a35.002 35.002 0 1 1-49.5 49.5L10.25 274.24a35 35 0 0 1 0-49.5L224.74 10.25A34.89 34.89 0 0 1 249.49 0z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.previous' | t }}</span>`).appendTo('.slick-prev.slick-arrow')
+    $(`<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-right" viewBox="0 0 284.49 498.98"><path d="M35 498.98a35 35 0 0 1-24.75-59.75l189.74-189.74L10.25 59.75a35.002 35.002 0 0 1 49.5-49.5l214.49 214.49a35 35 0 0 1 0 49.5L59.75 488.73A34.89 34.89 0 0 1 35 498.98z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.next' | t }}</span>`).appendTo('.slick-next.slick-arrow')
+  };
+</script>

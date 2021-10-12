@@ -1,0 +1,92 @@
+<div>
+  <div class="page-width">
+    <div class="subscribe_wrap">
+      {%- assign form_id = 'contact-' | append: section.id -%}
+      {%- form 'contact', id: form_id -%}
+
+        {%- if form.posted_successfully? -%}
+          <p class="note note--success">
+            {{ 'contact.form.post_success' | t }}
+          </p>
+        {%- endif -%}
+
+        {{ form.errors | default_errors }}
+
+        <div class="small--hide lazyload">
+
+        {% assign preview_image = collection.products[0].featured_media.preview_image %}
+        {% assign img_url = preview_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.'%}
+          <img class="subscribe_img grid-product__image lazyload"
+            data-src="{{ img_url }}"
+            data-widths="[180, 360, 540, 720, 900, 1080]"
+            data-aspectratio="{{ preview_image.aspect_ratio }}"
+            data-sizes="auto"
+            alt="{{ preview_image.alt | escape }}">
+          <p>{{ collection.products[0].featured_media.title }}</p>
+          <div class="subscribe_input">
+            <input placeholder="Your Email Address" type="email" id="ContactFormEmail-{{ section.id }}" class="input-full" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+          </div>
+        </div>
+
+        <button type="submit" class="subscribe_btn btn">
+          Let Me Know
+        </button>
+
+        <!-- {{ 'shopify.online_store.spam_detection.disclaimer_html' | t }} -->
+
+      {%- endform -%}
+    </div>
+  </div>
+</div>
+<style>
+  .subscribe_wrap {
+    width: 360px;
+  }
+  .subscribe_input {
+    margin: 4px;
+  }
+  .subscribe_input input {
+    border-radius: 4px;
+  }
+  .subscribe_img {
+    border-radius: 4px;
+  }
+  .subscribe_btn {
+    color: #333;
+    border-radius: 4px;
+    width: 352px;
+    margin: 4px;
+  }
+</style>
+{% schema %}
+  {
+    "name": "Contact form",
+    "class": "index-section",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "All submissions are sent to the customer email address of your store. [Learn more](https://help.shopify.com/en/manual/using-themes/change-the-layout/add-contact-form#view-contact-form-submissions)."
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title",
+        "default": "Contact us"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_phone",
+        "label": "Show phone number"
+      },
+      {
+        "type": "checkbox",
+        "id": "narrow_column",
+        "label": "Narrow column"
+      }
+    ],
+    "presets": [{
+      "name": "Contact form",
+      "category": "Store information"
+    }]
+  }
+{% endschema %}

@@ -1,0 +1,221 @@
+<section class="video_wrapper">
+  <div class="page-width" data-animate_images="true">
+    <div class="slogan_text lazyload" data-animate_text="true">Unboxing & Reviews</div>
+    <div class="videos_wrap swiper-container" id="videos_wrap">
+      <div class="videos_list swiper-wrapper">
+        {% for block in section.blocks %}
+          {% if block.type == 'KOL_Video' %}
+          {% assign poster = block.settings.poster %}
+          {% assign title = block.settings.title %}
+          {% assign content = block.settings.content %}
+          {% assign video_url = block.settings.url %}
+          {% assign url_text = block.settings.url_text %}
+          <div class="video_box swiper-slide">
+            <div class="video_image ">
+              {% if video_url %}<a class="item_thumbnail" href="{{ video_url }}" rel="nofollow">{% elsif url_text %}<a class="item_thumbnail" href="{{ url_text }}" rel="nofollow">{% endif %}
+                <img
+                  class="lazyload"
+                  data-src="
+                  {% if poster %}{{ poster | img_url : 'large' }}{% endif %}
+                  {% unless poster %}
+                  {{
+                    video_url.id
+                      | prepend: 'https://i.ytimg.com/vi/'
+                      | append: '/hqdefault.jpg'
+                  }}{% endunless %}"
+                  alt=""
+                />
+                <div class="play_mask">
+                  <div class="play_icon">
+                    <img
+                      class="lazyload"
+                      data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1.png?v=1621587474"
+                      alt=""
+                    />
+                  </div>
+                </div>
+              {% if video_url or url_text %}</a> {% endif %}
+            </div>
+            <div class="video_info">
+              <div class="video_title">{{ title }}</div>
+              <div class="video_content"> {{ content }}</div>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="swiper-button-prev swiper-button-black"></div>
+      <div class="swiper-button-next swiper-button-black"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media screen and (min-width: 768px) {
+    .video_wrapper {
+      background: #fff;
+      padding: 3vw 0;
+    }
+    .video_box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform: scale(1);
+      transition: 100ms;
+      z-index: 8;
+      height: auto;
+      width: 33.33333% !important;
+      opacity: .7;
+    }
+    .video_box.swiper-slide-active {
+      transform: scale(1.2);
+      opacity: 1;
+      z-index: 9;
+    }
+    .video_image {
+      position: relative;
+      max-height: 14vw;
+      min-height: 14vw;
+      overflow: hidden;
+    }
+    .video_image img {
+      height: 100%;
+      object-fit: contain;
+    }
+    .video_wrapper .slogan_text {
+      color: #000;
+      margin-bottom: 1vw;
+    }
+    .video_wrapper .video_title {
+      font-size: 1.4vw;
+      color: #333;
+      font-weight: bold;
+    }
+    .video_wrapper .video_content {
+      font-size: 1.2vw;
+      color: #333;
+    }
+    .video_wrapper .video_info {
+      margin: 1vw 0;
+      width: 100%;
+      text-align: left;
+    }
+    .videos_wrap.swiper-container {
+      padding-top: 4vw;
+      padding-bottom: 5vw;
+    }
+    .video_wrapper .swiper-pagination-bullet-active {
+      background: #000;
+    }
+    .video_wrapper .page-width {
+      width: 82vw;
+      padding: 0;
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .video_wrapper .page-width {
+      padding: 0;
+    }
+    .video_wrapper {
+      background: #fff;
+      padding: 30px 0;
+    }
+    .video_box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform: scale(1);
+      transition: 100ms;
+      z-index: 8;
+      height: auto;
+      width: 245px !important;
+    }
+    .video_box.swiper-slide-active {
+      transform: scale(1.2);
+      z-index: 9;
+    }
+    .video_image {
+      position: relative;
+      max-height: 180px;
+      min-height: 180px;
+      overflow: hidden;
+    }
+    .video_image img {
+      height: 100%;
+      object-fit: contain;
+    }
+    .video_wrapper .slogan_text {
+      color: #000;
+      margin-bottom: 10px;
+    }
+    .video_wrapper .video_title {
+      font-size: 14px;
+      color: #333;
+      font-weight: bold;
+      display: none;
+    }
+    .video_wrapper .video_content {
+      font-size: 12px;
+      color: #333;
+      display: none;
+    }
+    .video_wrapper .video_info {
+      margin: 4px 0;
+      width: 100%;
+      text-align: left;
+    }
+    .videos_wrap.swiper-container {
+      padding-top: 30px;
+      padding-bottom: 80px;
+    }
+    .video_wrapper .swiper-pagination-bullet-active {
+      background: #000;
+    }
+    .video_box.swiper-slide-active .video_title, 
+    .video_box.swiper-slide-active .video_content {
+      display: block;
+    }
+  }
+
+</style>
+
+<script src="{{ 'swiper-bundle.min.js' | asset_url }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+  if (window.isMobile) {
+    $('.page_wrap>.mobile-hide').html('')
+    var videos_swiper = new Swiper('.videos_wrap.swiper-container', {
+      slidesPerView: 'auto',
+      spaceBetween: 0,
+      centeredSlides: true,
+      loop: true,
+      pagination: {
+        el: '.videos_wrap .swiper-pagination',
+        clickable: true,
+      },
+      init: false
+    });
+  }else {
+    $('.page_wrap>.mobile-show').html('')
+    var videos_swiper = new Swiper('.videos_wrap.swiper-container', {
+      slidesPerView: 3,
+      spaceBetween: 0,
+      loop: true,
+      centeredSlides: true,
+      pagination: {
+        el: '.videos_wrap .swiper-pagination',
+        clickable: true,
+      },
+      init: false,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+    });
+  }
+  videos_swiper.init();
+  $('.videos_wrap.swiper-container').css('display','block')
+</script>

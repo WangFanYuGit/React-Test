@@ -1,0 +1,30 @@
+<div class="product_list_wrap">
+  {% for block in section.blocks %}
+    {% liquid 
+      assign product = block.settings.product
+      assign image = block.settings.image
+      assign discount_percent = block.settings.discount_percent | append: '%'
+      assign discount_bg = 'https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/265_2x_1e877f82-e25a-45de-863d-fce15adeda91.png?v=1623512350'  
+    %}
+    <div class="product_wrap {{ block.type }}">
+      <div class="product_img">
+        <img data-src="{{ image | img_url: 'master' }}" alt="" class="lazyload">
+        <div class="discount_wrap lazyload">
+          <img src="{{ discount_bg }}" alt="" class="lazyload">
+          <span class="discount_text" data-animate_text="true">
+            {{ discount_percent }}<br>
+            OFF
+          </span>
+        </div>
+      </div>
+      <div class="product_info">
+        <div class="product_title ellipsis" data-line-clamp="2">{{ product.title }}</div>
+        <div class="product_price_wrap">
+          <span class="product_price sale bold">{{ product.price | money }}</span>
+          <span class="product_price virtual">{{ product.compare_at_price | money }}</span>
+        </div>
+        <a target="_blank" href="{{ product.url }}" class="product_shop_now product_button">Shop Now</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>

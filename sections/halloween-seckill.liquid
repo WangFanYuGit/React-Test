@@ -1,0 +1,668 @@
+<section class="halloween-sekill {{ section.id }}" data-animate_image="true">
+  <ul class="flash_sale_products hide">
+    {% for block in section.blocks %}
+    {% liquid
+      assign start_date = block.settings.start_date
+      assign end_date = block.settings.end_date
+      assign image = block.settings.image
+      assign product_image = block.settings.product_image
+      assign product = block.settings.product
+      assign stock = block.settings.stock
+      assign discount = block.settings.discount | append: '%'
+      %}
+    <li 
+      data-discount="{{ discount }}"
+      data-stock="{{ stock }}"
+      data-handle="{{ product.handle }}"
+      data-url="{{ product.url }}" 
+      data-start-date="{{ start_date }}" 
+      data-end-date="{{ end_date }}"
+      data-image="{{ image | img_url : 'master' }}" 
+      data-product_image="{{ product_image | img_url : 'master' }}" 
+      data-title="{{ product.title }}"
+      data-price-sale="{{ product.price | money }}"
+      data-price-virtual="{{ product.compare_at_price | money }}"
+      data-id="{{ product.selected_or_first_available_variant.id }}">
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="flash_sale_wrap">
+    <div class="page-width">
+      <div class="flash_sale_logo">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1176.jpg?v=1632825360" alt="" class="mobile-hide lazyload">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1176152d4ec39c295040912f28f53517.jpg?v=1632905205" alt="" class="mobile-show lazyload">
+      </div>
+      <div class="product_count_time mobile-show">Time is Running Out -
+        <span class="sale">00:20:30</span>
+      </div>
+      <div class="flash_sale_banner">
+        <img src="" class="lazyload" alt="">
+        <div class="flash_sale_label lazyload" data-animate_text="true">
+          ONLY <span class="flash_sale_num bold">10 PCS</span> AVAILABLE
+        </div>
+        <div class="flash_sale_discount lazyload" data-animate_text="true">
+          <img src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/7407b19336c84275a4cd043394698cce.png?v=1632903699" alt="" class="lazyload">
+          <span class="flash_sale_discount_text bold">Save <span class="mobile-hide">Up to</span> <br > <span class="flash_sale_discount_percent">40%</span></span>
+        </div>
+      </div>
+      <div class="product_info_wrap mobile-hide">
+        <div class="flex_between">
+          <div class="product_title bold"></div>
+          <div class="product_price_wrap">
+            <span class="product_price sale bold"></span>
+            <span class="product_price virtual"></span>
+          </div>
+        </div>
+        <div class="flex_between">
+          <div class="product_count_time">Time is Running Out -
+            <span class="sale">00:20:30</span>
+          </div>
+          <a href="" class="product_shop_now" target="_blank">Shop Now</a>
+        </div>
+      </div>
+      <div class="product_info_wrap mobile-show">
+        <div class="flex_between">
+          <div class="product_title ellipsis bold"></div>
+          <div>
+            <div class="product_price_wrap">
+              <span class="product_price sale bold"></span>
+              <span class="product_price virtual"></span>
+            </div>
+            <a href="" class="product_shop_now" target="_blank">Shop Now</a>
+          </div>
+        </div>
+      </div>
+      <div class="flash_sale_swiper swiper-container">
+        <div class="swiper-wrapper stop-swiping">
+
+        </div>
+        <div class="flash_sale_swiper_arrow">
+          <div class="swiper-button-next swiper-button-black"></div>
+          <div class="swiper-button-prev swiper-button-black"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+<style>
+  @media screen and (max-width: 768px) {
+    .flash_sale_wrap {
+      padding-bottom: 36px;
+    }
+    .flash_sale_logo {
+      /* margin-bottom: 40px; */
+    }
+    .flash_sale_banner {
+      position: relative;
+      overflow: hidden;
+    }
+    .flash_sale_label {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background: #4C50AA;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      line-height: 14px;
+    }
+    .flash_sale_discount {
+      position: absolute;
+      right: 6%;
+      top: 30%;
+      width: 70px;
+    }
+    .flash_sale_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #111;
+      font-size: 12px;
+      line-height: 16px;
+      width: 100%;
+      text-align: center;
+    }
+    .flash_sale_discount_percent {
+      font-size: 17px;
+    }
+    .flash_sale_num {
+      font-size: 20px;
+      line-height: 24px;
+    }
+    .product_info_wrap {
+      background: #fff;
+      padding: 10px 13px;
+      margin-bottom: 10px;
+    }
+    .product_title {
+      font-size: 16px;
+      line-height: 17px;
+      color: #2A2A2A;
+      padding-top: 4px;
+    }
+    .product_price_wrap {
+      padding: 0;
+    }
+    .product_price.sale {
+      font-size: 15px;
+      line-height: 17px;
+    }
+    .product_price.virtual {
+      font-size: 13px;
+      line-height: 14px;
+    }
+    .product_count_time {
+      color: #fff;
+      font-size: 16px;
+      line-height: 17px;
+      text-align: center;
+      padding: 15px 0;
+    }
+    .flash_sale_wrap .product_shop_now {
+      width: 88px;
+      line-height: 22px;
+      border-radius: 11px;
+      font-size: 12px;
+    }
+    .flash_sale_swiper .product_wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 12px;
+      background: #fff;
+      border-right: 1px solid #EBEBEB;
+    }
+    .flash_sale_swiper .product_title {
+      font-size: 12px;
+      line-height: 16px;
+      color: #727272;
+      text-align: center;
+      padding: 6px 10px 4px;
+      height: 48px;
+    }
+    .flash_sale_swiper .product_price.sale {
+      font-size: 20px;
+      line-height: 26px;
+    }
+    .flash_sale_swiper .product_price.virtual {
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .flash_sale_swiper .product_button {
+      line-height: 24px;
+      width: 130px;
+      font-size: 12px;
+      border-radius: 12px;
+    }
+    .flash_sale_swiper_arrow .swiper-button-next {
+      background-size: 10px 22px;
+      background-color: rgba(0, 0, 0, .06);
+      right: 0;
+    }
+    .flash_sale_swiper_arrow .swiper-button-prev {
+      background-size: 10px 22px;
+      background-color: rgba(0, 0, 0, .06);
+      left: 0;
+    }
+  }
+  @media screen and (min-width: 769px) and (max-width: 1920px){
+    .flash_sale_wrap {
+      padding-bottom: 8vw;
+    }
+    .flash_sale_logo {
+      margin-bottom: 2vw;
+    }
+    .flash_sale_banner {
+      position: relative;
+      overflow: hidden;
+    }
+    .flash_sale_label {
+      position: absolute;
+      right: 0;
+      top: 2vw;
+      background: linear-gradient(90deg, #CCA0FF, #716BFF);
+      border-top-left-radius: 1.5vw;
+      border-bottom-left-radius: 1.5vw;
+      padding: .5vw 1vw .5vw 1.5vw;
+      color: #fff;
+      font-size: .9vw;
+      line-height: 1.2vw;
+    }
+    .flash_sale_num {
+      font-size: 1.5vw;
+      line-height: 1.8vw;
+    }
+    .flash_sale_discount {
+      position: absolute;
+      right: 6%;
+      top: 30%;
+      width: 11vw;
+      min-width: 150px;
+    }
+    .flash_sale_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #111;
+      font-size: 1vw;
+      line-height: 1.5vw;
+      text-align: center;
+      width: 100%;
+    }
+    .flash_sale_discount_percent {
+      font-size: 1.7vw;
+    }
+    .product_info_wrap {
+      background: #fff;
+      padding: 1vw 2vw;
+      margin-bottom: 20px;
+    }
+    .product_title {
+      font-size: 1.5vw;
+      line-height: 1.8vw;
+      color: #2A2A2A;
+    }
+    .product_price_wrap {
+      padding: .3vw 0;
+    }
+    .product_price.sale {
+      font-size: 1.7vw;
+      line-height: 2vw;
+    }
+    .product_price.virtual {
+      font-size: 1vw;
+      line-height: 1.3vw;
+    }
+    .product_count_time {
+      color: #888;
+      font-size: 1vw;
+      line-height: 1.3vw;
+    }
+    .flash_sale_wrap .product_shop_now {
+      width: 9vw;
+      line-height: 2.4vw;
+      border-radius: 2vw;
+    }
+    .flash_sale_swiper .product_wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 1.6vw;
+      background: #fff;
+      border-right: 1px solid #EBEBEB;
+    }
+    .flash_sale_swiper .product_title {
+      font-size: .8vw;
+      line-height: 1.1vw;
+      color: #727272;
+      text-align: center;
+      padding: .6vw 1vw .2vw;
+      height: 2.4vw;
+    }
+    .flash_sale_swiper .product_price.sale {
+      font-size: 1vw;
+      line-height: 1.3vw;
+    }
+    .flash_sale_swiper .product_price.virtual {
+      font-size: .7vw;
+      line-height: 1vw;
+    }
+    .flash_sale_swiper .product_button {
+      line-height: 2vw;
+      width: 9.5vw;
+      min-width: 140px;
+      font-size: .8vw;
+      border-radius: 1vw;
+
+    }
+    .flash_sale_swiper_arrow .swiper-button-next {
+      background-size: 14px 22px;
+      background-color: rgba(0, 0, 0, .06);
+      right: 0;
+    }
+    .flash_sale_swiper_arrow .swiper-button-prev {
+      background-size: 14px 22px;
+      background-color: rgba(0, 0, 0, .06);
+      left: 0;
+    }
+
+  }
+  @media screen and (min-width: 1921px) {
+    .flash_sale_wrap {
+      padding-bottom: 160px;
+    }
+    .flash_sale_logo {
+      margin-bottom: 40px;
+    }
+    .flash_sale_banner {
+      position: relative;
+      overflow: hidden;
+    }
+    .flash_sale_label {
+      position: absolute;
+      right: 0;
+      top: 40px;
+      background: linear-gradient(90deg, #CCA0FF, #716BFF);
+      border-top-left-radius: 30px;
+      border-bottom-left-radius: 30px;
+      padding: 10px 20px 10px 30px;
+      color: #fff;
+      font-size: 18px;
+      line-height: 24px;
+    }
+    .flash_sale_num {
+      font-size: 30px;
+      line-height: 36px;
+    }
+    .flash_sale_discount {
+      position: absolute;
+      right: 6%;
+      top: 30%;
+      width: 220px;
+      min-width: 150px;
+    }
+    .flash_sale_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #111;
+      font-size: 20px;
+      line-height: 30px;
+      text-align: center;
+      width: 100%;
+    }
+    .flash_sale_discount_percent {
+      font-size: 34px;
+    }
+    .product_info_wrap {
+      background: #fff;
+      padding: 20px 40px;
+      margin-bottom: 20px;
+    }
+    .product_title {
+      font-size: 30px;
+      line-height: 30px;
+      color: #2A2A2A;
+    }
+    .product_price_wrap {
+      padding: 6px 0;
+    }
+    .product_price.sale {
+      font-size: 34px;
+      line-height: 40px;
+    }
+    .product_price.virtual {
+      font-size: 20px;
+      line-height: 26px;
+    }
+    .product_count_time {
+      color: #888;
+      font-size: 20px;
+      line-height: 26px;
+    }
+    .flash_sale_wrap .product_shop_now {
+      width: 180px;
+      line-height: 48px;
+      border-radius: 40px;
+    }
+    .flash_sale_swiper .product_wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 32px;
+      background: #fff;
+      border-right: 1px solid #EBEBEB;
+    }
+    .flash_sale_swiper .product_title {
+      font-size: 16px;
+      line-height: 20px;
+      color: #727272;
+      text-align: center;
+      padding: 12px 20px 4px;
+      height: 48px;
+    }
+    .flash_sale_swiper .product_price.sale {
+      font-size: 20px;
+      line-height: 26px;
+    }
+    .flash_sale_swiper .product_price.virtual {
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .flash_sale_swiper .product_button {
+      line-height: 40px;
+      width: 190px;
+      min-width: 140px;
+      font-size: 16px;
+      border-radius: 20px;
+    }
+    .flash_sale_swiper_arrow .swiper-button-next {
+      background-size: 14px 22px;
+      background-color: rgba(0, 0, 0, .06);
+      right: 0;
+    }
+    .flash_sale_swiper_arrow .swiper-button-prev {
+      background-size: 14px 22px;
+      background-color: rgba(0, 0, 0, .06);
+      left: 0;
+    }
+  }
+</style>
+
+<script>
+  $(function () {
+    // 当前活动商品信息
+    let currentProduct = null; 
+    let currentIndex = null;
+    initActivity(); 
+    // 从页面获取当前活动商品
+    function initActivity() {
+      // 获取折扣商品信息集合
+      let products = $('.flash_sale_products li').map((index, item) => {
+        return $(item).data()
+      })
+      if (products.length) {
+        // 获取当前秒杀活动商品
+        products.each((index, product) => {
+          let nowDate = new Date().getTime();
+          let startDate = new Date(product.startDate).getTime();
+          let endDate = new Date(product.endDate).getTime();
+          if (nowDate > startDate && nowDate < endDate) {
+            currentProduct = product;
+            currentIndex = index; //拿到当前活动的下标
+          }
+        })
+        // 筛选掉当前进行中的活动，并且把所有的活动渲染到页面再初始化轮播图
+        products.splice(currentIndex, 1)
+        let swiper_content = '';
+        products.each((index, product )=> {
+          let nowDate = new Date().getTime();
+          let startDate = new Date(product.startDate).getTime();
+          let endDate = new Date(product.endDate).getTime();
+
+          let activityClass = '',activityText = '';
+          if (nowDate < startDate) {
+            activityClass = 'product_shop_now sale_not_start';
+            activityText = `October ${ new Date(startDate).getDate() } at 4 pm`;
+          }else if (nowDate > endDate) {
+            activityClass = 'sale_end';
+            activityText = 'Event ends'
+          }
+
+
+          swiper_content += `
+          <div class="swiper-slide ${ product.id }">
+            <div class="product_wrap">
+              <div class="product_img">
+                <img data-src="https://${ product.product_image }" alt="" class="lazyload">
+              </div>
+              <div class="product_title ellipsis">${ product.title }</div>
+              <div class="product_price_wrap">
+                <span class="product_price sale bold">${ product.priceSale }</span>
+                <span class="product_price virtual">${ product.priceVirtual }</span>
+              </div>
+              <div class="product_button ${ activityClass }">${ activityText }</div>
+            </div>
+          </div>
+        `
+        })
+        $('.flash_sale_swiper .swiper-wrapper').html(swiper_content)
+        const flash_sale_swiper = new Swiper('.flash_sale_swiper', {
+          slidesPerView: window.isMobile ? '2' : '5',
+          // effect : 'fade',
+          noSwiping : true,
+          noSwipingClass : 'stop-swiping',
+          fadeEffect: {
+            crossFade: true,
+          },
+          navigation: {
+            nextEl: '.flash_sale_swiper_arrow .swiper-button-next',
+            prevEl: '.flash_sale_swiper_arrow .swiper-button-prev'
+          }
+        });
+        // 设置当前进行的活动信息
+        if (currentProduct) {
+          setProductInfo();
+          countDown();
+          loopGetProduct()
+        }
+      }else {
+        // 隐藏flash sale
+        $('.flash_sale_wrap').addClass('hide')
+      }
+    }
+    function loopGetProduct() {
+      let getTimer = setTimeout(()=> {
+        getProduct().then(res=> {
+          if (!res.available) {
+            //设置按钮售罄样式
+            $('.product_info_wrap a.product_shop_now').attr('disabled', true);
+            $('.product_info_wrap a.product_shop_now').css({
+              'background': '#E0E0E0',
+              'pointer-events': 'none'
+            });
+            $('.product_info_wrap a.product_shop_now').html('Sold Out');
+            clearTimeout(getTimer)
+            return;
+          }
+          loopGetProduct()
+        })
+      },1000)
+    }
+    // 查询商品信息
+    async function getProduct() {
+      let url = `/products/${ currentProduct.handle }.js`;
+      try {
+        let response = await fetch(url)
+        let data = await response.json()
+        return data
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    // 设置商品信息
+    function setProductInfo() {
+      $('.flash_sale_banner > img').attr("src", currentProduct.image);
+      $('.flash_sale_banner .flash_sale_num').html(currentProduct.stock + ' PCS');
+      $('.flash_sale_banner .flash_sale_discount_percent').html(currentProduct.discount);
+      $('.product_info_wrap .product_title').html(currentProduct.title);
+      $('.product_info_wrap a.product_shop_now').attr('href',currentProduct.url);
+      $('.product_info_wrap .product_price.sale').html(currentProduct.priceSale);
+    }
+    // 倒计时
+    function countDown() {
+      let nowTime = new Date();
+      let endTime = new Date(currentProduct.endDate);
+      let leftTime = parseInt((endTime.getTime() - nowTime.getTime()) / 1000);
+
+      let d = addZero(parseInt(leftTime / (24 * 60 * 60)));
+      let h = addZero(parseInt(leftTime / (60 * 60) % 24));
+      let m = addZero(parseInt(leftTime / 60 % 60));
+      let s = addZero(parseInt(leftTime % 60));
+
+      document.querySelector(".product_count_time .sale").innerHTML = `${h}:${m}:${s}`;
+      if (leftTime <= 0) {
+        initActivity();
+        return;
+      }
+
+      let timer = setTimeout(()=> {
+        if (leftTime <=0) {
+          clearTimeout(timer)
+          return;
+        }
+        countDown()
+      },1000)
+    }
+    // 时间加零
+    function addZero(i) {
+      return i < 10 ? '0' + i : i + '';
+    }
+    
+
+  })
+</script>
+
+
+
+
+{% schema %}
+{
+  "name": "halloween-seckill",
+  "class": "halloween-seckill",
+  "settings": [],
+  "blocks": [
+      {
+          "type": "flash-sale-product",
+          "name": "Falsh Sale product",
+          "settings": [
+              {
+                "type": "product",
+                "id": "product",
+                "label": "flash sale product"
+              },
+              {
+                "type": "text",
+                "id": "discount",
+                "label": "flash sale product discount"
+              },
+              {
+                "type": "number",
+                "id": "stock",
+                "label": "flash sale product stock",
+                "default": 10
+              },
+              {
+                "type": "image_picker",
+                "id": "product_image",
+                "label": "flash sale product custom image"
+              },
+              {
+                  "type": "image_picker",
+                  "id": "image",
+                  "label": "flash sale product banner"
+              },
+              {
+                  "type": "text",
+                  "id": "start_date",
+                  "label": "start date"
+              },
+              {
+                  "type": "text",
+                  "id": "end_date",
+                  "label": "end date"
+              }
+          ]
+      }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,71 @@
+{% render 'buying-guides-userVideo' %}
+
+{% schema %}
+  {
+    "name": "Creation",
+    "class": "user_creation",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "Influencers_Video",
+        "name": "Influencer's Video",
+        "settings": [
+          {
+            "type": "video_url",
+            "id": "video_url",
+            "label": "Influencer's Video",
+            "accept": ["youtube", "vimeo"],
+            "info": "Only Supports YouTube and Vimeo. Not all features supported by Vimeo. [Learn more](https://archetypethemes.co/blogs/motion/how-do-i-add-background-videos)"
+          },
+          {
+            "type": "text",
+            "id": "video_title",
+            "label": "Video Title",
+            "default": "Video Title"
+          },
+          {
+            "type": "text",
+            "id": "video_author",
+            "label": "Author Name",
+            "default": "RuiChang Huang"
+          },
+          {
+            "type": "text",
+            "id": "video_date",
+            "label": "Video Upload Date",
+            "default": "May 17,2021"
+          }
+        ]
+      },
+      {
+        "type": "User_Video",
+        "name": "User's Video",
+        "settings": [
+          {
+            "type": "text",
+            "id": "video_url",
+            "label": "User's Video",
+            "info": "Supports YouTube, .MP4 and Vimeo. Not all features supported by Vimeo. [Learn more](https://archetypethemes.co/blogs/motion/how-do-i-add-background-videos)"
+          },
+          {
+            "type": "text",
+            "id": "video_title",
+            "label": "Video Title",
+            "default": "Video Title"
+          },
+          {
+            "type": "text",
+            "id": "video_author",
+            "label": "Author Name"
+          },
+          {
+            "type": "text",
+            "id": "video_date",
+            "label": "Video Upload Date",
+            "default": "May 17,2021"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

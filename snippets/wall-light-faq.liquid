@@ -1,0 +1,278 @@
+<link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url | split: '?' | first }}" rel="preload" as="style">
+
+{% assign install_video =  'https://www.youtube.com/watch?v=K8g7nVoSsIQ' %}
+
+<section class="faq_wrap">
+  <div class="slogan_text">FAQ</div>
+  <div class="question_wrap">
+    <div class="question_item active item-0" data-index="0">
+      <div class="question_text">Product & Segments</div>
+      <div class="question_bar"></div>
+    </div>
+    <div class="question_item item-1" data-index="1">
+      <div class="question_text">Lighting Modes</div>
+      <div class="question_bar"></div>
+    </div>
+    <div class="question_item item-2" data-index="2">
+      <div class="question_text">Connection</div>
+      <div class="question_bar"></div>
+    </div>
+    <div class="question_item item-3" data-index="3">
+      <div class="question_text">Installation</div>
+      <div class="question_bar"></div>
+    </div>
+  </div>
+  <div class="swiper-container alluring-faq-content" id="alluring-faq-content">
+    <div class="swiper-wrapper stop-swiping">
+      <div class="swiper-slide">
+        <div class="faq_item">
+          <div class="faq_text">
+            · Can I assemble Govee Glide Wall Light in any shape I want?
+          </div>
+          <div class="faq_sub_text">
+            Govee Glide light is modular and contains 6 segment and 1 corner that can be assembled in any order you choose.
+          </div>
+        </div>
+        <div class="faq_item">
+          <div class="faq_text">
+            · Will Govee Glide still function normally if I only assemble 4 of the segments together?
+          </div>
+          <div class="faq_sub_text">
+            Yes, you can assemble together as many or as few of the pieces as you wish (maximum 6 segments and 1 corner).
+          </div>
+        </div>
+        <div class="faq_item">
+          <div class="faq_text">
+            · How do I connected the segments together?
+          </div>
+          <div class="faq_sub_text">
+            Line up the pins of one segment with the slot of the next segment and press down firmly until the segments “snap” into place.
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide">
+        <div class="faq_item">
+          <div class="faq_text">
+            · How many preset scenes does Govee Glide have in total?
+          </div>
+          <div class="faq_sub_text">
+            There are a total of 40+ dynamic scenes with more to be added in the future through new App updates.
+          </div>
+        </div>
+        <div class="faq_item">
+          <div class="faq_text">
+            · How many music modes does Govee Glide have in total?
+          </div>
+          <div class="faq_sub_text">
+            Glide has 6 reactive music modes which can move to the beat of your music.
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide">
+        <div class="faq_item">
+          <div class="faq_text">
+            · Why can’t I find & add my Govee Glide in Govee Home App? 
+          </div>
+          <div class="faq_sub_text">
+            Make sure your smartphone’s Bluetooth is switched and your Govee Glide is plugged into power. On the My Devices home screen of the Govee Home App, press “+” in the upper right corner and search “Glide” or find Bluetooth devices near by. 
+          </div>
+        </div>
+        <div class="faq_item">
+          <div class="faq_text">
+            · Can Govee Glide work with Alexa and Google Home? 
+          </div>
+          <div class="faq_sub_text">
+            Yes, Glide can be voice controlled via Alexa and Google Home via Wi-Fi.
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide">
+        <div class="faq_item">
+          <div class="faq_text">
+            · How to Install Govee Glide Wall Light? 
+          </div>
+          <div class="faq_sub_text">
+            checkout the video.
+          </div>
+        </div>
+        <section class="banner" data-animate_images="true">
+          <a href="{{ install_video }}">
+            <img class="lazyload" data-src="{{ 'K8g7nVoSsIQ' | prepend: 'https://i.ytimg.com/vi/' | append: '/hqdefault.jpg' }}" alt="">
+            <div class="play_mask">
+              <div class="play_icon">
+                <img
+                  class="lazyload"
+                  data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1.png?v=1621587474"
+                  alt=""
+                />
+              </div>
+            </div>
+          </a>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  @media screen and (min-width: 599px) {
+    .faq_wrap {
+      padding: 4vw 0 5vw;
+      background: #000;
+    }
+    .faq_wrap .slogan_text {
+      font-size: 2.3vw;
+      line-height: 3.2vw;
+      font-weight: bold;
+      color: #fff;
+      text-align: center;
+    }
+    .question_wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2vw;
+    }
+    .question_bar {
+      width: 17.4vw;
+      height: 5px;
+      background: #fff;
+    }
+    .question_text {
+      font-size: 1.3vw;
+      line-height: 1.8vw;
+      margin-bottom: .8vw;
+      text-align: center;
+    }
+    .question_item:hover {
+      cursor: pointer;
+    }
+    .question_item.active .question_bar {
+      background: #17A2E4;
+    }
+  
+    .alluring-faq-content {
+      /* width: 52.6vw; */
+      width: 70vw;
+    }
+    .faq_item {
+      margin-bottom: 2vw;
+    }
+    .faq_text {
+      font-size: .9vw;
+      line-height: 1.1vw;
+      margin-bottom: .2vw;
+    }
+    .faq_sub_text {
+      font-size: .8vw;
+      line-height: 1.1vw;
+      margin-bottom: .2vw;
+    }
+    
+  }
+
+  @media screen and (max-width: 598px) {
+    .faq_wrap {
+      padding: 40px 30px;
+      background: #000;
+    }
+    .faq_wrap .slogan_text {
+      font-size: 24px;
+      line-height: 30px;
+      font-weight: bold;
+      color: #fff;
+      text-align: center;
+    }
+    .question_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #888;
+    }
+    .question_item {
+      border-radius: 30px;
+      background: #fff;
+      color: #17A2E4;
+      padding: 10px;
+      margin-bottom: 20px;
+      width: 160px;
+    }
+    .question_item.item-0 {
+      width: 100%;
+    }
+    .question_item.item-1 {
+      width: 45%;
+    }
+    .question_item.item-2 {
+      width: 45%;
+    }
+    .question_item.item-3 {
+      width: 100%;
+    }
+    .question_bar {
+      display: none;
+    }
+    .question_text {
+      font-size: 14px;
+      text-align: center;
+    }
+    .question_item:hover {
+      cursor: pointer;
+    }
+    .question_item.active {
+      background: #17A2E4;
+      color: #fff;
+    }
+  
+    .alluring-faq-content {
+      width: 100%;
+    }
+    .faq_item {
+      margin-bottom: 10px;
+    }
+    .faq_text {
+      font-size: 13px;
+      line-height: 14px;
+      margin-bottom: 4px;
+    }
+    .faq_sub_text {
+      font-size: 12px;
+      line-height: 12px;
+      margin-bottom: 4px;
+    }
+    
+  }
+</style>
+
+<script src="{{ 'swiper-bundle.min.js' | asset_url }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script>
+  var faq_swiper = new Swiper('#alluring-faq-content', {
+    slidesPerView: '1',
+    noSwiping : true,
+    noSwipingClass : 'stop-swiping',
+    effect : 'fade',
+    fadeEffect: {
+      crossFade: true,
+    },
+    on: {
+      slideChange: function() {
+        $('.question_item').removeClass('active');
+        $(`.question_item.item-${this.activeIndex}`).addClass('active');
+      }
+    }
+  });
+  function setFaqBarColor(target) {
+    $('.question_item').each((index, item)=> {
+      $(item).removeClass('active')
+      if ($(item).data('index') === target) {
+        $(item).addClass('active')
+      }
+    })
+  }
+  $('.question_item').on('click',function () {
+    let index = $(this).data('index');
+    faq_swiper.slideTo(index, 500, setFaqBarColor(index))
+  })
+
+</script>

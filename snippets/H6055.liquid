@@ -1,0 +1,1061 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% render 'additional-custom-content' %}
+
+<div class="page_wrap" data-animate_images="true">
+  <div class="mobile-hide lazyload">
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Govee StarPal Table Lamp</div>
+      <div class="banner_sub_text page_sub_text">Redefine Portable Ambiance</div>
+      <div class="product_func_list">
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_a9778bbd-90cc-4748-9b96-7afeebad10de.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">RGBWW</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_d4e00116-e06e-4cae-96f0-1ba61291c4b7.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">APP Control</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_95d24c71-049a-4385-96d4-e317fc005a32.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">DIY Customization</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_f662b422-c87e-4174-a635-7c51e63ff743.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Preset Scene</div>
+        </div>
+      </div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P1_178ded65-da4e-4462-9da2-dab62080d307.jpg?v=1626663545" alt="" class="lazyload">
+    </div>
+
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Comfortable Warm & Cool Whites</div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P2_b73eda69-6e86-4290-8731-e5de49cd917f.jpg?v=1626663545" alt="" class="lazyload">
+    </div>
+
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Choose Your Look</div>
+      <div class="color_bar"></div>
+      <div class="banner_sub_text page_sub_text">Extreme stability in both angles</div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P3_a7f7578d-a2d1-4a62-b72f-8cf94f840159.jpg?v=1626663545" alt="" class="lazyload">
+    </div>
+
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Fully Customize Your StarPal</div>
+      <div class="color_bar"></div>
+      <div class="banner_sub_text page_sub_text">Choose your colors, effects, and speeds to create your perfect lighting atmosphere.
+      </div>
+      <div class="product_func_list" style="width: 35vw;">
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_1384d38f-ba55-490d-b4d5-3d1df4d8f443.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Univere</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_2594ce13-767c-4788-a9a5-b840047041c9.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Hill</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_e4fa77ad-b753-4f5f-a8ab-8ea6e88d8aa7.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Firely</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_9d1c9806-15ec-463f-bf2b-8ab6ce508699.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Bomfire</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Firework</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Candlelight</div>
+        </div>
+      </div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P4_bac39b1b-6b99-454c-ab1d-ebaf686998e6.jpg?v=1626663545" alt="" class="lazyload">
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P5_9c207720-1072-46c4-9c9c-f2d9306b400d.jpg?v=1626663545" alt="" class="lazyload">
+      </div>
+
+      <div class="scence_item text right" data-animate_text="true">
+        <div class="scence_text page_text">Portable Lighting</div>
+        <div class="scence_color_bar"></div>
+        <div class="scence_sub_text page_sub_text">Unplug and bring StarPal along to shine on any space in your home</div>
+      </div>
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Fully Customize Your StarPal</div>
+        <div class="scence_color_bar"></div>
+        <div class="scence_sub_text page_sub_text">Choose your colors, effects, and speeds to create your perfect lighting atmosphere.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P6_434621a5-3399-4545-b2dc-4b9332a71677.jpg?v=1626663545" alt="" class="lazyload">
+      </div>
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P7.png?v=1626663545" alt="" class="lazyload">
+      </div>
+      <div class="scence_item text right" data-animate_text="true">
+        <div class="scence_text page_text">Always-There Brightness </div>
+        <div class="scence_color_bar"></div>
+        <div class="scence_sub_text page_sub_text">Brightly light up any space you place StarPal. Complete brightness customization from 1-100%.</div>
+      </div>
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Sleep and Wake Timers</div>
+        <div class="scence_color_bar"></div>
+        <div class="scence_sub_text page_sub_text">Never worry about turning off your StarPal before falling asleep. And when you wake, be greeted by peaceful lighting.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/P8_ca5afdc6-584b-4a2c-b5c9-770d2f758143.jpg?v=1626663545" alt="" class="lazyload">
+      </div>
+    </div>
+
+    <div class="specification_wrap bgc_white_important">
+      <div class="page-width specification_content">
+        <div class="specification_table">
+          <div class="specification_theader page_text color_black_important">
+            Specs
+          </div>
+          <div class="specification_tbody page_sub_text">
+            <div class="specification_tr">
+              <span class="specification_td">Technology</span>
+              <span class="specification_td bold">RGBWW</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Battery</span>
+              <span class="specification_td bold">3350 mAh</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Voltage</span>
+              <span class="specification_td bold">100-240V</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Cord Length</span>
+              <span class="specification_td bold">4.9ft(1.5m)</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Control Method</span>
+              <span class="specification_td bold">App</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Size</span>
+              <span class="specification_td bold">Diameter 6.1 inches(15.5cm) <br> Height 3.7 inches(9.3cm)</span>
+            </div>
+          </div>
+        </div>
+        <div class="spacification_image">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cec4c8e35a07b695b6eb340d263bc10c.png?v=1626665447" alt="" class="lazyload">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mobile-show lazyload">
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Govee StarPal Table Lamp</div>
+      <div class="banner_sub_text page_sub_text">Redefine Portable Ambiance</div>
+      <div class="product_func_list">
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_a9778bbd-90cc-4748-9b96-7afeebad10de.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">RGBWW</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_d4e00116-e06e-4cae-96f0-1ba61291c4b7.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">APP Control</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_95d24c71-049a-4385-96d4-e317fc005a32.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">DIY Customization</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_f662b422-c87e-4174-a635-7c51e63ff743.png?v=1626666233" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Preset Scene</div>
+        </div>
+      </div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/A1_4e465ce5-b9ae-4725-9016-23d97153eed0.jpg?v=1626677965" alt="" class="lazyload">
+    </div>
+
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Comfortable Warm & Cool Whites</div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/A2_fa021cb0-426c-4397-bd5f-5de7a0444687.jpg?v=1626677965" alt="" class="lazyload">
+    </div>
+
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Choose Your Look</div>
+      <div class="banner_sub_text page_sub_text">Extreme stability in both angles</div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/A3_b181a0d4-312a-445c-9fcd-ec5dd85a09f4.jpg?v=1626677965" alt="" class="lazyload">
+    </div>
+
+    <div class="banner_wrap text" data-animate_text="true">
+      <div class="banner_text page_text">Fully Customize Your StarPal</div>
+      <div class="banner_sub_text page_sub_text">Choose your colors, effects, and speeds to create your perfect lighting atmosphere.
+      </div>
+      <div class="product_func_list">
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_1384d38f-ba55-490d-b4d5-3d1df4d8f443.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Univere</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_2594ce13-767c-4788-a9a5-b840047041c9.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Hill</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_e4fa77ad-b753-4f5f-a8ab-8ea6e88d8aa7.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Firely</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_9d1c9806-15ec-463f-bf2b-8ab6ce508699.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Bomfire</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Firework</div>
+        </div>
+        <div class="product_func_item">
+          <div class="product_func_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6.png?v=1626667283" alt="" class="lazyload">
+          </div>
+          <div class="product_func_text">Candlelight</div>
+        </div>
+      </div>
+    </div>
+    <div class="banner_wrap img">
+      <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/A4.png?v=1626677965" alt="" class="lazyload">
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item text right" data-animate_text="true">
+        <div class="scence_text page_text">Portable Lighting</div>
+        <div class="scence_sub_text page_sub_text">Unplug and bring StarPal along to shine on any space in your home</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_d5aef376-29a0-46e9-ac2d-fa3e68ee4864.png?v=1626679168" alt="" class="lazyload">
+      </div>
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Fully Customize Your StarPal</div>
+        <div class="scence_sub_text page_sub_text">Choose your colors, effects, and speeds to create your perfect lighting atmosphere.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_fd8c2a39-aa5d-46a2-9cba-6d9f43f2eae1.png?v=1626679168" alt="" class="lazyload">
+      </div>
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item text right" data-animate_text="true">
+        <div class="scence_text page_text">Always-There Brightness </div>
+        <div class="scence_sub_text page_sub_text">Brightly light up any space you place StarPal. Complete brightness customization from 1-100%.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_ebd73160-f478-4553-9996-8c30bb22d3a4.png?v=1626679168" alt="" class="lazyload">
+      </div>
+    </div>
+
+    <div class="scence_wrap">
+      <div class="scence_item text left" data-animate_text="true">
+        <div class="scence_text page_text">Sleep and Wake Timers</div>
+        <div class="scence_sub_text page_sub_text">Never worry about turning off your StarPal before falling asleep. And when you wake, be greeted by peaceful lighting.</div>
+      </div>
+      <div class="scence_item img">
+        <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_85b3faa7-69be-4fd7-ab79-2ca58375fdf2.png?v=1626679168" alt="" class="lazyload">
+      </div>
+    </div>
+
+    <div class="specification_wrap bgc_white_important">
+      <div class="page-width specification_content">
+        <div class="specification_table">
+          <div class="specification_theader page_text color_black_important">
+            Specs
+          </div>
+          <div class="specification_tbody page_sub_text">
+            <div class="specification_tr">
+              <span class="specification_td">Technology</span>
+              <span class="specification_td bold">RGBWW</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Battery</span>
+              <span class="specification_td bold">3350 mAh</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Voltage</span>
+              <span class="specification_td bold">100-240V</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Cord Length</span>
+              <span class="specification_td bold">4.9ft(1.5m)</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Control Method</span>
+              <span class="specification_td bold">App</span>
+            </div>
+            <div class="specification_tr">
+              <span class="specification_td">Size</span>
+              <span class="specification_td bold">Diameter 6.1 inches(15.5cm) <br> Height 3.7 inches(9.3cm)</span>
+            </div>
+          </div>
+        </div>
+        <div class="spacification_image">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cec4c8e35a07b695b6eb340d263bc10c_5ce4c7f3-25a0-4bdb-9bb6-c3522975bbfa.png?v=1626677966" alt="" class="lazyload">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .page_wrap {
+    background-color: #fff;
+    margin-bottom: 50px;
+  }
+  .page_wrap [data-animate_images=true] .lazyload {
+    opacity:0
+  }
+  .page_wrap [data-animate_images=true] .lazyloaded {
+    opacity:1;
+    animation:0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+    animation-name:zoom-fade-small;
+    transition:none;
+  }
+  .page_wrap [data-animate_text=true] {
+    opacity: 0;
+  }
+  .page_wrap .lazyloaded [data-animate_text=true]{
+    opacity: 1;
+    animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+    animation-name: fade-in;
+  }
+  img {
+    display: block;
+    width: 100%;
+  }
+  .bold {
+    font-weight: bold;
+    font-family: 'Avenir LT Std';
+  }
+  .page_text {
+    font-family: 'Avenir LT Std';
+  }
+  .page_sub_text {
+    font-family: 'Avenir Next';
+  }
+
+  @media screen and (min-width: 768px) {
+    .page_text {
+      font-size: 2.3vw;
+      font-weight: bold;
+      line-height: 3.2vw;
+      color: #252525;
+    }
+    .page_sub_text {
+      font-size: 1.2vw;
+      line-height: 1.8vw;
+      color: #252525;
+      padding: .4vw 0 1vw;
+    }
+    .banner_wrap.text {
+      width: 100%;
+      text-align: center;
+      padding: 4.5vw 0 3.2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .banner_text {
+      width: 52.5vw;
+    }
+    .banner_sub_img {
+      width: 24vw;
+    }
+
+    .color_bar {
+      width: 5vw;
+      height: .2vw;
+      margin: 1vw 0;
+      background: linear-gradient(90deg, #ff00ff,#ff6b00, #d2f400, #00ceff);
+    }
+    .scence_color_bar {
+      width: 3vw;
+      height: .2vw;
+      margin: 1vw 0;
+      background: linear-gradient(60deg, #ff00ff, #00ffc0, #ffff00);
+    }
+
+    .scence_wrap {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      margin: .5vw;
+    }
+    .scence_item {
+      width: 50%;
+    }
+    .scence_item.text.left {
+      padding: 0 4.2vw 0 13vw;
+    }
+    .scence_item.text.right {
+      padding: 0 13vw 0 4.2vw;
+    }
+    .scence_text {
+      width: 100%;
+    }
+    .scence_sub_text {
+      margin-bottom: 1.6vw;
+    }
+    .product_func_list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 30vw;
+    }
+    .product_func_item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .product_func_img {
+      width: 2.5vw;
+    }
+    .product_func_text {
+      font-size: .8vw;
+      color: #252525;
+      font-family: 'Avenir Next';
+    }
+
+    .feature_wrap {
+      background: #F7F7F7;
+      padding-bottom: 4vw;
+    }
+    .feature_title {
+      text-align: center;
+      padding: 4.5vw 0 2vw;
+    }
+    .feature_list {
+      display: flex;
+      justify-content: space-between;
+    }
+    .feature_item {
+      width: calc(25% - 1.2vw);
+      display: flex;
+      flex-direction: column;
+    }
+    .feature_img {
+      margin-bottom: 1.6vw;
+    }
+
+    .specification_wrap {
+      padding: 4vw 0;
+    }
+    .specification_content {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      max-width: 1200px;
+    }
+    .specification_table {
+      flex: 1;
+      margin-right: 6vw;
+    }
+    .specification_theader {
+      padding: 1vw 0;
+      color: #fff;
+    }
+    .specification_tbody {
+      border-top: 1px solid #888888;
+    }
+    .specification_tr {
+      padding: .8vw 0;
+      border-bottom: 1px solid #888888;
+
+      display: flex;
+      justify-content: flex-start;
+    }
+    .specification_td {
+      width: 48%;
+    }
+    .spacification_image {
+      width: auto;
+    }
+
+    .compare_wrap {
+      padding: 0 0 4vw 0;
+      background: #333;
+    }
+    .compare_content {
+      max-width: 1200px;
+    }
+    .compare_header {
+      color: #fff !important;
+      padding: 2.6vw 0;
+    }
+    .compare_table {
+      border-top: 1px solid #888888;
+    }
+    .compare_tr {
+      display: flex;
+      padding: .8vw 0;
+      border-bottom: 1px solid #888888;
+    }
+    .compare_td {
+      color: #fff;
+      flex: 1;
+      font-size: .8vw;
+    }
+    .compare_td:not(:first-child) {
+      font-weight: bold;
+    }
+    .compare_td_img {
+      width: 12vw;
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .page_text {
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 30px;
+      color: #252525;
+    }
+    .page_sub_text {
+      font-size: 13px;
+      line-height: 18px;
+      color: #252525;
+      padding: 10px 0 12px;
+    }
+    .banner_wrap.text {
+      width: 100%;
+      text-align: left;
+      padding: 42px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .banner_text {
+      width: 100%;
+    }
+    .banner_sub_img {
+      width: 240px;
+    }
+    .scence_wrap {
+      padding: 0 25px 46px;
+    }
+    .scence_wrap:nth-child(n) {
+      background: #fff;
+    }
+    .scence_wrap:nth-child(2n) {
+      background: #f8f8f8;
+    }
+    .scence_item {
+      width: 100%;
+    }
+    .scence_item.text {
+      padding: 38px 0 0;
+    }
+    .scence_item.img, 
+    .scence_item.img img {
+      border-radius: 10px;
+    }
+    .scence_text {
+      width: 100%;
+    }
+    .scence_sub_text {
+      margin-bottom: 14px;
+    }
+    .product_func_list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .product_func_item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
+    .product_func_img {
+      width: 25px;
+    }
+    .product_func_text {
+      font-size: 12px;
+      color: #252525;
+      white-space: nowrap;
+      transform: scale(.8);
+      font-family: 'Avenir Next';
+    }
+
+    .specification_wrap {
+      padding: 36px 0;
+    }
+    .specification_content {
+      padding: 0 25px;
+    }
+    .specification_theader {
+      padding: 10px 0 20px;
+      color: #fff;
+    }
+    .specification_tbody {
+      border-top: 1px solid #888888;
+    }
+    .specification_tr {
+      padding: 6px 0;
+      border-bottom: 1px solid #888888;
+
+      display: flex;
+      justify-content: flex-start;
+    }
+    .specification_td {
+      width: 48%;
+      font-size: 12px;
+    }
+    .spacification_image {
+      width: 220px;
+      margin: 30px auto;
+    }
+
+    .compare_wrap {
+      padding: 0 0 50px 0;
+      background: #252525;
+    }
+    .compare_content {
+      padding: 0 0 0 25px;
+    }
+    .compare_header {
+      color: #fff !important;
+      padding: 10px 0 30px;
+    }
+    .compare_table {
+      border-top: 1px solid #888888;
+
+      overflow-x: scroll;
+      padding-bottom: 15px;
+    }
+
+    .compare_tr {
+      display: flex;
+      justify-content: flex-start;
+      padding: 6px 0;
+      border-bottom: 1px solid #888888;
+      width: fit-content;
+    }
+    .compare_td {
+      flex: 1;
+      font-size: 12px;
+
+      min-width: 180px;
+    }
+    .compare_td:first-child {
+      position: sticky;
+      position: -webkit-sticky;
+      left: 0;
+      top: 0;
+      min-width: 120px;
+      background: #252525;
+    }
+    .compare_td:not(:first-child) {
+      font-weight: bold;
+    }
+    .compare_td_img {
+      width: 160px;
+      display: block;
+    }
+  }
+
+  @media screen and (min-width: 1800px) {
+    .compare_td {
+      font-size: 16px;
+    }
+  }
+</style>

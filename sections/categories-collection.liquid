@@ -1,0 +1,170 @@
+<section class="categories_wrap lazyload">
+  {% assign categories_title = section.settings.categories_title %}
+  <div class="page_text categories_title" data-animate_text="true">{{ categories_title }}</div>
+  <div class="categories_list">
+    {% for block in section.blocks %}
+    {% if block.type == 'Category' %}
+    {% liquid 
+        assign categories_img = block.settings.categories_img
+        assign categories_img_mobile = block.settings.categories_img_mobile
+        assign categories_name = block.settings.categories_name
+        assign categories_url = block.settings.categories_url
+      %}
+      <div class="categories_item lazyload">
+        <div class="categories_bg">
+          <img src="{{ categories_img | img_url: 'master' }}" alt="{{ categories_img.alt }}" class="lazyload mobile-hide">
+          <img src="{{ categories_img_mobile | img_url: 'master' }}" alt="{{ categories_img_mobile.alt }}" class="lazyload mobile-show">
+        </div>
+        <div class="categories_bt lazyload">
+          <div class="categories_name page_text lazyload" data-animate_text="true">{{ categories_name }}</div>
+          <a target="_blank" href="{{ categories_url }}" class="categories_url" data-animate_text="true">View More</a>
+        </div>
+      </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+  @media screen and (min-width: 769px) {
+    .categories_wrap {
+      background-color: #F5F5F7;
+      padding: 1vw 20vw 4vw;
+    }
+    .categories_title {
+      text-align: center;
+      padding: 3.6vw 0 2.5vw;
+    }
+    .categories_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .categories_item {
+      width: calc( 50% - .75vw);
+
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5vw;
+    }
+    .categories_bg {
+      width: 100%;
+    }
+    .categories_bt {
+      padding: 1.5vw 0;
+      text-align: center;
+      background-color: #fff;
+      border: 1px solid #DEDEDE;
+      border-top: 0;
+    }
+    .categories_name.page_text {
+      font-size: 1.5vw;
+    }
+    .categories_url {
+      text-align: center;
+      display: inline-block;
+      color: #fff;
+      padding: .3vw 1.4vw;
+      background-color: #17A2E3;
+      border-radius: 1.3vw;
+      font-size: .9vw;
+    }
+    .categories_url:hover {
+      background: #fff;
+      color: #17A2E3;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .categories_wrap {
+      background-color: #F5F5F7;
+      padding: 10px 30px 40px;
+    }
+    .categories_title {
+      text-align: center;
+      padding: 36px 0 22px;
+    }
+    .categories_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .categories_item {
+      width: calc(50% - 3px);
+
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 6px;
+    }
+    .categories_bg {
+      width: 100%;
+    }
+    .categories_bt {
+      padding: 15px 0;
+      text-align: center;
+      background-color: #fff;
+      border: 1px solid #DEDEDE;
+      border-top: 0;
+    }
+    .categories_name.page_text {
+      font-size: 13px;
+    }
+    .categories_url {
+      text-align: center;
+      display: inline-block;
+      color: #fff;
+      padding: 4px 14px;
+      background-color: #17A2E3;
+      border-radius: 14px;
+      font-size: 12px;
+    }
+    .categories_url:hover {
+      background: #fff;
+      color: #17A2E3;
+    }
+  }
+</style>
+
+
+
+{% schema %}
+  {
+    "name": "Category",
+    "settings": [
+      {
+        "type": "text",
+        "id": "categories_title",
+        "label": "Upload Category Title"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "Category",
+        "name": "Categories",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "categories_img",
+            "label": "Upload Category Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "categories_img_mobile",
+            "label": "Upload Category Image of Moblie"
+          },
+          {
+            "type": "text",
+            "id": "categories_name",
+            "label": "Category Name"
+          },
+          {
+            "type": "url",
+            "id": "categories_url",
+            "label": "Category link"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

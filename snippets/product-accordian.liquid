@@ -1,0 +1,74 @@
+<!-- 
+<div class="narrowchart">
+	<div id="accordion">
+		<div class="accordianheader">
+			<h4>{{ section.settings.title1 }} <i class="fa fa-angle-down"></i></h4>
+		</div>
+		<div class="accordianbody">
+          {% if section.settings.pera1 %}
+         	 {{ section.settings.pera1 }}
+          {% else %}
+         	 {{ product.description }}
+          {% endif %}
+
+		</div>
+      
+      <div class="accordianheader">
+			<h4>{{ section.settings.title2 }} <i class="fa fa-angle-down"></i></h4>
+		</div>
+		<div class="accordianbody">
+			 {{ section.settings.pera2 }}
+		</div>
+      <div class="accordianheader">
+			<h4>{{ section.settings.title3 }} <i class="fa fa-angle-down"></i></h4>
+		</div>
+		<div class="accordianbody">
+			 {{ section.settings.pera3 }}
+		</div>
+      
+  </div>
+</div> -->
+
+
+  <div class="collapsibles-wrapper collapsibles-wrapper--border-bottom">
+
+  <button type="button" class="label collapsible-trigger collapsible-trigger-btn collapsible-trigger-btn--borders collapsible--auto-height" aria-controls="Product-description-{{ section_id }}">
+        {{ 'products.product.description' | t }}
+        {%- render 'collapsible-icons' -%}
+      </button>
+      <div id="Product-description-{{ section_id }}" class="collapsible-content collapsible-content--all">
+        <div class="collapsible-content__inner rte">
+          {{ product.description }}
+        </div>
+      </div>
+
+    {% if section.settings.title2  != blank%}
+    
+      <button type="button" class="label collapsible-trigger collapsible-trigger-btn collapsible-trigger-btn--borders" aria-controls="Product-content-2-{{ section_id }}">
+       {{ section.settings.title2 }} 
+        {%- render 'collapsible-icons' -%}
+      </button>
+      <div id="Product-content-2-{{ section_id }}" class="collapsible-content collapsible-content--all">
+        <div class="collapsible-content__inner rte">
+          {% if section.settings.pera2 %}
+         	 {{ section.settings.pera2 }}
+          
+          {% endif %}
+        </div>
+      </div>
+     {% endif %}
+     {% if section.settings.title3 != blank%}
+      <button type="button" class="label collapsible-trigger collapsible-trigger-btn collapsible-trigger-btn--borders" aria-controls="Product-content-3-{{ section_id }}">
+       {{ section.settings.title3 }} 
+        {%- render 'collapsible-icons' -%}
+      </button>
+      <div id="Product-content-3-{{ section_id }}" class="collapsible-content collapsible-content--all">
+        <div class="collapsible-content__inner rte">
+          {% if section.settings.pera3 %}
+         	 {{ section.settings.pera3 }}
+         
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+</div>

@@ -1,0 +1,93 @@
+<div class="mobile-hide">
+  <div class="footer_newSleter_new" {% if block.settings.show_footer_title %} id="Footer-{{ block.id }}"
+  class="collapsible-content collapsible-content--small is-open" {% endif %}>
+
+  <div class="collapsible-content__inner">
+    <div class="footer__collapsible footer_collapsible--disabled">
+      {% form 'customer', id: 'newsletter-footer-mobile-hide' %}
+      {% if form.posted_successfully? %}
+      <div class="note note--success">{{ 'general.newsletter_form.newsletter_confirmation' | t }}</div>
+      {% endif %}
+      {% if form.context == 'footer' %}
+      {% if form.errors %}
+      {{ form.errors | default_errors }}
+      {% endif %}
+      {% endif %}
+
+      <label for="Email1-{{ block.id }}"
+        class="hidden-label">{{ 'general.newsletter_form.newsletter_email' | t }}</label>
+      <input type="hidden" name="contact[tags]" value="prospect,newsletter">
+      <input type="hidden" name="contact[context]" value="footer">
+      <div class="flex_between">
+        {% if block.settings.show_footer_title %}
+        <p class="footer__title small--hide cancle_margin flex3 flex_left">{{ block.settings.title }}</p>
+        {% endif %}
+        <div class="footer__newsletter flex2 flex_center input_replace_placeHolder_color">
+          <input type="email" value="{% if customer %}{{ customer.email }}{% endif %}" placeholder="Email *"
+            name="contact[email]" id="Email1-{{ block.id }}" class="footer__newsletter-input" autocorrect="off"
+            autocapitalize="off">
+          <button style="display: flex; align-items: center; justify-content: center;" type="submit" class="footer__newsletter-btn" name="commit">
+            <img style="width: 31px;height:23px" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/133.png?v=1629862468"  class="lazyload">
+            <!-- <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-email" viewBox="0 0 64 64">
+              <path d="M63 52H1V12h62zM1 12l25.68 24h9.72L63 12M21.82 31.68L1.56 51.16m60.78.78L41.27 31.68" /></svg> -->
+            <span class="icon__fallback-text">{{ 'general.newsletter_form.submit' | t }}</span>
+          </button>
+        </div>
+        <div class="flex1 flex_center ">
+          <button type="submit" name="commit"
+            class="hvr-fade cancel_margin_top" style="border: 1px solid #00A2E3;">{{ 'Get $5 Off Now!' }}</button>
+        </div>
+        <div class="flex2 flex_right">
+          {%- render 'footer-logo-social-new', block: block, first_instance: true -%}
+        </div>
+      </div>
+      {% endform %}
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="mobile-show">
+  <div class="footer_newSleter_new_mobile_show" {% if block.settings.show_footer_title %} id="Footer-{{ block.id }}"
+    class="collapsible-content collapsible-content--small is-open" {% endif %}>
+
+    <div class="collapsible-content__inner">
+      <div class="footer__collapsible footer_collapsible--disabled">
+        {% form 'customer', id: 'newsletter-footer-mobile-show' %}
+        {% if form.posted_successfully? %}
+        <div class="note note--success">{{ 'general.newsletter_form.newsletter_confirmation' | t }}</div>
+        {% endif %}
+        {% if form.context == 'footer' %}
+        {% if form.errors %}
+        {{ form.errors | default_errors }}
+        {% endif %}
+        {% endif %}
+
+        <label for="Email-{{ block.id }}"
+          class="hidden-label">{{ 'general.newsletter_form.newsletter_email' | t }}</label>
+        <input type="hidden" name="contact[tags]" value="prospect,newsletter">
+        <input type="hidden" name="contact[context]" value="footer">
+        <div class="flex_between">
+          <p class="cancle_margin flex3 flex_left">{{ block.settings.title }}</p>
+          <div class="footer__newsletter flex2 flex_center input_replace_placeHolder_color">
+            <input type="email" value="{% if customer %}{{ customer.email }}{% endif %}" placeholder="Email *"
+              name="contact[email]" id="Email-{{ block.id }}" class="footer__newsletter-input mobil_set"
+              autocorrect="off" autocapitalize="off">
+            <button style="display: flex; align-items: center; justify-content: center;" type="submit" class="footer__newsletter-btn" name="commit">
+              <img style="width: 31.86px;height:23px" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/133.png?v=1629862468"  class="lazyload">
+              <!-- <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-email" viewBox="0 0 64 64">
+                <path d="M63 52H1V12h62zM1 12l25.68 24h9.72L63 12M21.82 31.68L1.56 51.16m60.78.78L41.27 31.68" /></svg> -->
+              <span class="icon__fallback-text">{{ 'general.newsletter_form.submit' | t }}</span>
+            </button>
+          </div>
+          <div class="flex1 flex_center ">
+            <button type="submit" name="commit"
+              class="push_btn">{{ 'Get $5 Off Now!' }}</button>
+          </div>
+        </div>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</div>

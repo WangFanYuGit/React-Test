@@ -1,0 +1,764 @@
+{%- liquid
+  assign isModal = false
+  if template == 'product.modal'
+    assign isModal = true
+  endif
+-%}
+
+{%- render 'H6119',
+  product: product,
+  description_style: section.settings.description_style,
+  image_container_width: section.settings.image_size,
+  section_id: product.id,
+  social: section.settings.social_enable,
+  isModal: isModal,
+  thumbnail_position: section.settings.thumbnail_position,
+  thumbnail_arrows: section.settings.thumbnail_arrows,
+  video_looping: section.settings.enable_video_looping,
+  video_style: section.settings.product_video_style
+-%}
+
+{%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+  <hr id="Reviews-{{ product.id }}" class="hr--large">
+  <div class="index-section index-section--small product-reviews product-reviews--full">
+    <div class="page-width">
+      <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Product pages",
+    "settings": [
+      {
+        "type": "select",
+        "id": "description_style",
+        "label": "Description position",
+        "default": "default",
+        "options": [
+          {
+            "value": "default",
+            "label": "Next to media"
+          },
+          {
+            "value": "full",
+            "label": "Below media"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "social_enable",
+        "label": "Enable social sharing",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Media"
+      },
+      {
+        "type": "paragraph",
+        "content": "Learn more about [media types](https://help.shopify.com/en/manual/products/product-media)"
+      },
+      {
+        "type": "select",
+        "id": "image_size",
+        "label": "Image size",
+        "default": "medium",
+        "options": [
+          {
+            "value": "small",
+            "label": "Small"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          },
+          {
+            "value": "large",
+            "label": "Large"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "thumbnail_position",
+        "label": "Thumbnail position",
+        "default": "beside",
+        "options": [
+          {
+            "value": "beside",
+            "label": "Next to media"
+          },
+          {
+            "value": "below",
+            "label": "Below media"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "thumbnail_arrows",
+        "label": "Show thumbnail arrows"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_video_looping",
+        "label": "Enable video looping",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "product_video_style",
+        "label": "Video style",
+        "default": "muted",
+        "options": [
+          {
+            "value": "muted",
+            "label": "Video without sound"
+          },
+          {
+            "value": "unmuted",
+            "label": "Video with sound"
+          }
+        ],
+        "info": "Video with sound will not autoplay"
+      },
+      {
+      "type":"header",
+      "content":"Collapse Tabs"
+      },
+     
+      {
+      "id":"title2",
+      "label":"Spec",
+      "type":"text"
+      },
+      {
+      "id":"pera2",
+      "type":"richtext",
+      "label":"Add Spec Text"
+      },
+{
+      "id":"title3",
+      "label":"Warranty",
+      "type":"text"
+      },
+      {
+      "id":"pera3",
+      "type":"richtext",
+      "label":"Add Warranty Text"
+      }
+    ],
+ "blocks": [
+        {
+        "type": "image",
+        "name": "image with text",
+        "settings": [
+        {
+        "type":"header",
+        "content":"Image with Text"
+        },
+
+{
+	"type":"color",
+	"id":"bg_color",
+	"label":"Select a background color"
+},
+        {
+        "type": "select",
+        "id": "image_position_2",
+        "label": "Select your Image position",
+        "default": "img_left",
+        "options": [
+        {
+        "label": "Image Left",
+        "value": "img_left"
+        },
+        {
+        "label": "Image Right",
+        "value": "img_right"
+        }
+        ]
+
+        },
+        {
+        "type": "image_picker",
+        "id": "img",
+        "label": "Upload Image"
+        },
+        {
+        "type": "image_picker",
+        "id": "mobile_img_IAT",
+        "label": "Upload Mobile Image"
+        },
+        {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading"
+        },
+        {
+        "type": "range",
+        "id": "heading_font",
+        "label": "Font Size",
+        "default": 45,
+        "min": 20,
+        "max": 80,
+        "unit": "px"
+        },
+        {
+        "type": "range",
+        "id": "heading_font_mobile",
+        "label": "Font Size Mobile",
+        "default": 45,
+        "min": 20,
+        "max": 80,
+        "unit": "px"
+        },
+        {
+        "type": "checkbox",
+        "id": "show_color_line",
+        "label": "Show color line"
+        },
+        {
+        "type":"richtext",
+        "id":"para",
+        "label":"Put your text"
+        },
+        {
+        "type": "range",
+        "id": "para_font",
+        "label": "Font Size",
+        "default": 28,
+        "min": 16,
+        "max": 80,
+        "unit": "px"
+        },
+        {
+        "type": "range",
+        "id": "para_font_mobile",
+        "label": "Font Size Mobile",
+        "default": 28,
+        "min": 16,
+        "max": 80,
+        "unit": "px"
+        }
+        ]
+        },
+ {
+        "type": "block-2",
+        "name": "Single Image",
+        "settings": [
+ 
+{
+        "type":"header",
+        "content":"Upload your image"
+        },
+ {
+        "type": "image_picker",
+        "id": "img_single",
+        "label": "Upload Image"
+        },
+{
+        "type": "image_picker",
+        "id": "mobile_img_single",
+        "label": "Upload Mobile Image"
+        },
+{
+"id":"img_link",
+"type":"url",
+"label":"Set a Link for this image"
+}
+        ]
+      },
+ {
+        "type": "block-3",
+        "name": "Image with Text (3)",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"3 Image with Text"
+            },
+            {
+            "type": "image_picker",
+            "id": "img_1",
+            "label": "Upload Image"
+            },
+            {
+            "type": "text",
+            "id": "heading1",
+            "label": "Heading"
+            },
+			{
+            "type":"richtext",
+            "id":"content_1",
+            "label":"Put your text"
+            },
+            {
+            "type": "image_picker",
+            "id": "img_2",
+            "label": "Upload Image"
+            },
+            {
+            "type": "text",
+            "id": "heading2",
+            "label": "Heading"
+            }
+,
+{
+            "type":"richtext",
+            "id":"content_2",
+            "label":"Put your text"
+            },
+            {
+            "type": "image_picker",
+            "id": "img_3",
+            "label": "Upload Image"
+            },
+            {
+            "type": "text",
+            "id": "heading3",
+            "label": "Heading"
+            },
+{
+            "type":"richtext",
+            "id":"content_3",
+            "label":"Put your text"
+            }
+            ]
+      },
+{
+        "type": "block-4",
+        "name": "Video",
+        "settings": [
+ 
+{
+        "type":"header",
+        "content":"Add Video"
+        },
+ {
+        "type": "text",
+        "id": "vid",
+        "label": "Your Video Youtube Link"
+        }
+        ]
+      },
+{
+        "type": "block-5",
+        "name": "Slider",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"customize slider"
+            },
+            {
+            "type": "image_picker",
+            "id": "sliderimg_1",
+            "label": "Upload Image"
+            },
+            {
+            "type": "text",
+            "id": "sliderheading1",
+            "label": "Heading"
+            },
+			{
+            "type":"richtext",
+            "id":"slidercontent_1",
+            "label":"Put your text"
+            },
+            {
+            "type": "image_picker",
+            "id": "sliderimg_2",
+            "label": "Upload Image"
+            },
+            {
+            "type": "text",
+            "id": "sliderheading2",
+            "label": "Heading"
+            }
+,
+{
+            "type":"richtext",
+            "id":"slidercontent_2",
+            "label":"Put your text"
+            },
+            {
+            "type": "image_picker",
+            "id": "sliderimg_3",
+            "label": "Upload Image"
+            },
+            {
+            "type": "text",
+            "id": "sliderheading3",
+            "label": "Heading"
+            },
+{
+            "type":"richtext",
+            "id":"slidercontent_3",
+            "label":"Put your text"
+            }
+            ]
+      },
+{
+        "type": "block-7",
+        "name": "Image with over Text",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"customize image with over text"
+            },
+            {
+            "type": "image_picker",
+            "id": "downimg_1",
+            "label": "Upload Image"
+            },
+            {
+            "type": "image_picker",
+            "id": "mobile_downimg",
+            "label": "Upload Mobile Image"
+            },
+            {
+            "type": "text",
+            "id": "overheading1",
+            "label": "Heading"
+            },
+            {
+            "type": "checkbox",
+            "id": "show_color_line",
+            "label": "Show color line"
+            },
+            {
+            "type": "checkbox",
+            "id": "mobile_layout",
+            "label": "Mobile Layout"
+            },
+            {
+            "type": "checkbox",
+            "id": "color_line_center",
+            "label": "Color line center"
+            },
+			{
+            "type":"richtext",
+            "id":"overcontent_1",
+            "label":"Put your text"
+            },
+            {
+            "type": "checkbox",
+            "id": "mobile_align_center",
+            "label": "Mobile Text Center"
+            },
+            {
+            "type": "range",
+            "id": "position_top",
+            "label": "Position Top",
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "position_left",
+            "label": "Position Left",
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "mobile_position_top",
+            "label": "Mobile Position Top",
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "mobile_position_left",
+            "label": "Mobile Position Left",
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "max_width",
+            "label": "Max Width",
+            "default": 100,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "mobile_max_width",
+            "label": "Mobile Max Width",
+            "default": 100,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "checkbox",
+            "id": "if_align",
+            "label": "Text-align Center"
+            },
+            {
+            "type": "image_picker",
+            "id": "detail_img",
+            "label": "Upload Detail Image"
+            },
+            {
+            "type": "range",
+            "id": "detail_width",
+            "label": "Detail Width",
+            "default": 100,
+            "min": 0,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "detail_margin_top",
+            "label": "Detail Margin Top",
+            "default": 0,
+            "min": 0,
+            "max": 100,
+            "unit": "px"
+            }
+            ]
+      },
+{
+        "type": "block-8",
+        "name": "Image with top Text",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"customize image with top text"
+            },
+            {
+            "type":"color",
+            "id":"bg_color_A",
+            "label":"Select a background color"
+            },
+            {
+            "type": "image_picker",
+            "id": "Abottomimg",
+            "label": "Upload Image"
+            },
+             {
+            "type": "image_picker",
+            "id": "mobile_img_Atype",
+            "label": "Upload Mobile Image"
+            },
+            {
+            "type": "text",
+            "id": "Atopheading",
+            "label": "Heading"
+            },
+            {
+            "type": "range",
+            "id": "Atopheading_font",
+            "label": "Font Size",
+            "default": 45,
+            "min": 20,
+            "max": 80,
+            "unit": "px"
+            },
+            {
+            "type": "checkbox",
+            "id": "show_color_line",
+            "label": "Show color line"
+            },
+{
+            "type": "checkbox",
+            "id": "color_line_center",
+            "label": "Color line center"
+            },
+			{
+            "type":"richtext",
+            "id":"Atopcontent",
+            "label":"Put your text"
+            },
+            {
+            "type": "range",
+            "id": "Atopcontent_font",
+            "label": "Font Size",
+            "default": 28,
+            "min": 16,
+            "max": 80,
+            "unit": "px"
+            }
+            ]
+      },
+{
+        "type": "block-9",
+        "name": "Image with bottom Text",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"customize image with bottom text"
+            },
+            {
+            "type":"color",
+            "id":"bg_color_B",
+            "label":"Select a background color"
+            },
+            {
+            "type": "image_picker",
+            "id": "Atopimg",
+            "label": "Upload Image"
+            },
+             {
+            "type": "image_picker",
+            "id": "mobile_img_Btype",
+            "label": "Upload Mobile Image"
+            },
+            {
+            "type": "text",
+            "id": "Abottomheading",
+            "label": "Heading"
+            },
+            {
+            "type": "range",
+            "id": "Abottomheading_font",
+            "label": "Font Size",
+            "default": 45,
+            "min": 20,
+            "max": 80,
+            "unit": "px"
+            },
+            {
+            "type": "checkbox",
+            "id": "show_color_line",
+            "label": "Show color line"
+            },
+{
+            "type": "checkbox",
+            "id": "color_line_center",
+            "label": "Color line center"
+            },
+			{
+            "type":"richtext",
+            "id":"Abottomcontent",
+            "label":"Put your text"
+            },
+            {
+            "type": "range",
+            "id": "Abottomcontent_font",
+            "label": "Font Size",
+            "default": 28,
+            "min": 16,
+            "max": 80,
+            "unit": "px"
+            }
+            ]
+      },
+{
+        "type": "block-10",
+        "name": "Image with Form",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"customize image with form"
+            },
+            {
+            "type":"color",
+            "id":"bg_color_B",
+            "label":"Select a background color"
+            },
+            {
+            "type": "image_picker",
+            "id": "Formimg",
+            "label": "Upload Image"
+            },
+             {
+            "type": "image_picker",
+            "id": "mobile_form_img",
+            "label": "Upload Mobile Image"
+            },
+            {
+            "type": "html",
+            "id": "form_code",
+            "label": "HTML",
+            "default": "<br>"
+             },
+            {
+            "type": "range",
+            "id": "img_Maxwidth",
+            "label": "Image Width",
+            "default": 35,
+            "min": 20,
+            "max": 80,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "form_Maxwidth",
+            "label": "Form Width",
+            "default": 65,
+            "min": 50,
+            "max": 80,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "mobile_img_Maxwidth",
+            "label": "Mobile Image Width",
+            "default": 35,
+            "min": 20,
+            "max": 100,
+            "unit": "%"
+            },
+            {
+            "type": "range",
+            "id": "mobile_form_Maxwidth",
+            "label": "Mobile Form Width",
+            "default": 65,
+            "min": 50,
+            "max": 100,
+            "unit": "%"
+            }
+            ]
+      },
+{
+        "type": "block-11",
+        "name": "Whole Form",
+        "settings": [
+
+            {
+            "type":"header",
+            "content":"customize whole form"
+            },
+            {
+            "type":"color",
+            "id":"bg_color_B",
+            "label":"Select a background color"
+            },
+            {
+            "type": "text",
+            "id": "FormTitle",
+            "label": "Form Title"
+            },
+            {
+            "type": "html",
+            "id": "form_code_w",
+            "label": "HTML",
+            "default": "<br>"
+             }
+            
+            ]
+      }
+        ]
+  }
+{% endschema %}

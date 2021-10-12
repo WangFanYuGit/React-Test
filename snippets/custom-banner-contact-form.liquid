@@ -1,0 +1,134 @@
+<div class="custom_subscribe_wrap">
+  {%- assign form_id = 'contact-' | append: section.id -%} {%- form 'contact',
+  id: form_id -%} {%- if form.posted_successfully? -%}
+  <p class="note note--success">
+    {{ "contact.form.post_success" | t }}
+  </p>
+  {%- endif -%}
+
+  {{ form.errors | default_errors }}
+
+  <div class="subscribe_title_wrap">
+    <div class="subscribe_title">Shape Your Lighting</div>
+    <div class="subscribe_sub_title">Get Your Early Order Discount Now</div>
+  </div>
+  <div class="subscribe_input">
+    <input
+      placeholder="Sign Up for Early Deal"
+      type="email"
+      id="ContactFormEmail-{{ section.id }}"
+      class="input-full"
+      name="contact[email]"
+      autocorrect="off"
+      autocapitalize="off"
+      value="{% if form.email %}{{ form.email }}{% elsif customer %}{{
+        customer.email
+      }}{% endif %}"
+    />
+  </div>
+
+  <button type="submit" class="subscribe_btn">
+    Let Me Know When It Launches
+  </button>
+  {%- endform -%}
+</div>
+<!-- <div class="custom_subscribe_wrap">
+  <div class="privy-embed-form" data-campaign="2420361"></div>
+</div> -->
+<style>
+  @media screen and (max-width: 640px) {
+    .subscribe_wrap {
+      position: absolute;
+      left: 50%;
+      top: auto;
+      bottom: 12%;
+      transform: translateX(-50%);
+      z-index: 999;
+      text-align: center;
+      width: 100%;
+    }
+    .subscribe_title_wrap {
+      margin-bottom: 16px;
+    }
+    .subscribe_title {
+      font-size: 25px;
+      line-height: 30px;
+      font-weight: bold;
+    }
+    .subscribe_sub_title {
+      font-size: 14px;
+    }
+    .subscribe_input {
+      margin-bottom: 6px;
+    }
+    .subscribe_input input {
+      border-radius: 4px;
+      border: none;
+      background: #fff;
+      width: 240px;
+      padding-left: 10px;
+    }
+    .subscribe_input input::-webkit-input-placeholder {
+      color: #7d7d7d;
+    }
+    .subscribe_img {
+      border-radius: 4px;
+    }
+    .subscribe_btn {
+      color: #fff;
+      border-radius: 4px;
+      width: 240px;
+      background: #00ace7;
+      text-align: center;
+      line-height: 24px;
+      height: 48px;
+      font-size: 14px;
+    }
+  }
+  @media screen and (min-width: 640px) {
+    .custom_subscribe_wrap {
+      position: absolute;
+      left: 14%;
+      top: 28%;
+      z-index: 999;
+    }
+    .subscribe_title_wrap {
+      margin-bottom: 2.2vw;
+    }
+    .subscribe_title {
+      font-size: 3vw;
+      line-height: 4vw;
+      font-weight: bold;
+    }
+    .subscribe_sub_title {
+      font-size: 1.8vw;
+    }
+    .subscribe_input {
+      margin-bottom: 1vw;
+    }
+    .subscribe_input input {
+      border-radius: 4px;
+      border: none;
+      padding-left: 1.4vw;
+      background: #fff;
+      width: 20vw;
+      color: #333;
+    }
+    .subscribe_input input::-webkit-input-placeholder {
+      color: #7d7d7d;
+    }
+    .subscribe_img {
+      border-radius: 4px;
+    }
+    .subscribe_btn {
+      color: #fff;
+      border-radius: 4px;
+      width: 20vw;
+      background: #00ace7;
+      text-align: center;
+      line-height: 1.7vw;
+      font-size: 1.1vw;
+      border: none;
+    }
+  }
+</style>

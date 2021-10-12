@@ -1,0 +1,70 @@
+<div class="page_wrap CLG_page">
+  {%- section 'CLG-page' -%}
+</div>
+<style>
+  img {
+    display: block;
+  }
+
+  .CLG_page .page-width {
+    max-width: 1200px;
+  }
+
+  .CLG_page {
+    background: #1C104D;
+  }
+
+  .CLG_page [data-animate_images=true] .lazyload {
+    opacity: 0
+  }
+
+  .CLG_page [data-animate_images=true] .lazyloaded {
+    opacity: 1;
+    animation: 0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+    animation-name: zoom-fade-small;
+    transition: none;
+  }
+
+  .CLG_page [data-animate_text=true] {
+    opacity: 0;
+  }
+
+  .CLG_page .lazyloaded [data-animate_text=true] {
+    opacity: 1;
+    animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+    animation-name: fade-in;
+  }
+
+  @media screen and (min-width: 769px) {
+    .page_text {
+      font-size: 2.3vw;
+      font-weight: bold;
+      line-height: 3.2vw;
+      color: #252525;
+    }
+
+    .page_sub_text {
+      font-size: 1.2vw;
+      line-height: 1.8vw;
+      color: #252525;
+      padding: .4vw 0 1vw;
+    }
+
+  }
+
+  @media screen and (max-width: 768px) {
+    .page_text {
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 30px;
+      color: #252525;
+    }
+
+    .page_sub_text {
+      font-size: 13px;
+      line-height: 18px;
+      color: #252525;
+      padding: 10px 0 12px;
+    }
+  }
+</style>

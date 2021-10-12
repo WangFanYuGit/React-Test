@@ -1,0 +1,18 @@
+{% assign product_img =  product.featured_media.preview_image %}
+
+<a href="{{ product.url }}" target="_blank" rel="nofollow" class="product_item">
+  <div class="product_bg">
+    <img src="{{ product_img | img_url: 'master' }}" alt="{{ product_img.alt }}" class="lazyload">
+  </div>
+  <div class="product_info lazyload">
+    <div class="product_title">{{ product.title }}</div>
+    {% render 'judgeme_widgets', widget_type: 'judgeme_preview_badge', concierge_install: true, product: product %}
+    <div class="product_shop_wrap">
+      <div class="product_price_wrap">
+        <div class="product_price_sale">{{ product.price | money }}</div>
+        <div class="product_price_virtual hide">{{ product.compare_at_price | money }}</div>
+      </div>
+      <button class="learn_more">Shop Now</button>
+    </div>
+  </div>
+</a>

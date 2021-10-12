@@ -1,0 +1,68 @@
+<section class="{{ section.id }} page-width" data-animate_image="true">
+  <div class="sub_header_img">
+    <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/outdoorLights.png?v=1632815589" alt="" class="mobile-hide lazyload">
+    <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Outdoor_Lights.png?v=1632905205" alt="" class="mobile-show lazyload">
+  </div>
+  {% render 'halloween-product-template' %}
+</section>
+
+
+
+
+{% schema %}
+{
+  "name": "halloween-outdoor-lights",
+  "class": "halloween-outdoor-lights",
+  "settings": [
+    {
+      "type": "text",
+      "id": "header",
+      "label": "折扣信息"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "main_product",
+      "name": "Main Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "自定义图"
+        },
+        {
+          "type": "text",
+          "id": "discount_percent",
+          "label": "折扣百分比"
+        }
+      ]
+    },
+    {
+      "type": "foot_product",
+      "name": "Foot Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "自定义图"
+        },
+        {
+          "type": "text",
+          "id": "discount_percent",
+          "label": "折扣百分比"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

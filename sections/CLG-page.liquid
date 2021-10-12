@@ -1,0 +1,389 @@
+{% liquid
+  assign banner_img_pc = section.settings.banner_img_pc 
+  assign banner_img_mb = section.settings.banner_img_mb 
+  assign CLG_logo_pc = section.settings.CLG_logo_pc 
+  assign CLG_logo_mb = section.settings.CLG_logo_mb 
+  assign update_banner_pc = section.settings.update_banner_pc 
+  assign update_banner_mb = section.settings.update_banner_mb 
+  assign using_banner_pc = section.settings.using_banner_pc 
+  assign using_banner_mb = section.settings.using_banner_mb 
+  assign footer_banner_pc = section.settings.footer_banner_pc 
+  assign footer_banner_mb = section.settings.footer_banner_mb 
+%}
+<section class="section_banner" data-animate_images="true">
+  <img data-src="{{ banner_img_pc | img_url: 'master' }}" alt="{{ banner_img_pc.alt }}" class="mobile-hide lazyload">
+  <img data-src="{{ banner_img_mb | img_url: 'master' }}" alt="{{ banner_img_mb.alt }}" class="mobile-show lazyload">
+</section>
+
+
+<section class="section_main page-width" data-animate_images="true">
+  <div class="section_main_conetnt lazyload">
+    <div class="CLG_logo_wrap">
+      <img data-src="{{ CLG_logo_pc | img_url: 'master' }}" alt="{{ CLG_logo_pc.alt }}" class="mobile-hide lazyload">
+      <img data-src="{{ CLG_logo_mb | img_url: 'master' }}" alt="{{ CLG_logo_mb.alt }}" class="mobile-show lazyload">
+    </div>
+
+    <div class="CLG_about_text page_sub_text" data-animate_text="true">
+      <p>Since 2017, Govee has created cutting-edge LED lights and smart home devices that transform traditional ways of living. </p> 
+      <p>Since 2010, Counter Logic Gaming (CLG) has made tremendous milestones in the growing and dedicated following of esports around the world. </p>
+      <p>We are proudly partnering with CLG by outfitting their player’s spaces and performance center with Govee lighting products. Now, we are inviting our fellow gamers to help you create your modern and immersive game room. </p>
+    </div>
+
+    <div class="update_banner" >
+      <img data-src="{{ update_banner_pc | img_url: 'master' }}" alt="{{ update_banner_pc.alt }}" class="mobile-hide lazyload">
+      <img data-src="{{ update_banner_mb | img_url: 'master' }}" alt="{{ update_banner_mb.alt }}" class="mobile-show lazyload">
+    </div>
+
+    <div class="product_list row_2">
+      {% for block in section.blocks %}
+        {% if block.type == 'update_product' %}
+          {% render 'CLG-product-template', product: block.settings.product %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="using_banner">
+      <img data-src="{{ using_banner_pc | img_url: 'master' }}" alt="{{ using_banner_pc.alt }}" class="mobile-hide lazyload">
+      <img data-src="{{ using_banner_mb | img_url: 'master' }}" alt="{{ using_banner_mb.alt }}" class="mobile-show lazyload">
+    </div>
+
+    <div class="product_list row_4">
+      {% for block in section.blocks %}
+        {% if block.type == 'using_product' %}
+          {% render 'CLG-product-template', product: block.settings.product %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <a href="/collections/all-products" class="CLG_view_all_product">VIEW ALL PRODUCTS</a>
+
+    <div class="CLG_footer">
+      <img data-src="{{ footer_banner_pc | img_url: 'master' }}" alt="{{ footer_banner_pc.alt }}" class="mobile-hide lazyload">
+      <img data-src="{{ footer_banner_mb | img_url: 'master' }}" alt="{{ footer_banner_mb.alt }}" class="mobile-show lazyload">
+    </div>
+  </div>
+</section>
+
+<style>
+  @media screen and (min-width: 569px) {
+    .section_banner {
+      min-height: 35vw;
+    }
+    .section_main_conetnt {
+      padding-bottom: 4vw;
+    }
+    .CLG_logo_wrap {
+      width: 24vw;
+      margin: 5vw auto -3.5vw;
+    }
+    .CLG_about_text {
+      margin-bottom: 4vw;
+    }
+    .CLG_about_text p {
+      font-size: 1.3vw;
+      color: #fff;
+    }
+    .CLG_view_all_product {
+      color: #fff;
+      text-align: center;
+      text-decoration: underline;
+      display: block;
+      padding: 0 0 4vw;
+    }
+    .update_banner, .using_banner {
+      margin-bottom: 2vw;
+    }
+    .product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .product_list.row_2 {
+      padding-bottom: 4vw;
+    }
+    .product_list.row_4 {
+      padding-bottom: 0;
+    }
+    .row_2 .product_item {
+      width: calc(50% - 1vw);
+    }
+    .row_4 .product_item {
+      width: calc(25% - 1vw);
+      padding: 1vw 1vw 0;
+    }
+    .row_2 .product_title {
+      font-size: 1.8vw;
+      line-height: 2.6vw;
+    }
+    .row_4 .product_title {
+      font-size: 1vw;
+      line-height: 1.3vw;
+    }
+    .row_2 .product_info {
+      padding: 2vw;
+    }
+    .row_4 .product_info {
+      padding: 1vw 0 2vw;
+    }
+    .row_2 .learn_more {
+      font-size: 1.3vw;
+      width: 12vw;
+      line-height: 2.8vw;
+      border-radius: 1vw;
+    }
+    .row_4 .learn_more {
+      font-size: 1vw;
+      width: 10vw;
+      line-height: 2.2vw;
+      border-radius: 1vw;
+    }
+    .row_2 .product_price_sale {
+      font-size: 1.8vw;
+    }
+    .row_4 .product_price_sale {
+      font-size: 1.4vw;
+    }
+    .product_item {
+      background: #fff;
+      margin-bottom: 2vw;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product_info {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+    }
+    .product_title {
+      font-weight: bold;
+      text-align: center;
+    }
+    .product_price_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      margin: .5vw auto;
+    }
+    .product_price_sale {
+      font-weight: bold;
+    }
+    .product_price_virtual {
+      font-size: 1.3vw;
+      line-height: 1.8vw;
+      color: #888;
+      text-decoration: line-through;
+    }
+    .learn_more {
+      text-align: center;
+      color: #fff;
+      background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/12_2x_2a8c90a0-a693-424f-a162-c950e770952e.png?v=1631673585') no-repeat;
+      background-size: cover;
+    }
+  }
+  @media screen and (max-width: 568px) {
+    .section_main_conetnt {
+      padding-bottom: 40px;
+    }
+    .CLG_logo_wrap {
+      width: 100%;
+      margin: 20px auto -60px;
+    }
+    .CLG_about_text {
+      margin-bottom: 40px;
+    }
+    .CLG_about_text p {
+      font-size: 13px;
+      color: #fff;
+    }
+    .CLG_view_all_product {
+      color: #fff;
+      text-align: center;
+      text-decoration: underline;
+      display: block;
+      font-size: 14px;
+      padding: 0 0 40px;
+    }
+    .update_banner, .using_banner {
+      margin-bottom: 20px;
+    }
+    .product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .product_list.row_2 {
+      padding-bottom: 40px;
+    }
+    .product_list.row_4 {
+      padding-bottom: 0;
+    }
+    .row_2 .product_item {
+      width: 100%;
+    }
+    .row_4 .product_item {
+      width: calc(50% - 10px);
+      padding: 10px 10px 0;
+    }
+    .row_2 .product_title {
+      font-size: 18px;
+      line-height: 26px;
+    }
+    .row_4 .product_title {
+      font-size: 12px;
+      line-height: 14px;
+    }
+    .row_2 .product_info {
+      padding: 20px;
+    }
+    .row_4 .product_info {
+      padding: 10px 0 20px;
+    }
+    .row_2 .learn_more {
+      font-size: 16px;
+      width: 160px;
+      line-height: 38px;
+    }
+    .row_4 .learn_more {
+      font-size: 12px;
+      width: 104px;
+      line-height: 24px;
+    }
+    .row_2 .product_price_sale {
+      font-size: 14px;
+    }
+    .row_4 .product_price_sale {
+      font-size: 12px;
+    }
+    .product_item {
+      background: #fff;
+      margin-bottom: 20px;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product_info {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+    }
+    .product_title {
+      font-weight: bold;
+      text-align: center;
+    }
+    .product_price_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      margin: 5px auto;
+    }
+    .product_price_sale {
+      font-weight: bold;
+    }
+    .product_price_virtual {
+      font-size: 12px;
+      line-height: 16px;
+      color: #888;
+      text-decoration: line-through;
+    }
+    .learn_more {
+      text-align: center;
+      color: #fff;
+      background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/12_2x_2a8c90a0-a693-424f-a162-c950e770952e.png?v=1631673585') no-repeat;
+      background-size: cover;
+    }
+  }
+</style>
+
+
+
+{% schema %}
+  {
+    "name": "CLG Page",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "banner_img_pc",
+        "label": "Upload CLG Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "banner_img_mb",
+        "label": "Upload CLG Banner of Mobile"
+      },
+      {
+        "type": "image_picker",
+        "id": "CLG_logo_pc",
+        "label": "Upload CLG LOGO of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "CLG_logo_mb",
+        "label": "Upload CLG LOGO of Mobile"
+      },
+      {
+        "type": "image_picker",
+        "id": "update_banner_pc",
+        "label": "Upload Update Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "update_banner_mb",
+        "label": "Upload Update Banner of Mobile"
+      },
+      {
+        "type": "image_picker",
+        "id": "using_banner_pc",
+        "label": "Upload Using Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "using_banner_mb",
+        "label": "Upload Using Banner of Mobile"
+      },
+      {
+        "type": "image_picker",
+        "id": "footer_banner_pc",
+        "label": "Upload Footer Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "footer_banner_mb",
+        "label": "Upload Footer Banner of Mobile"
+      }
+  
+    ],
+    "blocks": [
+      {
+        "type": "update_product",
+        "name": "Update Your Setup",
+        "settings": [
+          {
+            "type": "product",
+            "id": "product",
+            "label": "Select Update Product"
+          }
+        ]
+      },
+      {
+        "type": "using_product",
+        "name": "What We're Using",
+        "settings": [
+          {
+            "type": "product",
+            "id": "product",
+            "label": "Select Using Product"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

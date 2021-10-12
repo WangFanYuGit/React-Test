@@ -1,0 +1,98 @@
+<section class="categories_wrap lazyload" data-animate_images="true">
+  {% if section.settings.header != blank %}
+  <h4 class="page_text categories_header" data-animate_text="true">{{ section.settings.header }}</h4>
+  {% endif %}
+  {% assign min = 1 %}
+  {% assign max = 2020 %}
+  {% assign diff = max | minus: min %}
+  {% assign randomNumber = "now" | date: "%N" | modulo: diff | plus: min %}
+
+  {% assign categories_img = section.settings.categoires_img %}
+  {% assign categories_title = section.settings.categories_title %}
+  {% assign categories_desc = section.settings.categories_desc %}
+  {% assign categories_direction = section.settings.categories_direction %}
+
+
+
+  <div class="categories_item page-width" style="flex-direction: {{ categories_direction }};">
+    <div class="categories_banner">
+      <img src="{{ section.settings.categories_img | img_url: 'master' }}" alt="" class="lazyload">
+    </div>
+    <div class="categories_content">
+      <div class="categories_info">
+        <div class="categories_title page_text" data-animate_text="true">{{ categories_title }}</div>
+        <div class="categories_desc font_family_next" data-animate_text="true"> {{ categories_desc }} </div>
+      </div>
+      <div class="categories_swiper">
+        {%- render 'govee-product-swiper',
+        section: section,
+        swiper_index: randomNumber,
+        slidesPerView: 2
+        -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hot Categories",
+  "class": "hot_categories",
+  "settings": [
+    {
+      "type": "text",
+      "id": "header",
+      "label": "categories header"
+    },
+    {
+      "type": "image_picker",
+      "id": "categories_img",
+      "label": "categories image"
+    },
+    {
+      "type": "text",
+      "id": "categories_title",
+      "label": "categories title"
+    },
+    {
+      "type": "textarea",
+      "id": "categories_desc",
+      "label": "categories description"
+    },
+    {
+      "type": "select",
+      "id": "categories_direction",
+      "label": "image and content position",
+      "default": "unset",
+      "options": [
+        {
+          "value": "unset",
+          "label": "ltr"
+        },
+        {
+          "value": "row-reverse",
+          "label": "rtl"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+      {            
+        "type": "product",
+        "name": "categories_product",
+        "settings": [
+            {
+              "type": "product",
+              "id": "product",
+              "label": "Categories Product"
+              
+            }
+        ]
+      }
+  ],
+  "presets": [{
+    "name": "Hot Categories"
+  }]
+}
+
+{% endschema %}

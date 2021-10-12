@@ -1,0 +1,214 @@
+<div class="referral mobile-hide" id="Referral-{{ section.id }}">
+  <div class="referral-pic">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0518/2531/1900/files/lALPBFuNcaIyltXNBlHNBdk_1497_1617_1024x1024.png?v=1611025583"
+      alt=""
+      srcset="
+        https://cdn.shopify.com/s/files/1/0518/2531/1900/files/lALPBFuNcaIyltXNBlHNBdk_1497_1617_360x360.png?v=1611025583    360w,
+        https://cdn.shopify.com/s/files/1/0518/2531/1900/files/lALPBFuNcaIyltXNBlHNBdk_1497_1617_540x540.png?v=1611025583    540w,
+        https://cdn.shopify.com/s/files/1/0518/2531/1900/files/lALPBFuNcaIyltXNBlHNBdk_1497_1617_900x900.png?v=1611025583    900w,
+        https://cdn.shopify.com/s/files/1/0518/2531/1900/files/lALPBFuNcaIyltXNBlHNBdk_1497_1617_1080x1080.png?v=1611025583 1080w
+      "
+    />
+  </div>
+  <div class="referral-content">
+    <h3 class="h2 product-single__title">Give a Friend 10%</h3>
+    <h3>Get 10% in Commission</h3>
+    <p class="footer__collapsible">
+      Now is the time to join the Govee Referral Program. If you recommend a
+      friend using a provided link, that friend gets 10% off their purchase.
+      What's more, you get 10% in commission! Don't wait. Join this exciting
+      program today.
+    </p>
+    <button class="referral-join-us btn btn--inverse">
+      <span title="加入我们">JOIN NOW</span>
+    </button>
+  </div>
+</div>
+<div class="referral mobile-show">
+  <div class="referral-pic mobile">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0518/2531/1900/files/1_1024x1024.png?v=1611131403"
+      alt=""
+    />
+    <div class="referral-content azyloaded lazyautosizes">
+      <h3 class="h2 product-single__title">Give a Friend 10%</h3>
+      <h3 class="h2 product-single__title">Get 10% in Commission</h3>
+      <div class="footer__collapsible">
+        Now is the time to join the Govee Referral Program. If you recommend a
+        friend using a provided link, that friend gets 10% off their purchase.
+        What's more, you get 10% in commission! Don't wait. Join this exciting
+        program today.
+      </div>
+      <button class="referral-join-us btn btn--inverse">
+        <span title="加入我们">JOIN NOW</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="referral-conditions">
+  <h1>Govee Referral Program Conditions</h1>
+  <div class="referral-pi"></div>
+  <div class="referral-conditions-item">
+    <h4 class="referral-conditions-title">Participation Qualification</h4>
+    <div class="referral-conditions-content">
+      Any US residents who sign up on store.govee.com can become an affiliate.
+      By providing a valid email address, and accepting the program’s Terms &
+      Conditions, you can refer your friends and family through a provided
+      referral link.
+    </div>
+  </div>
+  <div class="referral-conditions-item">
+    <h4 class="referral-conditions-title">Conditions for Earning</h4>
+    <div class="referral-conditions-content">
+      Nobody tells the Govee story better than you, our customer. If you
+      recommend a friend using a provided link, that friend gets 10% off their
+      purchase. What's more, you get 10% in commission.
+    </div>
+  </div>
+  <div class="referral-conditions-item">
+    <h4 class="referral-conditions-title">Claim Your Reward</h4>
+    <div class="referral-conditions-content">
+      Once the purchase is complete, you will automatically receive an email
+      informing you someone made a purchase using your link. We will review the
+      order within 30 days. Once the order is verified, you will receive another
+      confirmation email, informing you how to collect your 10% commission.
+    </div>
+  </div>
+  <div class="referral-conditions-item">
+    <h4 class="referral-conditions-title">Multiple Referrals</h4>
+    <div class="referral-conditions-content">
+      Friends referred to the Govee Referral Program may only use one referral
+      link. If a referee receives links from multiple Govee Store users, only
+      the referrer who's link was used for the purchase will receive the reward.
+      Users cannot refer themselves.
+    </div>
+  </div>
+  <div class="referral-conditions-item">
+    <h4 class="referral-conditions-title">Termination and Changes</h4>
+    <div class="referral-conditions-content">
+      Govee may suspend or terminate the Referral Program or a user’s ability to
+      participate in the Referral Program at any time for any reason.Govee
+      reserves the right to suspend accounts or remove cash rewards if govee
+      notices any activity govee believes is abusive, fraudulent, or in
+      violation of the store.govee.com Terms of Service. govee reserves the
+      right to review and investigate all referral activities and to suspend
+      accounts or modify referrals in our sole discretion as deemed fair and
+      appropriate.
+    </div>
+  </div>
+</div>
+<style>
+  .referral {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    background-image: linear-gradient(#c12fc9, #10249b);
+  }
+  .referral-pic {
+    flex: 1;
+  }
+  .referral-pic img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .referral-content {
+    flex: 1;
+    overflow: auto;
+  }
+  @media screen {
+    .referral-content {
+      max-height: 360px;
+      margin-left: 60px;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .referral.mobile-hide {
+      display: none;
+    }
+  }
+  @media screen and (min-width: 768px) {
+    .referral.mobile-show {
+      display: none;
+    }
+  }
+  ::-webkit-scrollbar {
+    height: 0;
+    width: 0;
+    color: transparent;
+  }
+  .referral-conditions {
+    padding: 60px 40px;
+  }
+  .referral-pi {
+    width: 90px;
+    height: 4px;
+    background-image: linear-gradient(to right, #c12fc9, #10249b);
+    margin-bottom: 40px;
+  }
+  .referral-conditions-item {
+    margin-bottom: 20px;
+  }
+  .referral-conditions-title {
+    margin-bottom: 5px;
+    position: relative;
+  }
+  .referral-conditions-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-image: linear-gradient(#c12fc9, #10249b);
+    transform: translate(-18px, 6px);
+  }
+  .referral-conditions-content {
+    font-size: 14px;
+  }
+
+  .referral.mobile-show {
+    background: none;
+  }
+  .referral.mobile-show .referral-pic {
+    position: relative;
+  }
+  .referral.mobile-show .referral-content {
+    max-height: unset;
+    margin: unset;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .referral.mobile-show .referral-join-us {
+    font-size: 14px;
+    padding: 2px 18px;
+  }
+  .referral.mobile-show .footer__collapsible {
+    font-size: 12px;
+    width: 310px;
+  }
+  .referral.mobile-show .referral-join-us {
+    background-position: 91% 50%;
+  }
+</style>
+<script>
+  let _html = document.getElementsByClassName("referral-join-us")
+  for (let i=0;i<_html.length;i++) {
+    _html[i].addEventListener("click",function() {
+      window.open("https://govee.referralcandy.com/");
+    })
+  }
+</script>

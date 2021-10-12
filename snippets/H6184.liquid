@@ -1,0 +1,747 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="page_wrap">
+  <div class="mobile-hide">
+
+    <section class="banner_wrap page-width" data-animate_images="true">
+      <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_06541208-fee2-4e70-bf7e-a8f820ac4aea.png?v=1623831584" alt="" class="lazyload">
+
+      <div class="banner_text_wrap over_text">
+        <div class="banner_text lazyload" data-animate_text="true">EXTERIOR CAR <br> LED LIGHTS</div>
+        <div class="banner_sub_text lazyload" data-animate_text="true">RGBIC Underglow Car Lights with <br>App and Remote Control</div>
+      </div>
+    </section>
+
+    <section class="content_wrap page-width">
+      <div class="banner_wrap">
+        <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/3acef0fb-6c2b-4e89-abcd-dcbb6f6838ef.__CR0,0,970,600_PT0_SX970_V1___.jpg" alt="" class="lazyload">
+      </div>
+      
+      <div class="banner_wrap"">
+        <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/865d113d-3ed8-474d-8bc1-9b9e3997f39d.__CR0,0,970,300_PT0_SX970_V1___.jpg" alt="" class="lazyload">
+      </div>
+
+      <div class="scence_wrap">
+        <div class="image_wrap">
+          <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/dfde1570-d357-408c-88ea-579aaffdd171.__CR0,0,300,300_PT0_SX300_V1___.png" alt="" class="lazyload">
+        </div>
+        <div class="image_wrap">
+          <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/e9ca1e95-1ea7-47ff-8caf-ca4cc10b2cb1.__CR0,0,300,300_PT0_SX300_V1___.png" alt="" class="lazyload">
+        </div>
+        <div class="image_wrap">
+          <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/f6c46c52-1823-47b4-98a8-6d303d379ca7.__CR0,0,300,300_PT0_SX300_V1___.jpg" alt="" class="lazyload">
+        </div>
+      </div>
+
+      <div class="scence_wrap">
+        <div class="scence_text_wrap">
+          <div class="scence_text">DIY Mode</div>
+          <div class="scence_sub_text">Select from over 16 million colors, adjust light effect speeds, and enjoy dynamic scene modes including faded, jumping, flicker, running lights, music mix, and flowing.</div>
+        </div>
+        <div class="scence_text_wrap">
+          <div class="scence_text">APP Control</div>
+          <div class="scence_sub_text">Enjoy incredible features with Govee Home App, including Music mode, Scene modes, DIY mode, and Memory functions.</div>
+        </div>
+        <div class="scence_text_wrap">
+          <div class="scence_text">Music Mode</div>
+          <div class="scence_sub_text">Choose from Soft or Dynamic mode and enjoy your lights reacting to the beats of your favorite songs.</div>
+        </div>
+      </div>
+      
+    </section>
+
+    <section class="specification_wrap">
+
+      <div class="spacification_image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/ebed107e2501376eecc33d0943025856_8ccb139d-ac2c-4625-8fed-a653db2eddf3.png?v=1623843874" alt="" class="lazyload">
+      </div>
+
+      <div class="specification_table">
+        <div class="specification_theader">
+          Specs
+        </div>
+        <div class="specification_tbody">
+          <div class="specification_tr">
+            <span class="specification_td">Brand</span>
+            <span class="specification_td">Govee</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Model</span>
+            <span class="specification_td">H61840A1</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Item Weight</span>
+            <span class="specification_td">1.65 pounds</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Package Dimensions</span>
+            <span class="specification_td">9.8 x 6.54 x 2.83 inches</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Control</span>
+            <span class="specification_td">APP + Remote Control</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Vehicle Types</span>
+            <span class="specification_td">Cars, SUV, Pickup Trucks</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Bulb Type</span>
+            <span class="specification_td">LED</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="mobile-show">
+
+    <section class="banner_wrap page-width" data-animate_images="true">
+      <div class="banner_text_wrap over_text">
+        <div class="banner_text lazyload" data-animate_text="true">EXTERIOR CAR LED LIGHTS</div>
+        <div class="banner_sub_text lazyload" data-animate_text="true">RGBIC Underglow Car Lights with App and Remote Control</div>
+      </div>
+
+      <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_06541208-fee2-4e70-bf7e-a8f820ac4aea.png?v=1623831584" alt="" class="lazyload">
+
+    </section>
+
+    <section class="content_wrap">
+      <div class="banner_wrap">
+        <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/3acef0fb-6c2b-4e89-abcd-dcbb6f6838ef.__CR0,0,970,600_PT0_SX970_V1___.jpg" alt="" class="lazyload">
+      </div>
+      
+      <div class="banner_wrap">
+        <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/865d113d-3ed8-474d-8bc1-9b9e3997f39d.__CR0,0,970,300_PT0_SX970_V1___.jpg" alt="" class="lazyload">
+      </div>
+
+      <div class="scence_wrap">
+        <div class="image_wrap">
+          <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/dfde1570-d357-408c-88ea-579aaffdd171.__CR0,0,300,300_PT0_SX300_V1___.png" alt="" class="lazyload">
+        </div>
+        <div class="scence_text_wrap">
+          <div class="scence_text">DIY Mode</div>
+          <div class="scence_sub_text">Select from over 16 million colors, adjust light effect speeds, and enjoy dynamic scene modes including faded, jumping, flicker, running lights, music mix, and flowing.</div>
+        </div>
+        <div class="image_wrap">
+          <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/e9ca1e95-1ea7-47ff-8caf-ca4cc10b2cb1.__CR0,0,300,300_PT0_SX300_V1___.png" alt="" class="lazyload">
+        </div>
+        <div class="scence_text_wrap">
+          <div class="scence_text">APP Control</div>
+          <div class="scence_sub_text">Enjoy incredible features with Govee Home App, including Music mode, Scene modes, DIY mode, and Memory functions.</div>
+        </div>
+        <div class="image_wrap">
+          <img data-src="https://m.media-amazon.com/images/S/aplus-media/sc/f6c46c52-1823-47b4-98a8-6d303d379ca7.__CR0,0,300,300_PT0_SX300_V1___.jpg" alt="" class="lazyload">
+        </div>
+        <div class="scence_text_wrap">
+          <div class="scence_text">Music Mode</div>
+          <div class="scence_sub_text">Choose from Soft or Dynamic mode and enjoy your lights reacting to the beats of your favorite songs.</div>
+        </div>
+      </div>
+            
+    </section>
+
+    <section class="specification_wrap">
+
+      <div class="spacification_image">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/ebed107e2501376eecc33d0943025856_8ccb139d-ac2c-4625-8fed-a653db2eddf3.png?v=1623843874" alt="" class="lazyload">
+      </div>
+
+      <div class="specification_table">
+        <div class="specification_theader">
+          Specs
+        </div>
+        <div class="specification_tbody">
+          <div class="specification_tr">
+            <span class="specification_td">Brand</span>
+            <span class="specification_td">Govee</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Model</span>
+            <span class="specification_td">H61840A1</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Item Weight</span>
+            <span class="specification_td">1.65 pounds</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Package Dimensions</span>
+            <span class="specification_td">9.8 x 6.54 x 2.83 inches</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Control</span>
+            <span class="specification_td">APP + Remote Control</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Vehicle Types</span>
+            <span class="specification_td">Cars, SUV, Pickup Trucks</span>
+          </div>
+          <div class="specification_tr">
+            <span class="specification_td">Bulb Type</span>
+            <span class="specification_td">LED</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+</div>
+
+<style>
+  .page_wrap {
+    background: #000;
+  }
+  img {
+    display: block;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 768px) {
+    .banner_wrap {
+      position: relative;
+      min-height: 7vw;
+      padding-bottom: 1vw;
+    }
+    .banner_text_wrap {
+      position: absolute;
+      left: 10%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .banner_text_wrap.over_text {
+      color: #fff;
+    }
+    .banner_text_wrap.over_text .banner_text {
+      font-size: 3.5vw;
+      line-height: 3.8vw;
+      font-weight: bold;
+    }
+    .banner_text_wrap.over_text .banner_sub_text {
+      font-size: 1.5vw;
+      line-height: 1.8vw;
+    }
+    .content_wrap {
+      padding-bottom: 1vw;
+    }
+    .scence_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      padding: 1vw 0;
+    }
+    .scence_wrap .image_wrap {
+      width: 31%;
+    }
+
+    .scence_wrap .scence_text_wrap {
+      width: 31%;
+      padding-bottom: 2.5vw;
+      margin-right: 2vw;
+    }
+    .scence_wrap .scence_text_wrap:last-child {
+      margin-right: 0;
+    }
+    .scence_wrap .scence_text_wrap .scence_text {
+      /* color: #333; */
+      font-size: 1.4vw;
+      line-height: 1.8vw;
+      margin-bottom: .4vw;
+      font-weight: bold;
+    }
+    .scence_wrap .scence_text_wrap .scence_sub_text {
+      font-size: 1vw;
+      line-height: 1.3vw;
+      /* color: #333; */
+    }
+
+    .specification_wrap {
+      padding: 4vw;
+      margin-bottom: 4vw;
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: #000;
+    }
+    .specification_table {
+      flex: 1;
+      padding-right: 10vw;
+    }
+    .specification_theader {
+      font-size: 2vw;
+      line-height: 2.2vw;
+      font-weight: bold;
+      padding: 1vw 0;
+      border-bottom: 1px solid #fff;
+      display: inline-block;
+    }
+    .specification_tbody {
+      padding: 1.5vw 0;
+    }
+    .specification_tr {
+      padding: .8vw 0;
+      border-bottom: 1px solid #fff;
+
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    .specification_td {
+      font-size: 1vw;
+      line-height: 1.2vw;
+    }
+    .specification_td:first-child {
+      width: 55%;
+      font-weight: bold;
+    }
+    .specification_td:last-child {
+      width: 45%;
+    }
+    .spacification_image {
+      width: 25%;
+    }
+    .spacification_image img {
+      width: 5vw;
+      margin: auto;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .banner_wrap {
+      position: relative;
+      min-height: 100px;
+      margin-bottom: 10px;
+    }
+    .banner_text_wrap {
+      width: 100%;
+      text-align: center;
+      padding: 20px 40px;
+    }
+    .banner_text_wrap.over_text {
+      color: #000;
+    }
+    .banner_text_wrap.over_text .banner_text {
+      font-size: 30px;
+      line-height: 34px;
+      font-weight: bold;
+    }
+    .banner_text_wrap.over_text .banner_sub_text {
+      font-size: 15px;
+      line-height: 18px;
+    }
+    .content_wrap {
+      padding: 0 20px 0px;
+    }
+    .scence_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .scence_wrap .image_wrap {
+      width: 100%;
+      padding: 0 14px;
+    }
+
+    .scence_wrap .scence_text_wrap {
+      width: 100%;
+      padding: 20px 0;
+      /* color: #333; */
+    }
+
+    .scence_wrap .scence_text_wrap .scence_text {
+      font-size: 18px;
+      line-height: 22px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    .scence_wrap .scence_text_wrap .scence_sub_text {
+      font-size: 12px;
+      line-height: 14px;
+    }
+
+
+
+
+    .specification_wrap {
+      padding: 20px;
+      margin-bottom: 30px;
+      width: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .specification_table {
+      width: 100%;
+    }
+    .specification_theader {
+      font-size: 20px;
+      line-height: 22px;
+      font-weight: bold;
+      padding: 10px 0;
+      border-bottom: 1px solid #fff;
+      display: inline-block;
+    }
+    .specification_tbody {
+      padding: 15px 0;
+    }
+    .specification_tr {
+      padding: 8px 0;
+      border-bottom: 1px solid #fff;
+
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    .specification_td {
+      font-size: 12px;
+      line-height: 14px;
+    }
+    .specification_td:first-child {
+      width: 55%;
+      font-weight: bold;
+    }
+    .specification_td:last-child {
+      width: 45%;
+    }
+    .spacification_image {
+      width: 30%;
+    }
+    .spacification_image img {
+      width: 60px;
+    }
+  }
+
+
+
+</style>

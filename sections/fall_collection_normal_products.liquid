@@ -1,0 +1,107 @@
+<div class="page-width" style="padding-bottom: 40px;">
+  <h2 class="page_text fall_header">{{ section.settings.normal_title }}</h2>
+  <div class="section_img {% if section.settings.normal_discount_banner_pc == blank %} hide {% endif %}">
+    <img data-src="{{ section.settings.normal_discount_banner_pc | img_url: 'master' }}" alt="section.settings.normal_discount_banner_pc.alt" class="lazyload mobile-hide">
+    <img data-src="{{ section.settings.normal_discount_banner_mb | img_url: 'master' }}" alt="section.settings.normal_discount_banner_mb.alt" class="lazyload mobile-show">
+  </div>
+
+  <div class="grid" style="display: flex;">
+    <div class="grid--uniform">
+      {% for block in section.blocks %}
+        {% assign product = block.settings.normal_product %}
+        {% render 'product-grid-item', 
+          product: product,              
+        %}
+      {% endfor %}
+      {%- render 'quick-shop-modal', product: product -%}
+    </div>
+  </div>
+  <div class="viewMore page-width page_sub_text">
+    <span class="viewMoreIcon">+</span>
+    <button class="viewMoreText" style="color: #11ace7;">Load More</button>
+  </div>
+</div>
+
+<style>
+  .viewMore {
+    background: #f2f8fd;
+    text-align: center;
+    color: #11ace7;
+  }
+  .section_img {
+    margin-bottom: 40px;
+  }
+  .section_img img{
+    object-fit: none;
+  }
+  
+</style>
+
+
+<script>
+  $(function() {
+    let more = 1;
+    initShow(more);
+    $('.viewMore').on('click', function() {
+      viewMore()
+    })
+    function initShow(more) {
+      $('.fall-collection-normal-section .grid__item.grid-product').each((index, item)=> {
+        if ($(item).index() + 1 > 8*more) {
+          $(item).hasClass('hide') ? '' : $(item).addClass('hide')
+        }else {
+          $(item).hasClass('hide') && $(item).removeClass('hide')
+        }
+      })
+      $('.fall-collection-normal-section .grid__item.grid-product').last().index()+1 > 8*more ?
+      $('.viewMore').show(): $('.viewMore').hide()
+    }
+    function viewMore() {
+      more++;
+      initShow(more)
+    }
+  })
+</script>
+
+
+
+
+
+
+{% schema %}
+  {
+    "name": "Normal Products",
+    "class": "fall-collection-normal-section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "normal_title",
+        "label": "Normal Header",
+        "default": "Buy More Save More"
+      },
+      {
+        "type": "image_picker",
+        "id": "normal_discount_banner_pc",
+        "label": "normal discount banner of pc"
+      },
+      {
+        "type": "image_picker",
+        "id": "normal_discount_banner_mb",
+        "label": "normal discount banner of mobile"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "product_item",
+        "name": "normal product",
+        "settings": [
+        {
+            "type": "product",
+            "id": "normal_product",
+            "label": "Buy More Save More Product"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

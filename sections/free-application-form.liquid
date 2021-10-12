@@ -1,0 +1,506 @@
+<section class="application_form" data-animate_images="true">
+  <div class="header page_text" data-anmiate_text="true">Application Form</div>
+  
+  <div class="application_form_desc page-width">
+    <div class="desc_header page_text" data-anmiate_text="true">Requirement Of Free Products Review</div>
+    <div class="desc_wrap">
+      <div class="desc_item">
+        <div class="desc_icon">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/b10c76a6aa35ccfdd44ad437f0200734.png?v=1627293250" alt="" class="lazyload">
+        </div>
+        <div class="desc_text">
+          Followers at least 3K on your channel
+        </div>
+      </div>
+      <div class="desc_item">
+        <div class="desc_icon">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/7b218a15d9deead55a89b86612679875.png?v=1627293250" alt="" class="lazyload">
+        </div>
+        <div class="desc_text">
+          Average views of your video/post more than 1K
+        </div>
+      </div>
+      <div class="desc_item">
+        <div class="desc_icon">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6cf4a5e39827fcfad1a22ccadc2719e0.png?v=1627293250" alt="" class="lazyload">
+        </div>
+        <div class="desc_text">
+          Your channel about Tech, lights, game or related to our products
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form_content page-width">
+  {% form 'customer',id : 'free-application-form' %}
+    <div class="form_content_container">
+      {%- if form.posted_successfully? -%}
+        <p class="note note--success">
+          {{ 'general.newsletter_form.newsletter_confirmation' | t }}
+        </p>
+      {%- endif -%}
+      {% if form.errors %}
+        {{ form.errors | default_errors }}
+      {% endif %}
+
+
+      <div class="form_content_wrapper">
+        <div class="input_wrapper">
+          <input
+          class="input"
+          name="contact[first_name]"
+          type="text"
+          placeholder="*Name"
+          aria-label="Order Number">
+
+          <input
+          class="input"
+          name="contact[email]"
+          type="email"
+          placeholder="*Email Address"
+          aria-label="*Email Address">
+
+          <input
+          class="input"
+          name="contact[note][Address_Country]"
+          type="text"
+          placeholder="*Your Country"
+          aria-label="*Your Country">
+        </div>
+        
+        <input type="hidden" id="contact_chanel" name="contact[note][Website_Type]">
+        <input type="hidden" id="contact_tags" name="contact[tags]" value="free-application-products">
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            *Channel/Website Type
+          </div>
+          <div class="input_content">
+            <div class="icon_list">
+              <label for="Youtube" class="icon_list_item">
+                <div class="icon_img">
+                  <input id="Youtube" type="checkbox">
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Youtube.png?v=1627293250" alt="" class="lazyload">
+                </div>
+                <div class="icon_text">Youtube</div>
+              </label>
+              <label for="Twitter" class="icon_list_item">
+                <div class="icon_img">
+                  <input id="Twitter" type="checkbox" >
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Twitter.png?v=1627293250" alt="" class="lazyload">
+                </div>
+                <div class="icon_text">Twitter</div>
+              </label>
+              <label for="Twich" class="icon_list_item">
+                <div class="icon_img">
+                  <input id="Twich" type="checkbox" >
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Twich.png?v=1627293250" alt="" class="lazyload">
+                </div>
+                <div class="icon_text">Twich</div>
+              </label>
+              <label for="TikTok" class="icon_list_item">
+                <div class="icon_img">
+                  <input id="TikTok" type="checkbox" >
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/TikTok.png?v=1627293250" alt="" class="lazyload">
+                </div>
+                <div class="icon_text">TikTok</div>
+              </label>
+              <label for="Instagram" class="icon_list_item">
+                <div class="icon_img">
+                  <input id="Instagram" type="checkbox" >
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Instagram.png?v=1627293250" alt="" class="lazyload">
+                </div>
+                <div class="icon_text">Instagram</div>
+              </label>
+              <label for="Blog" class="icon_list_item">
+                <div class="icon_img">
+                  <input id="Blog" type="checkbox" >
+                  <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Blog.png?v=1627293250" alt="" class="lazyload">
+                </div>
+                <div class="icon_text">Blog</div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            *Channel Website/Link
+          </div>
+          <div class="input_content">
+            <input type="text" class="input" name="contact[note][Link]">
+          </div>
+        </div>
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            *Subscribers Amount/ Website Traffic
+          </div>
+          <div class="input_content">
+            <input type="text" class="input" name="contact[note][Subscribers_Amount]">
+          </div>
+        </div>
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            *Average View of Your Video/Article/Post/Content
+          </div>
+          <div class="input_content">
+            <input type="text" class="input" name="contact[note][Average_View]">
+          </div>
+        </div>
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            *Channel/Website Audience Country
+          </div>
+          <div class="input_content">
+            <input type="text" class="input" name="contact[note][Audience_Country]">
+          </div>
+        </div>
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            *When will you publish the video/post after you received the products?
+          </div>
+          <div class="input_content">
+            <input type="text" class="input" name="contact[note][When_Publish]">
+          </div>
+        </div>
+
+        <div class="input_wrapper">
+          <div class="input_label">
+            * Products you would like to promote/review?
+          </div>
+          <div class="input_content">
+            <input type="text" class="input" name="contact[note][Promote_Product]">
+          </div>
+        </div>
+        
+        <div class="input_wrapper">
+          <input
+            id="submit"
+            class="btn btn--inverse btn--full add-to-cart CCB"
+            name="subscribe"
+            type="text"
+            value="APPLY NOW"
+            aria-label="APPLY NOW" />
+        </div>
+      </div>
+    </div>
+  {% endform %}
+  </div>
+</section>
+
+
+<style>
+  .application_form {
+    background: #07abf7;
+  }
+  @media screen and (min-width: 769px) {
+    .application_form {
+      padding-top: 2.8vw;
+      padding-bottom: 10vw;
+    }
+    .application_form .header {
+      font-size: 2.7vw;
+      line-height: 2.4vw;
+      font-weight: bold;
+      padding-bottom: 2.8vw;
+    }
+    .application_form .desc_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 2vw;
+      margin-bottom: 1vw;
+    }
+    .application_form .application_form_desc {
+      background: #fff;
+      max-width: 1200px;
+      padding: 2.5vw 0;
+      margin-bottom: 1vw;
+    }
+    .application_form .desc_header {
+      color: #343434;
+      font-size: 1.6vw;
+      text-align: center;
+
+      margin-bottom: 2vw;
+    }
+    .desc_wrap .desc_item {
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+
+      flex: 1;
+      padding: 0 3vw;
+      text-align: center;
+    }
+    .desc_item .desc_icon{
+      width: 3vw;
+      height: 3vw;
+      margin-bottom: 1vw;
+    }
+    .desc_item .desc_text{
+      font-weight: normal;
+      font-size: 1vw;
+    }
+    .application_form .form_content {
+      background: #fff;
+      max-width: 1200px;
+      padding: 2.5vw 4.5vw;
+    }
+    .form_content .input {
+      color: #666666;
+      border: 1px solid #CCCCCC;
+      display: inline-block;
+      border-radius: 5px;
+      font-size: .9vw;
+      width: calc(32% - .75vw);
+    }
+    .form_content .input::placeholder {
+      color: #666666;
+      font-size: .9vw;
+    }
+    .form_content .input:focus {
+      color: #00ACE7;
+      border-color: #00ACE7;
+    }
+    .form_content .input:focus::placeholder {
+      color: #00ACE7;
+      font-size: .9vw;
+    }
+    .form_content .input_wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2vw;
+    }
+    .input_wrapper .input_label {
+      font-size: 1vw;
+      color: #666666;
+      flex: 1;
+      padding-right: 10vw;
+    }
+    .input_wrapper .input_content {
+      width: calc(50% + 1vw);
+    }
+    .input_wrapper .icon_list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 1vw;
+      padding-top: 10px;
+    }
+    .input_wrapper .icon_list.error {
+      background-color: rgba(255, 0, 0,.1);
+    }
+    .icon_list .icon_list_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .icon_list_item .icon_img {
+      min-width: 20px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .icon_list_item input[type='checkbox'] {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .icon_list_item .icon_text {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .form_content_wrapper .input_wrapper:nth-child(2) {
+      padding: 1vw 0 2vw;
+    }
+    .form_content_wrapper .input_wrapper:last-child {
+      padding-top: 3vw;
+    }
+
+    .input_content input[type='text'] {
+      display: inline-block;
+      width: 100%;
+      border-radius: 5px;
+    }
+
+  }
+  @media screen and (max-width: 768px) {
+    .application_form {
+      padding: 40px 10px 20px;
+    }
+    .application_form .header {
+      font-size: 30px;
+      line-height: 34px;
+      font-weight: bold;
+    }
+    .application_form .desc_wrap {
+      display: flex;
+      justify-content: space-around;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px;
+      margin-bottom: 10px;
+    }
+    .application_form .application_form_desc {
+      background: #fff;
+      padding: 20px 0;
+      margin-bottom: 10px;
+    }
+    .application_form .desc_header {
+      color: #343434;
+      font-size: 16px;
+      text-align: center;
+
+      margin-bottom: 10px;
+    }
+    .desc_wrap .desc_item {
+      color: #000;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+    }
+    .desc_item .desc_icon{
+      width: 30px;
+      margin-bottom: 10px;
+      margin-right: 20px;
+    }
+    .desc_item .desc_text{
+      font-weight: normal;
+      font-size: 12px;
+      text-align: left;
+      flex: 1;
+    }
+    .application_form .form_content {
+      background: #fff;
+      padding: 30px 10px 10px;
+    }
+    .form_content .input {
+      color: #666666;
+      border: 1px solid #CCCCCC;
+      display: inline-block;
+      border-radius: 5px;
+      font-size: 12px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .form_content .input::placeholder {
+      color: #666666;
+      font-size: 12px;
+    }
+    .form_content .input:focus {
+      color: #00ACE7;
+      border-color: #00ACE7;
+    }
+    .form_content .input:focus::placeholder {
+      color: #00ACE7;
+      font-size: 12px;
+    }
+    .form_content .input_wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+    .input_wrapper .input_label {
+      font-size: 12px;
+      color: #333;
+      flex: 1;
+    }
+    .input_wrapper .input_content {
+      width: 100%;
+    }
+    .input_wrapper .input_content input {
+      margin-bottom: 0;
+    }
+    .input_wrapper .icon_list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 10px;
+      padding-top: 10px;
+    }
+    .input_wrapper .icon_list.error {
+      background-color: rgba(255, 0, 0,.1);
+    }
+    .icon_list .icon_list_item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      width: 25%;
+    }
+    .icon_list_item .icon_img {
+      min-width: 20px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .icon_list_item input[type='checkbox'] {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .icon_list_item .icon_text {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .form_content_wrapper .input_wrapper:nth-child(2) {
+      padding: 10px 0 0 0;
+    }
+    .form_content_wrapper .input_wrapper:last-child {
+      padding-top: 10px;
+    }
+
+    .input_content input[type='text'] {
+      display: inline-block;
+      width: 100%;
+      border-radius: 5px;
+    }
+
+  }
+</style>
+
+
+<script>
+  let list = []
+  $('.icon_list_item').on('click','input[type="checkbox"]', function() {
+    let id = $(this).attr('id')
+    if ($(this).get(0).checked) {
+      list = list.concat(id).sort()
+    }else {
+      list = list.filter(item => item != id).sort()
+    }
+    $('#contact_chanel').val(list.join(','))
+  })
+
+  $('.form_content_container input#submit').click(function () {
+    // contact[note][] == 不能使用 Channel - -、
+    let formData = $('form#free-application-form').serializeArray().slice(2,-1)
+    let emptyData = formData.find(item => !item.value)
+    if (emptyData) {
+      $(`.form_content_container input[type!='checkbox'], .form_content_container .input_wrapper .icon_list`).removeClass('error')
+      if (emptyData.name === 'contact[note][Website_Type]') {
+        $(`.form_content_container .input_wrapper .icon_list`).addClass('error')
+      }else {
+        $(`.form_content_container input[name='${emptyData.name}']`).addClass('error')
+      }
+    }else {
+      $('.form_content_container input#submit').attr('type', 'submit').submit()
+    }
+  })
+</script>

@@ -1,0 +1,30 @@
+{% liquid
+  assign summer_sale_banner = section.settings.summer_sale_banner
+  assign summer_sale_banner_mobile = section.settings.summer_sale_banner_mobile
+%}
+
+<section class="banner lazyload">
+  <img src="{{ summer_sale_banner | img_url: 'master' }}" alt="{{ summer_sale_banner.alt }}" class="lazyload mobile-hide">
+  <img src="{{ summer_sale_banner_mobile | img_url: 'master' }}" alt="{{ summer_sale_banner_mobile.alt }}" class="lazyload mobile-show">
+</section>
+
+
+{% schema %}
+  {
+    "name": "Summer Sale Banner",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "summer_sale_banner",
+        "label": "Upload Summer Sale Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "summer_sale_banner_mobile",
+        "label": "Upload Summer Sale Banner of Mobile"
+      }
+    ],
+    "blocks": [
+    ]
+  }
+{% endschema %}

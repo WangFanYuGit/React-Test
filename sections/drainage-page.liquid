@@ -1,0 +1,95 @@
+{% render 'drainage-page' %}
+
+{% schema %}
+  {
+    "name": "Lyra Pages",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "KOL Title"
+      },
+      {
+        "type": "text",
+        "id": "buy_info_tip",
+        "label": "Purchase tips"
+      },
+      {
+        "type": "url",
+        "id": "top_buy_url_to",
+        "label": "buy link"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "KOL_Video",
+        "name": "KOL视频",
+        "settings":[
+          {
+            "type": "image_picker",
+            "id": "poster",
+            "label": "Upload Poster"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Input Video Title"
+          },
+          {
+            "type": "textarea",
+            "id": "content",
+            "label": "Input Video content"
+          },
+          {
+            "type": "video_url",
+            "id": "url",
+            "label": "Youtube Video Url",
+            "accept": ["youtube", "vimeo"],
+            "info": "支持Youtube 或者 vimeo的视频链接"
+          },
+          {
+            "type": "url",
+            "id": "url_text",
+            "label": "本地视频Url",
+            "info": "本地视频链接"
+          }
+        ]
+      },
+      {
+        "type": "swiper_artile",
+        "name": "User Reviews",
+        "settings":[
+          
+          {
+            "type": "text",
+            "id": "user_name",
+            "label": "Input username"
+          },
+
+          {
+            "type": "image_picker",
+            "id": "user_icon",
+            "label": "user icon"
+          },
+
+          {
+            "type": "range",
+            "id": "stars_number",
+            "label": "星星数量",
+            "default": 5,
+            "min": 0,
+            "max": 5,
+            "step": 0.5,
+            "unit": "px"
+          },
+
+          {
+            "type": "textarea",
+            "id": "content",
+            "label": "Input content"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

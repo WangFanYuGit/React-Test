@@ -1,0 +1,30 @@
+<section class="product_swiper_wrap_{{ swiper_index }} lazyload" data-slide-per-view="{{ slidesPerView }}" data-swiper_index="{{ swiper_index  }}" data-animate_images="true">
+  <div class="recommed_container recommed_container_{{ swiper_index }} swiper-container">
+    <div class="swiper-wrapper">
+      {% for block in section.blocks %}
+        {% render 'govee-product',product: block.settings.product %}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="{% if section.blocks.size <= slidesPerView %} hide {% endif %} recommed_container_button_wrap recommed_container_button_wrap_{{ swiper_index }}">
+    <div class="recommed_next swiper-button-next swiper-button-gray hvr-bounce-in"></div>
+    <div class="recommed_prev swiper-button-prev swiper-button-gray hvr-bounce-in"></div>
+  </div>
+</section>
+
+<script>
+  $(function () {
+    var slidesPerView = $('.product_swiper_wrap_{{ swiper_index }}').data('slide-per-view');
+    var recommed_swiper = new Swiper('.recommed_container_{{ swiper_index }}.swiper-container', {
+      slidesPerView: window.isMobile || slidesPerView == 2 ? 2 : 4,
+      spaceBetween: window.isMobile || slidesPerView == 2 ? 8 : 30,
+      navigation: {
+        nextEl: '.recommed_container_button_wrap_{{ swiper_index }} .recommed_next.swiper-button-next',
+        prevEl: '.recommed_container_button_wrap_{{ swiper_index }} .recommed_prev.swiper-button-prev'
+      }
+    });
+
+  })
+</script>
+
+

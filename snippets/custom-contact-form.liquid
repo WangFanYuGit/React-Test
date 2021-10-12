@@ -1,0 +1,64 @@
+<div class="subscribe_wrap">
+  {%- form 'customer', id: 'custom-contact-form' -%}
+    <div class="small--hide lazyload">
+      <div class="subscribe_img">
+        <img class="grid-product__image lazyload"
+          data-src="https://cdn.shopify.com/s/files/1/0512/3489/8105/files/6170_e5daca76-7c5c-4c11-b52b-45d0ab2883ec.jpg?v=1612852129"
+          data-widths="[180, 360, 540, 720, 900, 1080]"
+          data-sizes="auto" />
+      </div>
+      <div class="grid-product__title subscribe_title">
+        Govee Phantasy Pro RGBIC LED Strip Lights (32.8 Ft)
+      </div>
+
+      <div class="subscribe_input">
+        {%- if form.posted_successfully? -%}
+          <p class="note note--success">
+            {{ 'contact.form.post_success' | t }}
+          </p>
+    	  {%- endif -%}
+        
+    	  {{ form.errors | default_errors }}
+        
+        <input placeholder="Your Email Address" type="email" id="ContactFormEmail-{{ section.id }}" class="input-full" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+      </div>
+    </div>
+  
+    <button type="submit" class="subscribe_btn btn">
+      Let Me Know
+    </button>
+
+  {%- endform -%}
+</div>
+
+<style>
+  .subscribe_wrap {
+    width: 284.5px;
+    margin-left: 20px;
+    display: inline-block;
+  }
+  .subscribe_input {
+    margin: 4px;
+  }
+  .subscribe_input input {
+    border-radius: 4px;
+  }
+  .subscribe_img {
+    border-radius: 4px;
+    height: 284.5px;
+  }
+  .subscribe_img img {
+  	height: 100%;
+    width: 100%;
+    display: block;
+  }
+  .subscribe_btn {
+    color: #333;
+    border-radius: 4px;
+    width: 276px;
+    margin: 4px;
+  }
+  .subscribe_title {
+  	margin: 8px 0;
+  }
+</style>

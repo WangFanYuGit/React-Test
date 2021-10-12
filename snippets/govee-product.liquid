@@ -1,0 +1,15 @@
+<div class="recommed_item swiper-slide">
+  {% assign product_img =  product.featured_media.preview_image %}
+  <div class="recommed_image hvr-grow">
+    <img
+      class="lazyload"
+      data-src="{{ product_img | img_url: 'master' }}"
+      alt="">
+  </div>
+  <div class="recommed_name page_text" data-animate_text="true">{{ product.title }}</div>
+  <div class="recommed_price_wrap">
+    <span class="recommed_sale_price" data-animate_text="true">{{ product.price | money }}</span>
+    <span class="recommed_price" data-animate_text="true">{{ product.compare_at_price | money }}</span>
+  </div>
+  <a href="{{ product.url }}"><button class="recommed_shop hvr-fade">Shop Now</button></a>
+</div>

@@ -1,0 +1,130 @@
+{% liquid
+  assign hot_sale_banner = section.settings.hot_sale_banner
+  assign hot_sale_banner_mobile = section.settings.hot_sale_banner_mobile
+%}
+
+<section class="top_products_section" data-animate_images="true">
+  {% if hot_sale_banner %}
+    <div class="top_section_banner">
+      <img src="{{ hot_sale_banner | img_url: 'master' }}" alt="{{ hot_sale_banner.alt }}" class="lazyload mobile-hide">
+      <img src="{{ hot_sale_banner_mobile | img_url: 'master' }}" alt="{{ hot_sale_banner_mobile.alt }}" class="lazyload mobile-show">
+    </div>
+    <div class="top_product_list">
+    {% for block in section.blocks %}
+      {% if block.type == 'hot-sale' %}
+        {% liquid 
+          assign product_img = block.settings.hot_sale_products_img
+          assign product_img_mobile = block.settings.hot_sale_products_img_mobile
+          assign product_image = block.settings.hot_sale_products_image
+          assign product_image_mobile = block.settings.hot_sale_products_image_mobile
+          assign product_title = block.settings.hot_sale_products_title
+          assign product_price_sale = block.settings.hot_sale_products_price_sale 
+          assign product_price_virtual = block.settings.hot_sale_products_price_virtual 
+          assign product_url = block.settings.hot_sale_products_url
+          assign product_star = block.settings.hot_sale_stars_number | at_least: 0 | at_most: 5
+          assign product_reviews = block.settings.hot_sale_reviews
+          assign product_sale_percent = product_price_sale | divided_by: product_price_virtual | times: 100 | minus: 100 | abs | round | append: '%' 
+        %}
+        {% render 'summer-sale-products',
+          product_img:product_img,  
+          product_img_mobile: product_img_mobile,
+          product_image: product_image,
+          product_image_mobile: product_image_mobile,
+          product_title: product_title,
+          product_price_sale: product_price_sale,
+          product_price_virtual: product_price_virtual,
+          product_url: product_url,
+          product_star: product_star,
+          product_reviews: product_reviews,
+          product_sale_percent: product_sale_percent,
+          forloop: forloop
+        %}
+      {% endif %}
+    {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+
+
+{% schema %}
+  {
+    "name": "Hot Sale Section",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "hot_sale_banner",
+        "label": "Upload Hot Sale Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "hot_sale_banner_mobile",
+        "label": "Upload Hot Sale Banner of Mobile"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "hot-sale",
+        "name": "HOT SALE PRODUCTS",
+        "settings": [
+
+          {
+            "type": "image_picker",
+            "id": "hot_sale_products_img",
+            "label": "Upload Hot Sale Products Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "hot_sale_products_img_mobile",
+            "label": "Upload Hot Sale Products Image of Moblie"
+          },
+          {
+            "type": "image_picker",
+            "id": "hot_sale_products_image",
+            "label": "Upload Hot Sale Products Physical Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "hot_sale_products_image_mobile",
+            "label": "Upload Hot Sale Products Physical Image of Mobile"
+          },
+          {
+            "type": "text",
+            "id": "hot_sale_products_title",
+            "label": "Product Title"
+          },
+          {
+            "type": "range",
+            "id": "hot_sale_stars_number",
+            "label": "Product Star Level",
+            "default": 5,
+            "min": 0,
+            "max": 5,
+            "step": 0.1,
+            "unit": "px"
+          },
+          {
+            "type": "text",
+            "id": "hot_sale_reviews",
+            "label": "Product Reviews"
+          },
+          {
+            "type": "text",
+            "id": "hot_sale_products_price_sale",
+            "label": "Hot Sale Products Sale Price"
+          },
+          {
+            "type": "text",
+            "id": "hot_sale_products_price_virtual",
+            "label": "Hot Sale Products Virtual Price"
+          },
+          {
+            "type": "url",
+            "id": "hot_sale_products_url",
+            "label":"Hot Sale Products Url" 
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

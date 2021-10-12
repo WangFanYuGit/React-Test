@@ -1,0 +1,193 @@
+<section class="more_deals_wrap" data-animate_images="true">
+  {% if section.settings.header != blank %}
+  <h4 class="page_text more_deals_header">{{ section.settings.header }}</h4>
+  {% endif %}
+
+  <div class="more_deals_list page-width">
+    {% for block in section.blocks %}
+    <div class="more_deals_item">
+      <img src="{{ block.settings.product_img | img_url: 'master' }}" alt="" class="lazyload">
+
+      <div class="more_deals_content">
+        <div class="more_deals_title font_family_black">
+          {{block.settings.product_name}}
+        </div>
+        <div class="more_deals_link">
+          <a class="font_family_medium" href="{{block.settings.product_url}}">
+            <span class="link_name hvr-grow">View More</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</section>
+<style>
+  @media screen and (min-width: 769px) {
+    .more_deals_wrap {
+      padding-bottom: 4.5vw;
+      background: #F5F5F7;
+    }
+
+    .more_deals_wrap .more_deals_header {
+      padding: 4.5vw 0 1.5vw;
+      text-align: center;
+    }
+
+    .more_deals_wrap .more_deals_list {
+      max-width: 1400px;
+      padding: 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .more_deals_wrap .more_deals_item {
+      width: 25%;
+      box-sizing: border-box;
+      padding-bottom: 2vw;
+      border: 1px solid #DEDEDE;
+      background-color: #fff;
+    }
+    .more_deals_wrap .more_deals_item:not(:last-child) {
+      margin-right: 1vw;
+    }
+
+    .more_deals_wrap .more_deals_item>img {
+      width: 100%;
+      margin-bottom: 1.9vw;
+    }
+
+    .more_deals_wrap .more_deals_title {
+      width: 100%;
+      font-size: 1.1vw;
+      color: #252525;
+      line-height: 1.5vw;
+      font-weight: bolder;
+      margin-bottom: .4vw;
+      text-align: center;
+    }
+
+    .more_deals_wrap .more_deals_link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .more_deals_wrap .more_deals_link>a {
+      display: inline-block;
+      font-weight: lighter;
+
+    }
+
+    .more_deals_wrap .more_deals_link .link_name {
+      font-size: .8vw;
+      font-weight: lighter;
+      line-height: 1.2vw;
+      color: #252525;
+      text-decoration: underline;
+    }
+
+  }
+
+  @media screen and (max-width: 768px) {
+    .more_deals_wrap {
+      background-color: #F5F5F7;
+    }
+
+    .more_deals_wrap .more_deals_header {
+      padding: 40px 0 15px;
+      text-align: center;
+    }
+
+    .more_deals_wrap .more_deals_list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 0 30px;
+    }
+
+    .more_deals_wrap .more_deals_item {
+      width: calc(50% - 7px);
+      background-color: #fff;
+      margin-bottom: 14px;
+      border: 1px solid #DEDEDE;
+      position: relative;
+    }
+
+    .more_deals_wrap .more_deals_item .position_bottom {
+      position: absolute;
+      bottom: 32px;
+      left: 0;
+      width: 100%;
+    }
+
+    .more_deals_wrap .more_deals_item>img {
+      width: 100%;
+    }
+
+    .more_deals_wrap .more_deals_content {
+      padding: 12px 0 16px;
+      text-align: center;
+    }
+
+    .more_deals_wrap .more_deals_title {
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .more_deals_wrap .more_deals_link>a {
+      display: inline-block;
+      font-weight: lighter;
+    }
+
+    .more_deals_wrap .more_deals_link .link_name {
+      font-size: 12px;
+      font-weight: lighter;
+      color: #252525;
+      text-decoration: underline;
+    }
+  }
+</style>
+
+{% schema %}
+{
+"name": "more deals",
+"settings": [
+{
+"type": "text",
+"id": "header",
+"label": "more deals header"
+}
+],
+"blocks": [
+{
+"type": "more",
+"name": "they_saying items",
+"limit": 4,
+"settings": [
+{
+"type": "image_picker",
+"id": "product_img",
+"label": "item image"
+},
+{
+"type": "text",
+"id": "product_name",
+"label": "item name"
+},
+{
+"type": "url",
+"id": "product_url",
+"label": "item more_deals_link"
+}
+]
+}
+],
+"presets": [{
+"name": "more deals"
+}]
+}
+
+{% endschema %}

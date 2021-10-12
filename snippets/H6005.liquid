@@ -1,0 +1,1144 @@
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+<div id="H6005">
+  <div class="mobile-hide">
+    <section class="banner" data-animate_images="true">
+      <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_cba11776-8eae-4fba-b49d-f4b879d7a83e.jpg?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack Color Changing" class="govee_image lazyload">
+      <div class="banner_over_text">
+        <div class="over_text_title page_text_important color_white_important">Govee Bluetooth RGBWW LED Bulbs</div>
+        <div class="over_text_sub_title page_sub_text_important">Smart Lighting For All Sockets</div>
+      </div>
+    </section>
+
+    <section class="space_wrap">
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-01.png?v=1622689399">
+        <p class="icon_sub_title">16 Million Colors</p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-02.png?v=1622689399">
+        <p class="icon_sub_title">2700K-6500K</p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-03.png?v=1622689399">
+        <p class="icon_sub_title">Timer Setting</p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-04.png?v=1622689399">
+        <p class="icon_sub_title">DIY Mode</p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-05.png?v=1622689399">
+        <p class="icon_sub_title">8 Scene Modes</p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-06.png?v=1622689399">
+        <p class="icon_sub_title">APP Control</p>
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text">
+        <div class="over_text_title page_text_important">Dynamic Music Mode</div>
+        <div class="over_text_sub_title page_sub_text_important">Don't just hear your music - See it! Music mode allows the light of each bulb to pulse and change with the beat of the music thanks to built-in, highly sensitive mics. Great for jazzing up get togethers with friends & family.</div>
+      </div>
+      <div class="middle_banner _fff" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02-banner.jpg?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack music led light bulbs" class="govee_image lazyload">
+      </div>
+    </section>
+    
+    <section class="scenes_wrap _3041a7">
+      <div class="wrap_item">
+        <div class="wrap_item">
+          <div class="wrap_title page_text_important">
+            Right Light, Right Time
+          </div>
+          <div class="wrap_img extra-wrap">
+            <div class="wrap_sub_title page_sub_text_important">
+              With 16 million colors plus calming or daylight whites, always find the perfect light no matter your mood or occasion. Reinvent and reinvigorate any room's atmosphere with just a touch of a button.
+            </div> 
+          </div>
+        </div>
+      </div>
+      <div class="wrap_item" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03-banner.jpg?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack different colors" class="govee_image lazyload">
+      </div>
+    </section>
+
+    <section class="scenes_wrap _3041a7">
+      <div class="wrap_item" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04-banner_8cec28ba-c730-4d2b-8623-a56d729d9b1d.jpg?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack app controlled" class="govee_image lazyload">
+      </div>
+      <div class="wrap_item">
+        <div class="wrap_title page_text_important">
+          Supremely Easy App Control
+        </div>
+        <div class="wrap_img extra-wrap">
+          <div class="wrap_sub_title page_sub_text_important">
+            Connect smart LED bulbs to the Govee Home App via Bluetooth. Control colors, dynamic effects, and mood-boosting modes from up to 196ft away and group control up to 6 bulbs simultaneously.
+          </div> 
+        </div>
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text">
+        <div class="over_text_title page_text_important">Fantastic Customization Options</div>
+        <div class="over_text_sub_title page_sub_text_important">DIY mode allows you to set exactly the colors and dynamic effects you want displayed. With the Color Picking feature, be presented with a range of colors to select based on beautiful photos you upload to Govee Home. </div>
+      </div>
+      <div class="middle_banner" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/05-banner_4d4b6423-37bc-48fb-8334-e6cab9f497ba.jpg?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack diy led light bulbs" class="govee_image lazyload">
+      </div>
+    </section>
+
+    <section class="middle_wrap _3041a7">
+      <div class="banner_top_text">
+        <div class="over_text_title page_text_important" style="color: #fff;">Lights That Meet Your Schedule</div>
+        <div class="over_text_sub_title page_sub_text_important" style="color: #e0e2ef;">Set timers and schedule sleep/wake times, color changes, and more for each bulb so your home's light conforms to your daily needs automatically. 
+        </div>
+      </div>
+      <div class="middle_banner tow_pic" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/06-_1_8c99e66a-aa46-4a4e-9071-da6d19d63979.png?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack led bulbs timer" class="govee_image lazyload">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/06-_2_077ca7bf-acb3-40ed-af89-3d9d93afcfb7.png?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack led bulbs timer" class="govee_image lazyload">
+      </div>
+    </section>
+    
+    <section class="middle_wrap">
+      <div class="banner_over_text top5">
+        <div class="over_text_title page_text_important" style="color: #000;">Save On Energy & Purchases</div>
+        <div class="over_text_sub_title page_sub_text_important" style="color: rgba(0, 0, 0, .7);">This 9W LED light bulb is equivalent brightness to an incandescent bulb yet uses 80% less power. With a super-long lifespan, screw in LED bulb once and enjoy it for years to come. 
+        </div>
+      </div>
+      <div class="middle_banner" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07-banner.jpg?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack energy saving" class="govee_image lazyload">
+    </section>
+
+    <section class="compare_wrap">
+      <div class="compare_title page_text_important">
+        Compare with other models
+      </div>
+      <table class="new-table bgc_white_important" style=" max-width: 1250px;margin: 0 auto; background:#0F0F0F;">
+        <tbody>
+          <tr>
+            <td class="bgc_white_important" width="30%">Model</td>
+            <td class="bgc_white_important" width="35%" style="color: #00ace7;">B6005</td>
+            <td class="bgc_white_important" width="35%">B6003</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Preview</td>
+            <td class="bgc_white_important" style="max-height: 13vw;"><img class="formright-img" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/B6005.png?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack group control"></td>
+            <td class="bgc_white_important" style="max-height: 13vw;">
+            <img class="formright-img" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6003_fe3b6987-51ae-4814-8efa-2301e49e167b.png?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack group control"> </td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Color</td>
+            <td class="bgc_white_important" colspan="2">RGBWW(RGB+Warm White 2700K+Cold White 6500K)</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Wattage</td>
+            <td class="bgc_white_important">9W=60W</td>
+            <td class="bgc_white_important">9W=60W</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Pack</td>
+            <td class="bgc_white_important">2 Packs</td>
+            <td class="bgc_white_important">2 Packs</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Control Methods </td>
+            <td class="bgc_white_important" style="color: #00ace7;">APP Control</td>
+            <td class="bgc_white_important">APP Control+Voice Control</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Group Control(APP)</td>
+            <td class="bgc_white_important" style="color: #00ace7;">Up to 6 LED bulbs</td>
+            <td class="bgc_white_important">Up to 50 LED bulbs</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Music Mode</td>
+            <td class="bgc_white_important" style="color: #00ace7;">✓</td>
+            <td class="bgc_white_important">X</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Scene Mode</td>
+            <td class="bgc_white_important">8</td>
+            <td class="bgc_white_important">8</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="specification_wrap H6005 bgc_white_important">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Working Voltage</div>
+              <div class="bottom color_black_important">110 Volts</div>
+            </div>  
+            <div class="H6005_spacification_item">
+              <div class="top">Wattage</div>
+              <div class="bottom color_black_important">9 W</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Lumen</div>
+              <div class="bottom color_black_important">800 Lumen</div>
+            </div>  
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Color</div>
+              <div class="bottom color_black_important">RGBWW</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Color Temperature</div>
+              <div class="bottom color_black_important">2700-6500K</div>
+            </div>  
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Product Dimensions</div>
+              <div class="bottom color_black_important">5.12 x 2.56 x 5.12 inches</div>
+            </div>  
+          </div>
+        </div>
+      </div>
+      <div class="product_img" data-animate_images="true">
+        <img class="govee_image lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/B6005_37e82e2e-1fe2-4a94-9717-9df3400c5c1d.png?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack specs">
+      </div>
+    </section>
+  </div>
+
+  <div class="mobile-show">
+    <section class="middle_wrap">
+      <div class="banner_top_text over_top">
+        <div class="over_text_title page_text_important">Govee Bluetooth RGBWW LED Bulbs</div>
+        <div class="over_text_sub_title page_sub_text_important">Smart Lighting For All Sockets</div>
+      </div>
+      <div class="middle_banner" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_f297c0fa-698b-4bdd-b0aa-7755d93c911a.jpg?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack color changing" class="lazyload">
+      </div>
+    </section>
+
+    <section class="space_wrap">
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-01_29002e2e-ceb0-40ef-b7cb-a3b77d427c37.png?v=1622713909">
+        <p class="icon_sub_title"> 16 Million Colors </p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-02_ab374262-17e0-40ee-b10c-04b4745d3e4b.png?v=1622713909">
+        <p class="icon_sub_title"> 2700K-6500K </p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-03_fdafac65-aefb-4987-9bb7-a167db7a5517.png?v=1622713910">
+        <p class="icon_sub_title"> Timer Setting </p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-04_81b771fb-1a7b-4319-bd7d-3b9d886a509e.png?v=1622713909">
+        <p class="icon_sub_title"> DIY Mode </p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-05_ae2a856c-3af8-4f77-aebe-bcb406f26ea0.png?v=1622713909">
+        <p class="icon_sub_title"> 8 Scene Modes </p>
+      </div>
+      <div class="space_item">
+        <img class="lazyload width_auto_important" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/icon-06_c82bf6f9-87f7-4a1e-b6d4-e86bff7943dd.png?v=1622713909">
+        <p class="icon_sub_title"> App Control </p>
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text grey black">
+        <div class="over_text_title page_text_important">Dynamic Music Mode</div>
+        <div class="over_text_sub_title page_sub_text_important">Don't just hear your music - See it! Music mode allows the light of each bulb to pulse and change with the beat of the music thanks to built-in, highly sensitive mics. Great for jazzing up get togethers with friends & family.</div>
+      </div>
+      <div class="middle_banner" style="padding: 30px 10px; background: #f9f9f9;" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03-banner_e26b0688-50e4-44fd-9155-b6f77f26e9f7.jpg?v=1622713909" alt="" class="lazyload">
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text over_top">
+        <div class="over_text_title page_text_important">Right Light, Right Time</div>
+        <div class="over_text_sub_title page_sub_text_important">With 16 million colors plus calming or daylight whites, always find the perfect light no matter your mood or occasion. Reinvent and reinvigorate any room's atmosphere with just a touch of a button.</div>
+      </div>
+      <div class="middle_banner" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04-banner_b22ef49a-1516-4ae6-abde-1389ea9bb61d.jpg?v=1622713909" alt="" class="lazyload">
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text over_top">
+        <div class="over_text_title page_text_important">Supremely Easy App Control</div>
+        <div class="over_text_sub_title page_sub_text_important">Connect smart LED bulbs to the Govee Home App via Bluetooth. Control colors, dynamic effects, and mood-boosting modes from up to 196ft away and group control up to 6 bulbs simultaneously.</div>
+      </div>
+      <div class="middle_banner" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/05-banner_7531d052-b408-406a-aea2-3076ae297424.jpg?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack app controlled" class="lazyload">
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text grey black">
+        <div class="over_text_title page_text_important">Fantastic Customization Options</div>
+        <div class="over_text_sub_title page_sub_text_important">DIY mode allows you to set exactly the colors and dynamic effects you want displayed. With the Color Picking feature, be presented with a range of colors to select based on beautiful photos you upload to Govee Home.</div>
+      </div>
+      <div class="middle_banner" style="padding: 30px 10px; background: #f9f9f9;" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/06-banner.jpg?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack diy led light bulbs" class="lazyload">
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text grey" style="background: #3041a7; padding-bottom: 40px;">
+        <div class="over_text_title page_text_important" style="color: #fff;">Lights That Meet Your Schedule</div>
+        <div class="over_text_sub_title page_sub_text_important" style="color: #e0e2ef;">Set timers and schedule sleep/wake times, color changes, and more for each bulb so your home's light conforms to your daily needs automatically. 
+        </div>
+      </div>
+      <div class="middle_banner tow_pic" style="padding: 20px 10px 40px;" data-animate_images="true">
+        <img style="margin-bottom: 10px;" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07-_1_491ab8c4-6704-4bba-ab9e-a65d2d5075e1.jpg?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack led bulbs timer" class="govee_image lazyload">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07-_2_9326fe2e-0a70-4d9d-bcbd-bc163159f999.jpg?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack led bulbs timer" class="govee_image lazyload">
+    </section>
+
+    <section class="middle_wrap">
+      <div class="banner_top_text over_top">
+        <div class="over_text_title page_text_important" style="color: #000;">Save On Energy & Purchases</div>
+        <div class="over_text_sub_title page_sub_text_important" style="color: rgba(0, 0, 0, .7);">This 9W LED light bulb is equivalent brightness to an incandescent bulb yet uses 80% less power. With a super-long lifespan, screw in LED bulb once and enjoy it for years to come. 
+        </div>
+      </div>
+      <div class="middle_banner" data-animate_images="true">
+        <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/08-banner.jpg?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack energy saving" class="govee_image lazyload">
+    </section>
+
+    <section class="compare_wrap">
+      <div class="compare_title page_text_important">
+        Compare with other models
+      </div>
+      <table class="new-table bgc_white_important" style=" max-width: 1250px;margin: 0 auto; background:#0F0F0F;">
+        <tbody>
+          <tr>
+            <td class="bgc_white_important" width="30%">Model</td>
+            <td class="bgc_white_important" width="35%" style="color: #00ace7;">B6005</td>
+            <td class="bgc_white_important" width="35%">B6003</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Preview</td>
+            <td class="bgc_white_important" style="max-height: 13vw;"><img class="formright-img" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/B6005_f53621c7-6179-4b12-b952-05a5f575b747.png?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack group control"></td>
+            <td class="bgc_white_important" style="max-height: 13vw;">
+            <img class="formright-img" src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6003_c4ae59ae-ab7f-41c3-843c-f6f8f50886a2.png?v=1622713909" alt="Govee Bluetooth LED Light Bulbs 2 Pack group control"> </td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Color</td>
+            <td class="bgc_white_important" colspan="2">RGBWW(RGB+Warm White 2700K+Cold White 6500K)</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Wattage</td>
+            <td class="bgc_white_important">9W=60W</td>
+            <td class="bgc_white_important">9W=60W</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Pack</td>
+            <td class="bgc_white_important">2 Packs</td>
+            <td class="bgc_white_important">2 Packs</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Control Methods </td>
+            <td class="bgc_white_important" style="color: #00ace7;">APP Control</td>
+            <td class="bgc_white_important">APP Control+Voice Control</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Group Control(APP)</td>
+            <td class="bgc_white_important" style="color: #00ace7;">Up to 6 LED bulbs</td>
+            <td class="bgc_white_important">Up to 50 LED bulbs</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Music Mode</td>
+            <td class="bgc_white_important" style="color: #00ace7;">✓</td>
+            <td class="bgc_white_important">X</td>
+          </tr>
+          <tr>
+            <td class="bgc_white_important">Scene Mode</td>
+            <td class="bgc_white_important">8</td>
+            <td class="bgc_white_important">8</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="specification_wrap H6005 bgc_white_important">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Working Voltage</div>
+              <div class="bottom color_black_important">110 Volts</div>
+            </div>  
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Wattage</div>
+              <div class="bottom color_black_important">9 W</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Lumen</div>
+              <div class="bottom color_black_important">800 Lumen</div>
+            </div>  
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Color</div>
+              <div class="bottom color_black_important">RGBWW</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Color Temperature</div>
+              <div class="bottom color_black_important">2700-6500K</div>
+            </div>  
+            <div class="H6005_spacification_item">
+              <div class="top color_black_important">Product Dimensions</div>
+              <div class="bottom color_black_important">5.12 x 2.56 x 5.12 inches</div>
+            </div>  
+          </div>
+        </div>
+      </div>
+      <div class="product_img" data-animate_images="true">
+        <img class="govee_image lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/B6005_37e82e2e-1fe2-4a94-9717-9df3400c5c1d.png?v=1622689399" alt="Govee Bluetooth LED Light Bulbs 2 Pack specs">
+      </div>
+    </section>
+
+  </div>
+</div>
+
+
+ <style>
+  #H6005 img {
+    display: block;
+  }
+  .specification_table_td.title {
+    font-weight: bold;
+  }
+  @media screen and (min-width: 769px) {
+    .banner {
+      position: relative;
+      min-height: 300px;
+    }
+    .banner_over_text {
+      position: absolute;
+      left: 50%;
+      top: 15%;
+      width: 100%;
+      text-align: center;
+      transform: translateX(-50%);
+      z-index: 1;
+      padding: 0 10vw;
+    }
+    .banner_over_text.top5 {
+      top: 5%;
+    }
+    .over_text_title {
+      font-size: 3vw;
+      line-height: 4vw;
+      margin-bottom: 1vw;
+      font-weight: bold;
+    }
+    .over_text_sub_title {
+      font-size: 1.6vw;
+      color: #e0e2ef;
+    }
+
+    .icon_sub_title {
+      font-size: 1.2vw;
+      color: #e0e2ef;
+    }
+    .space_wrap {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      background: #3041a7;
+      padding: 4.5vw 3vw;
+    }
+    .space_wrap .space_item {
+      text-align: center;
+      padding: 0 10px;
+    }
+    .space_wrap .space_item p {
+      margin: 0;
+    }
+    .space_wrap .space_item img {
+      height: 6vw;
+      max-width: 100%;
+      margin: auto;
+      margin-bottom: 20px;
+    }
+    .scenes_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+    }
+    .wrap_item {
+      flex: 1;
+    }
+    .wrap_title {
+      font-size: 3vw;
+      color: #fff;
+      margin: 0 100px;
+      font-weight: bold;
+      letter-spacing: 0;
+    }
+    .wrap_sub_title {
+      color: #e0e2ef;
+      font-size: 1.6vw;
+    }
+    .wrap_img {
+      margin: 40px 100px 0;
+    }
+    .extra-wrap {
+      margin: 0 100px;
+      color: #555;
+    }
+    .extra-code-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 40px auto 0;
+    }
+    .extra-code-item {
+      display: flex;
+      align-items: center;
+    }
+    .extra-code-img {
+      width: fit-content !important;
+    }
+    .extra-code-text {
+      padding-left: 10px;
+      width: 100% !important;
+      font-size:0.8vw;
+    }
+    .middle_wrap {
+      background: #fff;
+      position: relative;
+    }
+    .middle_banner {
+      padding: 0 4vw 4vw;
+    }
+    ._fff {
+      background: #fff;
+    }
+    ._3041a7 {
+      background: #3041a7;
+    }
+    #H6005 .middle_banner.tow_pic {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #H6005 .tow_pic img {
+      max-width: 50%;
+    }
+    .tow_pic img:first-child {
+      margin-right: 1vw;
+    }
+    .banner_top_text {
+      padding: 2.5vw 0;
+      width: 64%;
+      margin: 0 auto;
+      text-align: center;
+      color: #fff;
+    }
+    .banner_top_text.over_top {
+      position: absolute;
+      top: 2%;
+      transform: translateX(-50%);
+      left: 50%;
+    }
+    .banner_top_text .over_text_title {
+      color: #000;
+      letter-spacing: normal;
+    }
+    .banner_top_text .over_text_sub_title {
+      color: rgba(0, 0, 0, .7);
+    }
+
+    .banner_top_text.over_left {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .banner_top_text.over_left .over_text_title {
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .banner_top_text.over_left .over_text_sub_title {
+      color: #f7f7f7;
+      margin-bottom: 40px;
+    }
+    .extra-battery-wrap {
+      width: 40%;
+      margin: 0 auto;
+    }
+    .extra-battery-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #50afdf;
+      font-weight: bold;
+    }
+    .extra-battery-info span {
+      font-size: 40px;
+    }
+    .extra-battery-code p {
+      color: #fff !important;
+      font-size: 1.6vw;
+    }
+    .extra-battery-img img {
+      margin: 0 auto;
+    }
+
+    .specification_wrap {
+      background: #000;
+      padding: 2vw 20% 2vw 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .specification_wrap .product_img {
+      height: 25vw;
+    }
+    .specification_wrap .product_img img {
+      height: 100%;
+    }
+    .specification_wrap .specification_table {
+      width: 60%;
+    }
+    .H6005_spacification_item {
+      flex: 1;
+    }
+    .H6005_spacification_item:first-child {
+      margin-right: 6vw;
+    }
+    .H6005_spacification_item .top {
+      font-size: 1vw;
+      color: rgba(255, 255, 255, .6);
+      word-break: break-word;
+    }
+    .H6005_spacification_item .bottom {
+      color: #fff;
+      font-size: 1.25vw;
+      word-break: break-word;
+    }
+    .spacification_td_item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 10px 0;
+      border-bottom: 1px solid #4d4d4d;
+    }
+    .specification_table_td.title .spacification_td_item {
+      font-size: 2.8vw;
+      border-bottom: none;
+    }
+    .compare_wrap {
+      padding: 2vw 0 4vw;
+    }
+    .compare_title {
+      font-size: 2.8vw;
+      font-weight: bold;
+      text-align: center;
+      padding: 2.5vw 0 6vw;
+    }
+    .new-table td {
+      border-left: 1px solid #464646;
+      border-top: 1px solid #464646;
+      font-family: inherit;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .black {
+      color: #000;
+    }
+    .middle_wrap {
+      position: relative;
+      min-height: 200px;
+    }
+    .middle_banner {
+      background: #f9f9f9;
+    }
+    .banner_top_text.over_top {
+      position: absolute;
+      top: 5%;
+      transform: translateX(-50%);
+      left: 50%;
+      width: 100%;
+      z-index: 1;
+      padding: 0 20px;
+    }
+    .banner_top_text.grey {
+      padding: 30px 10px 0;
+      background: #f9f9f9;
+    }
+    .banner_top_text.over_top.black {
+      top: 5%;
+    }
+    .banner_top_text.black .over_text_title {
+      color: #000;
+    }
+    .banner_top_text.black .over_text_sub_title {
+      font-size: 12px;
+      color: #555;
+    }
+    .banner_top_text .over_text_title {
+      color: #fff;
+    }
+    .banner_top_text .over_text_sub_title {
+      color: #f7f7f7;
+      font-size: 12px;
+    }
+    .over_text_img {
+      padding: 10px 20px 10px;
+    }
+    .over_text_title {
+      font-size: 28px;
+      line-height: 30px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      text-align: center;
+      color: #000;
+    }
+    .over_text_sub_title {
+      font-size: 16px;
+      color: rgba(0, 0, 0, .7);
+      text-align: center;
+    }
+    .space_wrap {
+      display: flex;
+      flex-wrap: wrap;
+      background: #fff;
+      padding: 20px 0;
+      background: #3041a7;
+    }
+    .space_wrap .space_item {
+      width: 33%;
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 0 10px;
+    }
+    .space_wrap .space_item img {
+      margin: 0 auto;
+      height: 50px;
+      max-width: 100%;
+      margin: auto;
+      margin-bottom: 10px;
+    }
+    .space_wrap .space_item p {
+      margin: 0;
+    }
+    .icon_title {
+      font-weight: bold;
+      color: #000;
+      font-size: 14px;
+    }
+    .icon_sub_title {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .7);
+    }
+    .specification_wrap {
+      background: #000;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap-reverse;
+    }
+    .specification_wrap .product_img {
+      height: 200px;
+      margin: 0 auto;
+    }
+    .specification_wrap .product_img img {
+      height: 100%;
+    }
+    .specification_wrap .specification_table {
+      width: 100%;
+    }
+    .H6005_spacification_item {
+      flex: 1;
+    }
+    .H6005_spacification_item:first-child {
+      margin-right: 10px;
+    }
+    .H6005_spacification_item .top {
+      font-size: 12px;
+      color: rgba(255, 255, 255, .7);
+      word-break: break-word;
+    }
+    .H6005_spacification_item .bottom {
+      color: #fff;
+      font-size: 12px;
+      word-break: break-word;
+    }
+    .spacification_td_item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 10px 0;
+      border-bottom: 1px solid #7f7f7f;
+    }
+    .specification_table_td.title .spacification_td_item {
+      font-size: 28px;
+      border-bottom: none;
+      font-weight: bold;
+    }
+
+    .compare_wrap {
+      padding: 20px 10px 40px;
+    }
+    .compare_title {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px 10px;
+    }
+    .new-table td {
+      border-left: 1px solid #464646;
+      border-top: 1px solid #464646;
+      font-family: inherit;
+    }
+  }
+</style>

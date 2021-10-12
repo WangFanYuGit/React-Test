@@ -1,0 +1,47 @@
+<div class="page-width">
+  <h2 class="fall_header page_text">{{ section.settings.special_title }}</h2>
+  <div class="grid" style="display: flex;">
+    <div class="grid--uniform">
+      {% for block in section.blocks %}
+        {% assign product = block.settings.special_discount_product %}
+        {% render 'product-grid-item', 
+          product: product,              
+        %}
+        {% endfor %}
+        {%- render 'quick-shop-modal', product: product -%}
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+{% schema %}
+  {
+    "name": "Special Products",
+    "class": "fall-collection-special-section",
+    "settings": [
+      {
+        "type": "text",
+        "id": "special_title",
+        "label": "Section Header",
+        "default": "Special Discounts"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "product_item",
+        "name": "special discount product",
+        "settings": [
+        {
+            "type": "product",
+            "id": "special_discount_product",
+            "label": "Special Discounts Product"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

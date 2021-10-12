@@ -1,0 +1,1771 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+assign product_zoom_size = '1800x1800'
+assign product_image_size = '620x'
+case image_container_width
+when 'small'
+assign product_image_width = 'medium-up--two-fifths'
+assign product_description_width = 'medium-up--three-fifths'
+assign product_image_size = '480x'
+when 'medium'
+assign product_image_width = 'medium-up--one-half'
+assign product_description_width = 'medium-up--one-half'
+assign product_image_size = '620x'
+when 'large'
+assign product_image_width = 'medium-up--three-fifths'
+assign product_description_width = 'medium-up--two-fifths'
+assign product_image_size = '740x'
+endcase
+
+unless thumbnail_position
+assign thumbnail_position = 'beside'
+endunless
+
+unless description_style
+assign description_style = 'full'
+endunless
+-%}
+
+<div id="ProductSection-{{ section_id }}"
+     class="product-section"
+     data-section-id="{{ section_id }}"
+     data-section-type="product-template"
+     data-product-title="{{ product.title | escape }}"
+     data-product-handle="{{ product.handle }}"
+     {% if settings.product_zoom_enable %}
+     data-image-zoom="true"
+     {% endif %}
+     {% if settings.inventory_enable %}
+     data-inventory="true"
+     {% endif %}
+     {% if settings.inventory_transfers_enable %}
+     data-incoming-inventory="true"
+     {% endif %}
+     {% unless isModal %}
+     data-enable-history-state="true"
+     {% endunless %}>
+
+  {%- render 'product-template-variables', product: product, current_variant: current_variant -%}
+
+  <div class="page-content">
+    <div class="page-width">
+
+      {%- if settings.show_breadcrumbs and isModal != true -%}
+      {%- render 'breadcrumbs' -%}
+      {%- endif -%}
+
+      <div class="grid">
+        <div class="grid__item {{ product_image_width }} product-single__sticky">
+          {%- render 'product-images',
+            section_id: section_id,
+          product: product,
+          isModal: isModal,
+          product_zoom_size: product_zoom_size,
+          product_image_size: product_image_size,
+          thumbnail_position: thumbnail_position,
+          thumbnail_arrows: thumbnail_arrows,
+          video_looping: video_looping,
+          video_style: video_style
+          -%}
+        </div>
+
+        <div class="grid__item {{ product_description_width }}">
+
+          <div class="product-single__meta">
+            {%- if settings.vendor_enable -%}
+            <div class="product-single__vendor">
+              {%- assign vendor_handle = product.vendor | handleize  -%}
+              {%- if collections[vendor_handle] != empty -%}
+              <a href="{{ routes.collections_url }}/{{ collections[vendor_handle].handle }}">
+                {{ collections[vendor_handle].title }}
+              </a>
+              {%- else -%}
+              {{ product.vendor | link_to_vendor }}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+
+            {%- if isModal -%}
+            <p class="h2 product-single__title">
+              {{ product.title }}
+            </p>
+            {%- else -%}
+            <h1 class="h2 product-single__title">
+              {{ product.title }}
+            </h1>
+            {%- endif -%}
+
+            {%- if settings.enable_product_reviews and settings.reviews_layout == 'full' -%}
+            {%- if isModal -%}
+            {%- assign review_link = product.url | within: collection | append: '#Reviews-' | append: product.id -%}
+            {%- else -%}
+            {%- assign review_link = '#Reviews-' | append: product.id -%}
+            {%- endif -%}
+            <a href="{{ review_link }}" class="product-single__review-link">
+              <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+            </a>
+            {%- endif -%}
+
+            {%- if settings.sku_enable -%}
+            <p id="Sku-{{ section_id }}" class="product-single__sku">
+              {%- if current_variant.sku -%}
+              {{ current_variant.sku }}
+              {%- endif -%}
+            </p>
+            {%- endif -%}
+
+            {%- assign hide_sale_price = true -%}
+            {%- if product.compare_at_price_max > product.price -%}
+            {%- if current_variant.compare_at_price -%}
+            {%- assign hide_sale_price = false -%}
+            {%- endif -%}
+            <span
+                  id="PriceA11y-{{ section_id }}"
+                  class="visually-hidden"
+                  aria-hidden="{{ hide_sale_price }}">
+              {{ 'products.general.regular_price' | t }}
+            </span>
+            <span class="product__price-wrap-{{ section_id }}{% if hide_sale_price %} hide{% endif %}">
+              <span id="ComparePrice-{{ section_id }}" class="product__price product__price--compare">
+                {%- if current_variant.compare_at_price > current_variant.price -%}
+                {{ current_variant.compare_at_price | money }}
+                {%- endif -%}
+              </span>
+            </span>
+            <span id="ComparePriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {%- else -%}
+            <span id="PriceA11y-{{ section_id }}" class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+            {%- endif -%}
+
+            <span id="ProductPrice-{{ section_id }}"
+                  class="product__price{% if current_variant.compare_at_price > current_variant.price %} sale-price{% endif %}">
+              {{ current_variant.price | money }}
+            </span>
+
+            <div class="product__unit-price product__unit-price-wrapper--{{ section_id }}{% unless current_variant.unit_price_measurement %} hide{% endunless %}">
+              {%- capture unit_price_base_unit -%}
+              <span class="product__unit-base--{{ section_id }}">
+                {%- if current_variant.unit_price_measurement -%}
+                {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+                {{ current_variant.unit_price_measurement.reference_value }}
+                {%- endif -%}
+                {{ current_variant.unit_price_measurement.reference_unit }}
+                {%- endif -%}
+              </span>
+              {%- endcapture -%}
+
+              <span class="product__unit-price--{{ section_id }}">{{ current_variant.unit_price | money }}</span>/{{ unit_price_base_unit }}
+            </div>
+            <div class="wc_product_review_badge" data-handle="{{ product.handle }}" data-product_id="{{ product.id }}"></div>
+
+            {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte">
+              <small>
+                {%- if shop.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </small>
+            </div>
+            {%- endif -%}
+
+            {%- if settings.inventory_enable or settings.inventory_transfers_enable -%}
+            {%- assign variants_with_inventory_tracking = product.variants | where: 'inventory_management', 'shopify' -%}
+
+            <script>
+              // Store inventory quantities in JS because they're no longer
+              // available directly in JS when a variant changes.
+              // Have an object that holds all potential products so it works
+              // with quick view or with multiple featured products.
+              window.inventories = window.inventories || {};
+              window.inventories['{{section_id}}'] = {};
+                                 {%- for variant in variants_with_inventory_tracking -%}
+                                 window.inventories['{{section_id}}'][{{variant.id}}] = {
+                'quantity': {{ variant.inventory_quantity | default: 0 }},
+                'incoming': {{ variant.incoming | default: false | json }},
+                'next_incoming_date': {{ variant.next_incoming_date | date: format: 'date' | json }}
+              };
+              {%- endfor -%}
+            </script>
+
+            {% comment %}
+            If loaded in quick view, it might be from a JS-loaded function
+            that loads recommended products. If that's the case, the above
+            JS will not set the variant inventory. Add it to an accessible
+            data div to read later instead.
+            {% endcomment %}
+            {%- if isModal -%}
+            <div
+                 data-section-id="{{ section_id }}"
+                 class="hide js-product-inventory-data"
+                 aria-hidden="true"
+                 >
+              {%- for variant in variants_with_inventory_tracking -%}
+              <div
+                   class="js-variant-inventory-data"
+                   data-id="{{ variant.id }}"
+                   data-quantity="{{ variant.inventory_quantity | default: 0 }}"
+                   data-incoming="{{ variant.incoming | default: false | json }}"
+                   data-date="{{ variant.next_incoming_date | date: format: 'date' | json }}"
+                   >
+              </div>
+              {%- endfor -%}
+            </div>
+            {%- endif -%}
+
+            {%- assign inventory_visible = false -%}
+            {%- if settings.inventory_enable and current_variant.inventory_management == 'shopify' -%}
+            {%- if current_variant.inventory_quantity <= settings.inventory_threshold and current_variant.inventory_quantity >= 0 -%}
+            {%- assign inventory_visible = true -%}
+            {%- endif -%}
+            {%- endif -%}
+            {%- if current_variant.inventory_quantity == 0 or current_variant.inventory_policy == 'continue' -%}
+            {%- assign inventory_visible = false -%}
+            {%- endif -%}
+            <div
+                 id="ProductInventory-{{ section_id }}"
+                 class="product__inventory {% unless inventory_visible %}hide{% endunless %}"
+                 >
+              {%- if current_variant.available -%}
+              {{ 'products.product.stock_label' | t: count: current_variant.inventory_quantity }}
+              {%- endif -%}
+            </div>
+
+            {%- if settings.inventory_transfers_enable -%}
+            <div
+                 id="ProductIncomingInventory-{{ section_id }}"
+                 class="product__inventory{% if inventory_visible %} hide{% endif %}">
+              {%- if current_variant.incoming and inventory_visible == false -%}
+              {%- if current_variant.next_incoming_date -%}
+              {%- assign date = current_variant.next_incoming_date | date: format: 'date' -%}
+              {%- if current_variant.available -%}
+              {{ 'products.product.will_not_ship_until' | t: date: date }}
+              {%- else -%}
+              {{ 'products.product.will_be_in_stock_after' | t: date: date }}
+              {%- endif -%}
+              {%- else -%}
+              {{ 'products.product.waiting_for_stock' | t }}
+              {%- endif -%}
+              {%- endif -%}
+            </div>
+            {%- endif -%}
+            {% endif %}
+
+            <hr class="hr--medium">
+
+            {% unless isModal %}
+            {% comment %}
+            Shopify's product form attaches a number of tracking
+            scripts that cause slower load times and false statistics.
+            Quick view modals request these on-demand.
+            {% endcomment %}
+            {%- render 'product-form',
+                section_id: section_id,
+            product: product,
+            current_variant: current_variant
+            -%}
+            {% else %}
+            <div
+                 id="ProductFormHolder-{{ section_id }}"
+                 data-url="{{ product.url }}"
+                 data-template="{{ product.template_suffix }}">
+              {%- if product.options.size > 0 -%}
+              {%- for i in (1..product.options.size) -%}
+              <div class="placeholder-content" style="min-height: 86px; max-width: 66%;"></div>
+              {%- endfor -%}
+              {%- endif -%}
+              <div class="placeholder-content" style="min-height: 86px;"></div>
+            </div>
+            {% endunless %}
+
+            {%- unless isModal -%}
+            {%- if settings.surface_pickup_enable -%}
+            <div id="StoreAvailabilityHolder-{{ section_id }}"
+                 data-product-name="{{ product.title | escape }}"
+                 data-base-url="{{ shop.url }}{{ routes.root_url }}"
+                 ></div>
+            {%- endif -%}
+            {%- endunless -%}
+
+            {%- unless description_style == 'full' -%}
+
+            {%- unless settings.product_description_collapse -%}
+            <div class="product-single__description rte">
+              {{ product.description }}
+            </div>
+            {%- endunless -%}
+
+            {%- render 'product-additional-content', product: product, section_id: section_id -%}
+            {%- endunless -%}
+
+
+            {% render 'product-accordian' %}
+
+
+
+          </div>
+        </div>
+      </div>
+
+      {% if description_style == 'full' %}
+      {% unless settings.product_description_collapse %}
+      <div class="product-single__description-full rte">
+        {{ product.description }}
+      </div>
+      {% endunless %}
+
+      {%- render 'product-additional-content', product: product, section_id: section_id -%}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% render 'additional-custom-content' %}
+
+
+{% render 'product-page-style'%}
+<div id="H5177">
+  <div class="mobile-hide ipad-show">
+    <section class="banner_wrap banner_1 banner_none">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01.jpg?v=1617954588" alt="banner_1">
+      <div class="banner_text">
+        <div class="title title_color page_text_important color_white_important">Smart Thermo-<br>Hygrometer</div>
+        <div class="sub_title sub_title_color page_sub_text_important color_white_important">Effortless temperature and humidity monitoring</div>
+      </div>
+    </section>
+
+    <section class="space_wrap">
+      <div class="space_item">
+        <div class="flex">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/654d3e6757084160305a21992fd910ea.png?v=1617954588" alt="">
+          </div>
+          <div class="space_title color_white_important">Large Touchscreen</div>
+        </div>
+      </div>
+      <div class="space_item">
+        <div class="flex">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/alert.png?v=1617954588" alt="">
+          </div>
+          <div class="space_title color_white_important">Smart Alerts</div>
+        </div>
+      </div>
+      <div class="space_item">
+        <div class="flex">
+          <div class="space_item_img 3">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8d982b52520281d22cd8a3df110889f7.png?v=1617954588" alt="">
+          </div>
+          <div class="space_title color_white_important">Swiss-Made Sensor</div>
+        </div>
+      </div>
+      <div class="space_item">
+        <div class="flex">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cc2767c03de8dd9939f5ed16d5e68179.png?v=1617954588" alt="">
+          </div>
+          <div class="space_title color_white_important">High-Contrast Backlight</div>
+        </div>
+      </div>
+      <div class="space_item">
+        <div class="flex">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6450eabd6ff2968cfcb1c6ed2ca7dbb6.png?v=1617954588" alt="">
+          </div>
+          <div class="space_title color_white_important">Remote Monitoring</div>
+        </div>
+      </div>
+      <div class="space_item">
+        <div class="flex">
+          <div class="space_item_img">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2.png?v=1617955940" alt="">
+          </div>
+          <div class="space_title color_white_important">Export Your Data</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title page_text_important">App Notification Alerts</div>
+      <div class="sub_title page_sub_text_important">Any temp or humidity readings out of your preset range trigger a notification alert.</div>
+    </section>
+
+    <section class="banner_wrap center">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02_6e5666e0-75d1-4900-a63f-7be5884ae813.jpg?v=1617954588" alt="banner_1">
+      <div class="banner_modal_wrap">
+        <div class="banner_modal_img">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/22893fbfe63b3006c6dbb04adf44b09d.png?v=1617954588" alt="" class="lazyload">
+        </div>
+        <div class="banner_modal_box">
+          <div class="banner_modal_top">
+            <div class="modal_top_left">
+              <div class="logo">
+                <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/logo.png?v=1617954588" alt="">
+              </div>
+              <span>GOVEE HOME</span>
+            </div>
+            <span class="modal_top_right">now</span>
+          </div>
+          <div class="banner_modal_middle">Temperature alarm</div>
+          <div class="banner_modal_bottom">Smart Thermometer: The current temperature 82.8°F is higher than the preset range. Please pay attention.</div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="scenes_wrap H5177">
+      <div class="scenes_item color">
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title page_text_important">197ft Whole-Home<br>Coverage</div>
+            <div class="sub_title page_sub_text_important">A 197ft/60m range allows you to 
+              monitor temp and humidity at a glance.</div>
+            <div class="inner_icon_wrap">
+              <div class="inner_icon inner_icon_1">
+                197<span style="font-size: 20px; font-weight: normal;">ft</span>
+              </div>
+              <div class="inner_icon inner_icon_1">
+                60<span style="font-size: 20px; font-weight: normal;">m</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03_d01c5cf3-5a99-472f-82d6-06fc7def4bc5.jpg?v=1617954588" alt="">
+        </div>
+      </div>
+      <div class="scenes_item">
+        <div class="scenes_item_img">
+          <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04_7ca32177-8d07-447a-9bc0-cd7434d43d3b.jpg?v=1617954588" alt="">
+        </div>
+        <section class="scenes_item_wrap">
+          <div class="scenes_item_wrap_inner">
+            <div class="title title_color page_text_important">Updates Every 2<br >Seconds</div>
+            <div class="sub_title sub_title_color page_sub_text_important">Our Swiss-made sensor is accurate to ±0.54°F/±0.3°C and ±3%RH updating every 2 seconds.</div>
+            <div class="parametric_wrap">
+              <div class="parametric_item">
+                <span class="left">±</span><span class="middle">0.54</span><span class="right">℉</span>
+              </div>
+              <div class="parametric_item border">
+                <span class="left">±</span><span class="middle">0.3</span><span class="right">℃</span>
+              </div>
+              <div class="parametric_item">
+                <span class="left">±</span><span class="middle">0.54</span><span class="right">RH</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="banner_wrap">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/05_02910fd0-d9c3-4add-93dc-ab0917277553.jpg?v=1617954588" alt="banner_1">
+      <div class="scenes_item_wrap_inner absolute">
+        <div class="title title_color">Easy to Read Graphs</div>
+        <div class="sub_title sub_title_color">Simple, visual data over an hour, a week,<br> a month, or a year.</div>
+        <div class="sub_wrap">
+          <div class="icon_wrap">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4bad0e13b57c294b5ea02ec8d3b44611.png?v=1617954588" alt="">
+          </div>
+          <div class="description_wrap">
+            <div class="small_title title_color">Temperature & Humidity</div>
+            <div class="small_sub_title sub_title_color">You can quickly know the temp and humidity<br>changes with just a glance</div>
+          </div>
+        </div>
+        <div class="sub_wrap">
+          <div class="icon_wrap">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/b891d8b94436c22917fbfd577b317750.png?v=1617954588" alt="">
+          </div>
+          <div class="description_wrap">
+            <div class="small_title title_color">Export Your Data</div>
+            <div class="small_sub_title sub_title_color">2 Year Cloud Data Storage</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="banner_wrap banner_1 banner_top">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/06_978e1e26-0695-43ec-85fa-fcfb627cab82.jpg?v=1617954588" alt="banner_1">
+      <div class="banner_text">
+        <div class="title page_text_important color_white_important">Responsive LCD Touch Screen</div>
+        <div class="sub_title page_sub_text_important">Bright orange backlight for easier reading. Large high contrast display screen. </div>
+      </div>
+    </section>
+
+    <section class="banner_wrap banner_1 banner_top_left">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07.jpg?v=1617954588" alt="banner_1">
+      <div class="banner_text">
+        <div class="title title_color page_text_important">Portable Sleek Design</div>
+        <div class="sub_title sub_title_color page_sub_text_important">Wall mount or use tabletop stand for a stylish monitor with a 6-month high-quality battery is included.</div>
+      </div>
+    </section>
+
+    <section class="compare_wrap bgc_white_important">
+      <div class="compare_title bgc_white_important page_text_important">
+        Compare with other models
+      </div>
+      <div class="compare_content color_white_important">
+        <div class="compare_tab">
+          <div class="compare_tab_item active">Model</div>
+          <div class="compare_tab_item">Remote Control</div>
+          <div class="compare_tab_item">Bluetooth-Enabled Range</div>
+          <div class="compare_tab_item">Wi-Fi-Enabled Range</div>
+          <div class="compare_tab_item">Temperature Accuracy</div>
+          <div class="compare_tab_item">Humidity Accuracy</div>
+          <div class="compare_tab_item">Working Temperature</div>
+          <div class="compare_tab_item">Working Humidity Range</div>
+          <div class="compare_tab_item">Data Refresh Speed</div>
+          <div class="compare_tab_item">Power Supply</div>
+          <div class="compare_tab_item">Size</div>
+          <div class="compare_tab_item">Weight</div>
+        </div>
+    
+        <div class="compare_product">
+          <div class="compare_product_item active">H5177</div>
+          <div class="compare_product_item">Bluetooth</div>
+          <div class="compare_product_item active">60m/197ft (no obstructions)</div>
+          <div class="compare_product_item">/</div>
+          <div class="compare_product_item">±0.3°C（±0.54℉)</div>
+          <div class="compare_product_item">±3%RH</div>
+          <div class="compare_product_item">-20to60°C(14to140℉)</div>
+          <div class="compare_product_item">0-100%RH</div>
+          <div class="compare_product_item">2s</div>
+          <div class="compare_product_item">3×AA Batteries (included)</div>
+          <div class="compare_product_item active">4.42×3.61×0.89 in</div>
+          <div class="compare_product_item active">0.3329 lb</div>
+          <div class="compare_product_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5177.png?v=1622108182" alt="Govee Bluetooth Indoor Thermo-Hygrometer" class="lazyload">
+          </div>
+        </div>
+
+        <div class="compare_product">
+          <div class="compare_product_item static">H5174</div>
+          <div class="compare_product_item">Bluetooth</div>
+          <div class="compare_product_item static">70m/230ft (no obstructions)</div>
+          <div class="compare_product_item">/</div>
+          <div class="compare_product_item">±0.3°C（±0.54℉)</div>
+          <div class="compare_product_item">±3%RH</div>
+          <div class="compare_product_item">-20to60°C(14to140℉)</div>
+          <div class="compare_product_item">0-100%RH</div>
+          <div class="compare_product_item">2s</div>
+          <div class="compare_product_item">3×AAA Batteries (included)</div>
+          <div class="compare_product_item static">4.42×3.61×0.89 in</div>
+          <div class="compare_product_item static">0.3329 lb</div>
+          <div class="compare_product_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5174.png?v=1622108182" alt="Govee Bluetooth Indoor Thermo-Hygrometer" class="lazyload">
+          </div>
+        </div>
+    
+        <div class="compare_product">
+          <div class="compare_product_item static">H5179</div>
+          <div class="compare_product_item">WiFi+Bluetooth</div>
+          <div class="compare_product_item static">30m/49ft (no obstructions)</div>
+          <div class="compare_product_item">50m/164ft (no obstructions)</div>
+          <div class="compare_product_item">±0.3°C（±0.54℉)</div>
+          <div class="compare_product_item">±3%RH</div>
+          <div class="compare_product_item">-20to60°C(14to140℉)</div>
+          <div class="compare_product_item">0-99%RH</div>
+          <div class="compare_product_item">2s</div>
+          <div class="compare_product_item">3×AA Batteries (included)</div>
+          <div class="compare_product_item static">2.83x2.83x0.94 in</div>
+          <div class="compare_product_item static">0.2623 lb</div>
+          <div class="compare_product_img">
+            <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5179.png?v=1622108182" alt="Govee Bluetooth Indoor Thermo-Hygrometer" class="lazyload">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="specification_wrap H5177 bgc_white_important">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item color_black_important">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Temperature Accuracy</div>
+              <div class="bottom color_black_important">±0.3°C（±0.54℉)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Humidity Accuracy</div>
+              <div class="bottom color_black_important">±3%RH</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Working Temperature</div>
+              <div class="bottom color_black_important">-20 to 60°C (14 to 140℉)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Working Humidity Range</div>
+              <div class="bottom color_black_important">0-100%RH</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Bluetooth-Enabled Range</div>
+              <div class="bottom color_black_important">60m/197ft (no obstructions)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Data Refresh Speed</div>
+              <div class="bottom color_black_important">2s</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Power Supply</div>
+              <div class="bottom color_black_important">3×AAA Batteries (included)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Size</div>
+              <div class="bottom color_black_important">4.42×3.61×0.89 in</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Weight</div>
+              <div class="bottom color_black_important">0.3329 lb</div>
+            </div>  
+          </div>
+        </div>
+      </div>
+      <div class="product_img">
+        <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/0c46e56a847cf493ce9b82001739baf7.png?v=1617954588" alt="">
+      </div>
+    </section>
+  </div>
+  
+  <div class="mobile-show ipad-hide">
+    <section class="banner_wrap banner_1 banner_top">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/01_f6173b72-6479-47f6-a01b-4d8067be825f.jpg?v=1618216224" alt="banner_1">
+      <div class="banner_text">
+        <div class="title title_color page_text_important color_white_important">Smart Thermo-Hygrometer</div>
+        <div class="sub_title sub_title_color page_sub_text_important color_white_important">Effortless temperature and humidity monitoring</div>
+      </div>
+    </section>
+
+    <section class="space_wrap">
+        <div class="space_item">
+          <div class="flex">
+            <div class="space_item_img">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/654d3e6757084160305a21992fd910ea.png?v=1617954588" alt="">
+            </div>
+            <div class="space_title color_white_important">Large Touchscreen</div>
+          </div>
+        </div>
+        <div class="space_item">
+          <div class="flex">
+            <div class="space_item_img">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/alert.png?v=1617954588" alt="">
+            </div>
+            <div class="space_title color_white_important">Smart Alerts</div>
+          </div>
+        </div>
+        <div class="space_item">
+          <div class="flex">
+            <div class="space_item_img 3">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/8d982b52520281d22cd8a3df110889f7.png?v=1617954588" alt="">
+            </div>
+            <div class="space_title color_white_important">Swiss-Made Sensor</div>
+          </div>
+        </div>
+        <div class="space_item">
+          <div class="flex">
+            <div class="space_item_img">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/cc2767c03de8dd9939f5ed16d5e68179.png?v=1617954588" alt="">
+            </div>
+            <div class="space_title color_white_important">High-Contrast Backlight</div>
+          </div>
+        </div>
+        <div class="space_item">
+          <div class="flex">
+            <div class="space_item_img">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/6450eabd6ff2968cfcb1c6ed2ca7dbb6.png?v=1617954588" alt="">
+            </div>
+            <div class="space_title color_white_important">Remote Monitoring</div>
+          </div>
+        </div>
+        <div class="space_item">
+          <div class="flex">
+            <div class="space_item_img">
+              <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2.png?v=1617955940" alt="">
+            </div>
+            <div class="space_title color_white_important">Export Your Data</div>
+          </div>
+        </div>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title page_text_important">App Notification Alerts</div>
+      <div class="sub_title page_sub_text_important">Any temp or humidity readings out of your preset range trigger a notification alert.</div>
+    </section>
+
+    <section class="banner_wrap center">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/02_01a51e15-0dbb-4720-843d-78658cbd6316.jpg?v=1618216224" alt="banner_1">
+      <div class="banner_modal_wrap">
+        <div class="banner_modal_img">
+          <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/22893fbfe63b3006c6dbb04adf44b09d.png?v=1617954588" alt="" class="lazyload">
+        </div>
+        <div class="banner_modal_box">
+          <div class="banner_modal_top">
+            <div class="modal_top_left">
+              <div class="logo">
+                <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/logo.png?v=1617954588" alt="">
+              </div>
+              <span>GOVEE HOME</span>
+            </div>
+            <span class="modal_top_right">now</span>
+          </div>
+          <div class="banner_modal_middle">Temperature alarm</div>
+          <div class="banner_modal_bottom">Smart Thermometer: The current temperature 82.8°F is higher than the preset range. Please pay attention.</div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="middle_wrap color_6396bb">
+      <div class="title page_text_important">197ft Whole-Home Coverage</div>
+      <div class="sub_title page_sub_text_important">A 197ft/60m range allows you to monitor temp and humidity at a glance.</div>
+    </section>
+
+    <section class="banner_wrap center color_6396bb">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/03_46bccd29-48f0-428c-9888-aa470907bd70.jpg?v=1618216224" alt="banner_1">
+      
+    </section>
+
+    <section class="banner_wrap">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/04_f9c4cb2c-92f0-4957-a6b9-b83d3592fadd.jpg?v=1618216224" alt="banner_1">
+      <section class="middle_wrap absolute">
+        <div class="title">Easy to Read Graphs</div>
+        <div class="sub_title">Simple, visual data over an hour, a week, a month, or a year.</div>
+      </section>
+      <div class="absolute icon_phone_wrap">
+        <div class="sub_wrap">
+          <div class="icon_wrap">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4bad0e13b57c294b5ea02ec8d3b44611.png?v=1617954588" alt="">
+          </div>
+          <div class="description_wrap">
+            <div class="small_title title_color">Temperature & Humidity</div>
+          </div>
+        </div>
+        <div class="sub_wrap">
+          <div class="icon_wrap">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/b891d8b94436c22917fbfd577b317750.png?v=1617954588" alt="">
+          </div>
+          <div class="description_wrap">
+            <div class="small_title title_color">Export Your Data</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="banner_wrap banner_1 banner_top">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/05_4f7d8be2-6d5f-46a6-a231-e7eddd58cfb0.jpg?v=1618216224" alt="banner_1">
+      <div class="banner_text">
+        <div class="title page_text_important color_white_important">Responsive LCD Touch Screen</div>
+        <div class="sub_title page_sub_text_important">Bright orange backlight for easier reading. Large high contrast display screen. </div>
+      </div>
+    </section>
+
+    <section class="banner_wrap banner_top">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/06_2fe9e8e2-f5eb-4989-bf23-ba7b538126b0.jpg?v=1618216224" alt="banner_1">
+
+      <section class="scenes_item_wrap">
+        <div class="banner_text">
+          <div class="title title_color page_text_important">Updates Every 2 Seconds</div>
+          <div class="sub_title sub_title_color page_sub_text_important">Our Swiss-made sensor is accurate to ±0.54°F/±0.3°C and ±3%RH updating every 2 seconds.</div>
+          <div class="parametric_wrap">
+            <div class="parametric_item">
+              <span class="left">±</span><span class="middle">0.54</span><span class="right">℉</span>
+            </div>
+            <div class="parametric_item border">
+              <span class="left">±</span><span class="middle">0.3</span><span class="right">℃</span>
+            </div>
+            <div class="parametric_item">
+              <span class="left">±</span><span class="middle">0.54</span><span class="right">RH</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="middle_wrap">
+      <div class="title title_color page_text_important">Portable Sleek Design</div>
+      <div class="sub_title sub_title_color page_sub_text_important">Wall mount or use tabletop stand for a stylish monitor with a 6-month high-quality battery is included.</div>
+    </section>
+
+    <section class="banner_wrap center">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/07_70d00c55-a7c7-42e0-84b2-194c79e961a5.jpg?v=1618216224" alt="banner_1">
+    </section>
+
+    <section class="banner_wrap">
+      <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/0c46e56a847cf493ce9b82001739baf7_7d016fbf-b9c4-4d59-8320-b520407b3c5b.png?v=1618216224" alt="banner_1">
+    </section>
+
+    <section class="compare_wrap bgc_white_important">
+      <div class="compare_title bgc_white_important page_text_important">
+        Compare with other models
+      </div>
+      <table class="compare_content color_white_important">
+        <tbody class="compare_tab color_white_important">
+          <tr class="compare_tr color_white_important">
+            <td class="compare_td">Model</td>
+            <td class="compare_td active">H5177</td>
+            <td class="compare_td">H5179</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Appearance</td>
+            <td class="compare_td img">
+              <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5177.png?v=1622108182" alt="Govee Bluetooth Indoor Thermo-Hygrometer" class="lazyload">
+            </td>
+            <td class="compare_td img">
+              <img data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5179.png?v=1622108182" alt="Govee Bluetooth Indoor Thermo-Hygrometer" class="lazyload">
+            </td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Temperature Accuracy</td>
+            <td class="compare_td">±0.3°C（±0.54℉)</td>
+            <td class="compare_td">±0.3°C（±0.54℉)</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Humidity Accuracy</td>
+            <td class="compare_td">±3%RH</td>
+            <td class="compare_td">±3%RH</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Working Temperature</td>
+            <td class="compare_td">-20 to 60°C<br>(14 to 140℉)</td>
+            <td class="compare_td">-20 to 60°C<br>(14 to 140℉)</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Working Humidity Range</td>
+            <td class="compare_td">0-100%RH</td>
+            <td class="compare_td">0-100%RH</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Bluetooth-Enabled Range</td>
+            <td class="compare_td active">60m/230ft <br>(no obstructions)</td>
+            <td class="compare_td">30m/49ft <br>(no obstructions)</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Wi-Fi-Enabled <br>Range</td>
+            <td class="compare_td">/</td>
+            <td class="compare_td">50m/164ft <br>(no obstructions)</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Data Refresh Speed</td>
+            <td class="compare_td">2s</td>
+            <td class="compare_td">2s</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Power Supply</td>
+            <td class="compare_td">3×AA Batteries <br>(included)</td>
+            <td class="compare_td">3×AAA Batteries <br>(included)</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td">Size</td>
+            <td class="compare_td active">4.42×3.61×0.89 in</td>
+            <td class="compare_td">2.83x2.83x0.94 in</td>
+          </tr>
+          <tr class="compare_tr">
+            <td class="compare_td active">Weight</td>
+            <td class="compare_td">0.3329 lb</td>
+            <td class="compare_td">0.2623 lb</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="specification_wrap H5177 bgc_white_important">
+      <div class="specification_table">
+        <div class="specification_table_td title">
+          <div class="spacification_td_item color_black_important">SPECS</div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Temperature Accuracy</div>
+              <div class="bottom color_black_important">±0.3°C（±0.54℉)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Humidity Accuracy</div>
+              <div class="bottom color_black_important">±3%RH</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Working Temperature</div>
+              <div class="bottom color_black_important">-20 to 60°C (14 to 140℉)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Working Humidity Range</div>
+              <div class="bottom color_black_important">0-100%RH</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Bluetooth-Enabled Range</div>
+              <div class="bottom color_black_important">60m/197ft (no obstructions)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Data Refresh Speed</div>
+              <div class="bottom color_black_important">2s</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Power Supply</div>
+              <div class="bottom color_black_important">3×AAA Batteries (included)</div>
+            </div>  
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Size</div>
+              <div class="bottom color_black_important">4.42×3.61×0.89 in</div>
+            </div>  
+          </div>
+        </div>
+        <div class="specification_table_td">
+          <div class="spacification_td_item">
+            <div class="H5177_spacification_item">
+              <div class="top color_black_important">Weight</div>
+              <div class="bottom color_black_important">0.3329 lb</div>
+            </div>  
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<style>
+  #H5177 {
+    background: #fff;
+  }
+  @media screen and (max-width: 767px) {
+    .compare_wrap {
+      background: #131313;
+      padding: 0 10px;
+    }
+    .compare_title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      padding: 24px 0;
+    }
+    .compare_content {
+      border-top: 1px solid #393939;
+      border-right: 1px solid #393939;
+      background: none;
+    }
+    .compare_tr {
+      color: #fcfcfc;
+    }
+    .compare_td {
+      font-size: 12px;
+      font-weight: bold;
+      color: #afafaf;
+      border-bottom: 1px solid #393939;
+      border-left: 1px solid #393939;
+      padding: 6px 8px;
+      width: 22%;
+    }
+    .compare_td.img img {
+      width: 60px;
+    }
+    .compare_td.active {
+      color: #00ace7;
+    } 
+  }
+
+  @media screen and (min-width: 768px) {
+    .compare_wrap {
+      background: #000;
+    }
+    .compare_title {
+      font-size: 2.8vw;
+      font-weight: bold;
+      text-align: center;
+      padding: 2.5vw 0 6vw;
+    }
+    .compare_content {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 3.125vw 2vw 3.125vw 0;
+      max-width: calc(100% - 18vw);
+      margin: 0 auto;
+    }
+    .compare_tab {
+      padding: 1.25vw 0;
+      color: #fcfcfc;
+    }
+    .compare_tab_item {
+      font-size: 1vw;
+      padding: 0.8vw 2.5vw;
+      font-weight: bold;
+      color: #afafaf;
+    }
+    .compare_tab_item.active {
+      color: #fff;
+      background: #00ace7;
+    }
+    .compare_product {
+      padding: 1.875vw 2.5vw;
+      border-radius: 2px;
+      position: relative;
+      margin-right: 1.1vw;
+      color: #afafaf;
+    }
+    .compare_product:last-child {
+      margin-right: 0;
+    }
+    .compare_product_item {
+      font-size: 1vw;
+      text-align: center;
+      padding: 0.8vw 0;
+      font-weight: bold;
+      color: #afafaf;
+    }
+    .compare_product_item.active {
+      color: #00ace7;
+    }
+    .compare_product_item.static {
+      color: #fff;
+    }
+    .compare_product_img {
+      position: absolute;
+      top: -16%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 7.5vw;
+    }  
+  }
+
+  .mobile-hide .banner_1 {
+    min-height: 500px;
+  }
+  .banner_none .banner_text {
+    top: 30%;
+    transform: none;
+  }
+  .banner_wrap.center {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 60px;
+  }
+  .banner_wrap.banner_top .banner_text{
+    top: 10%;
+    width: 100%;
+    text-align: center;
+    transform: none;
+    left: 0;
+  }
+  .banner_none .title {
+    margin-bottom: 40px;
+    color: #111;
+  }
+  .mobile-hide .space_wrap {
+    padding: 40px;
+    background: #6396bb;
+  }
+  .space_item {
+    display: inline-block;
+    width: 32%;
+    padding: 20px 80px;
+    vertical-align: middle;
+    font-weight: bold;
+  }
+  .space_item .flex {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 20%;
+  }
+  .space_item_img {
+    width: 30px;
+    margin-right: 20px;
+  }
+  .space_item_img img {
+    display: block;
+  }
+  .space_title {
+    display: inline-block;
+    width: 100%;
+  }
+
+  .middle_wrap {
+    background: #fff;
+  }
+  .middle_wrap .title {
+    color: #111;
+  }
+  .middle_wrap .sub_title {
+    color: rgba(0, 0, 0, .7);
+  }
+  .banner_modal_wrap {
+    position: absolute;
+    right: 8%;
+    top: 25%;
+  }
+  .banner_modal_img img {
+    display: block;
+  }
+  .banner_modal_box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px 6px 0 10px;
+  }
+  .banner_modal_top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal_top_left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .banner_modal_top .logo {
+    margin-right: 10px;
+  }
+  .banner_modal_middle {
+    font-weight: bold;
+    font-size: 20px;
+  }
+  .banner_modal_bottom {
+    font-size: 14px;
+  }
+
+  .scenes_wrap .scenes_item.color {
+    background: #6396bb;
+  }
+  .scenes_item_wrap {
+    align-self: flex-start;
+  }
+  .scenes_item_wrap_inner {
+    padding: 20% 16% 0;
+  }
+  .scenes_item_wrap_inner .title {
+    color: #fff;
+    line-height: 60px;
+    margin-bottom: 10px;
+  }
+  .scenes_item_wrap_inner .sub_title {
+    color: rgba(255, 255, 255, .7);
+    font-size: 20px;
+    padding-right: 20%;
+  }
+
+
+  .inner_icon_wrap {
+    font-size: 60px;
+    font-weight: bold;
+    padding-top: 10%;
+  }
+  .inner_icon_wrap .inner_icon {
+    display: inline-block;
+  }
+  .inner_icon_wrap .inner_icon_1 {
+    margin-right: 20px;
+  }
+  .parametric_wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+  .parametric_item {
+    color: #466ce8;
+  }
+  .parametric_item.border {
+    border-right: 2px solid #787878;
+    border-left: 2px solid #787878;
+    padding: 0 20px;
+    margin: 0 20px;
+  }
+  .parametric_item .left {
+    font-size: 20px;
+  }
+  .parametric_item .middle {
+    font-size: 40px;
+    line-height: 40px;
+  }
+  .parametric_item .right {
+    font-size: 20px;
+    vertical-align: top;
+  }
+
+  .sub_wrap {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+  .icon_wrap {
+    width: 40px;
+  }
+  .icon_wrap img {
+    display: block;
+  }
+  .description_wrap {
+    margin-left: 14px;
+    flex: 1;
+  }
+  .description_wrap .small_title {
+    font-size: 20px;
+  }
+  .description_wrap .small_sub_title {
+    font-size: 12px;
+  }
+
+  .scenes_item_wrap_inner.absolute {
+    position: absolute;
+    top: 10%;
+    left: 6%;
+    padding: 4%;
+    width: 50%;
+  }
+  .scenes_item_wrap_inner .title_color {
+    color: #111;
+  }
+  .scenes_item_wrap_inner .sub_title_color {
+    color: rgba(0, 0, 0, .7);
+  }
+  .banner_top .banner_text .title{
+    font-size: 50px;
+    line-height: 60px;
+  }
+  .banner_top .banner_text .title {
+    margin-bottom: 20px;
+  }
+  .banner_top .banner_text .sub_title {
+    font-size: 22px;
+    line-height: 22px;
+    color: rgba(255, 255, 255, .7);
+  }
+  .banner_text .title.title_color {
+    color: #111;
+  }
+  .banner_text .sub_title.sub_title_color {
+    color: rgba(0, 0, 0, .7);
+  }
+  .banner_top_left .banner_text {
+    top: 10%;
+    left: 8%;
+    transform: none;
+  }
+  .banner_top_left .title {
+    margin-bottom: 10px;
+  }
+  .specification_wrap {
+    background: #000;
+    padding: 40px 10%;
+  }
+  .specification_wrap .product_img {
+    height: 400px;
+  }
+  .specification_wrap .specification_table {
+    margin-right: 40px;
+  }
+  .H5177_spacification_item {
+    flex: 1;
+  }
+  .H5177_spacification_item .top {
+    font-size: 18px;
+    color: rgba(255, 255, 255, .7);
+    word-break: break-word;
+  }
+  .H5177_spacification_item .bottom {
+    color: #fff;
+    font-size: 20px;
+    word-break: break-word;
+  }
+  .spacification_td_item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  .specification_table_td.title .spacification_td_item {
+    font-size: 50px;
+  }
+  .specification_table_td > .spacification_td_item:first-child {
+    border-bottom: 0;
+    font-weight: normal;
+  }
+
+  @media screen and (max-width: 1365px) {
+    .mobile-hide .banner_1 {
+      min-height: 200px;
+    }
+    .mobile-hide .space_wrap {
+      padding: 20px 40px;
+    }
+    .space_item {
+      padding: 20px 60px;
+    }
+    .space_item_img {
+      width: 30px;
+    }
+    .space_title {
+      font-size: 14px;
+    }
+    .banner_text .title.title_color {
+      font-size: 40px;
+      line-height: 40px;
+      margin-bottom: 20px;
+    }
+    .banner_text .sub_title.sub_title_color {
+      font-size: 16px;
+      line-height: 18px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 40px;
+      line-height: 40px;
+      margin-bottom: 20px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 20px;
+      line-height: 22px;
+      margin-bottom: 20px;
+    }
+    .inner_icon_wrap {
+      font-size: 60px;
+      line-height: 70px;
+    } 
+    .parametric_wrap {
+      padding-top: 40px;
+    }
+    .parametric_item .left {
+      font-size: 20px;
+      line-height: 20px;
+    }
+    .parametric_item .middle {
+      font-size: 30px;
+      line-height: 30px;
+    }
+    .parametric_item .right {
+      font-size: 20px;
+      line-height: 20px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 16px;
+      line-height: 16px;
+    }
+    .icon_wrap {
+      width: 40px;
+    }
+    .description_wrap .small_title {
+      font-size: 18px;
+    }
+    .description_wrap .small_sub_title {
+      font-size: 12px;
+    }
+    .sub_wrap {
+      padding-top: 20px;
+    }
+
+    .specification_table_td.title .spacification_td_item {
+      font-size: 30px;
+    }
+    .H5177_spacification_item .top {
+      font-size: 14px;
+    }
+    .H5177_spacification_item .bottom {
+      font-size: 16px;
+    }
+    .banner_top .banner_text .title {
+      font-size: 40px;
+      line-height: 40px;
+      margin-bottom: 10px;
+    }
+    .banner_top .banner_text .sub_title {
+      font-size: 20px;
+      line-height: 20px;
+    }
+    .spacification_td_item {
+      padding: 10px 0;
+    }
+
+    .banner_modal_wrap {
+      position: absolute;
+      right: 26px;
+      top: 23%;
+    }
+    .banner_modal_img {
+      width: 360px;
+    }
+    .banner_modal_middle {
+      font-size: 14px;
+    }
+    .banner_modal_bottom {
+      font-size: 12px;
+    }
+  }
+  @media screen and (min-width: 1366px) {
+    .mobile-hide .banner_1 {
+      min-height: 500px;
+    }
+    .space_item {
+      padding: 20px 60px;
+    }
+    .space_item_img {
+      width: 40px;
+    }
+    .space_title {
+      font-size: 18px;
+    }
+    .banner_text .title.title_color {
+      font-size: 50px;
+      line-height: 60px;
+    }
+    .banner_text .sub_title.sub_title_color {
+      font-size: 22px;
+      line-height: 24px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 40px;
+      line-height: 50px;
+      margin-bottom: 20px;
+    }
+    .inner_icon_wrap {
+      font-size: 60px;
+      line-height: 60px;
+    } 
+    .parametric_item .left {
+      font-size: 20px;
+      line-height: 20px;
+    }
+    .parametric_item .middle {
+      font-size: 50px;
+      line-height: 50px;
+    }
+    .parametric_item .right {
+      font-size: 20px;
+      line-height: 20px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 22px;
+      line-height: 22px;
+    }
+    .parametric_wrap {
+      padding-top: 60px;
+    }
+    .icon_wrap {
+      width: 54px;
+    }
+    .description_wrap .small_title {
+      font-size: 22px;
+    }
+    .description_wrap .small_sub_title {
+      font-size: 16px;
+    }
+
+
+    .banner_modal_wrap {
+      position: absolute;
+      right: 26px;
+      top: 23%;
+    }
+    .banner_modal_img {
+      width: 360px;
+    }
+    .banner_modal_middle {
+      font-size: 14px;
+    }
+    .banner_modal_bottom {
+      font-size: 12px;
+    }
+  }
+  @media screen and (min-width: 1600px) {
+    .space_item_img {
+      width: 50px;
+    }
+    .space_title {
+      font-size: 15px;
+    }
+    .banner_text .title.title_color {
+      font-size: 50px;
+      line-height: 60px;
+    }
+    .banner_text .sub_title.sub_title_color {
+      font-size: 22px;
+      line-height: 24px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    .inner_icon_wrap {
+      font-size: 70px;
+      line-height: 80px;
+    } 
+    .parametric_item .left {
+      font-size: 30px;
+      line-height: 30px;
+    }
+    .parametric_item .middle {
+      font-size: 60px;
+      line-height: 60px;
+    }
+    .parametric_item .right {
+      font-size: 30px;
+      line-height: 30px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 26px;
+      line-height: 26px;
+    }
+    .parametric_wrap {
+      padding-top: 60px;
+    }
+    .icon_wrap {
+      width: 54px;
+    }
+    .description_wrap .small_title {
+      font-size: 22px;
+    }
+    .description_wrap .small_sub_title {
+      font-size: 16px;
+    }
+
+    .banner_modal_wrap {
+      position: absolute;
+      right: 40px;
+      top: 23%;
+    }
+    .banner_modal_img {
+      width: 420px;
+    }
+    .banner_modal_middle {
+      font-size: 18px;
+    }
+    .banner_modal_bottom {
+      font-size: 14px;
+    }
+  }
+  @media screen and (min-width: 1920px) {
+    .banner_text .title.title_color {
+      font-size: 60px;
+      line-height: 70px;
+    }
+    .banner_text .sub_title.sub_title_color {
+      font-size: 26px;
+      line-height: 30px;
+    }
+    .space_item_img {
+      width: auto;
+    }
+    .space_title {
+      font-size: 20px;
+    }
+    .scenes_item_wrap_inner .title {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    .inner_icon_wrap {
+      font-size: 70px;
+      line-height: 80px;
+    } 
+    .parametric_item .left {
+      font-size: 30px;
+      line-height: 30px;
+    }
+    .parametric_item .middle {
+      font-size: 60px;
+      line-height: 60px;
+    }
+    .parametric_item .right {
+      font-size: 30px;
+      line-height: 30px;
+    }
+    .scenes_item_wrap_inner .sub_title {
+      font-size: 26px;
+      line-height: 26px;
+    }
+    .parametric_wrap {
+      padding-top: 60px;
+    }
+    .icon_wrap {
+      width: auto;
+    }
+    .description_wrap .small_title {
+      font-size: 24px;
+    }
+    .description_wrap .small_sub_title {
+      font-size: 16px;
+    }
+  }
+
+  .mobile-show .banner_wrap {
+    margin-bottom: 0;
+  }
+  .mobile-show .banner_top .banner_text .title {
+    font-size: 24px;
+    line-height: 30px;
+    margin-bottom: 4px;
+  }
+  .mobile-show .banner_top .banner_text .sub_title {
+    font-size: 14px;
+    line-height: 14px;
+    font-weight: normal;
+  }
+  .mobile-show .space_wrap {
+    background: #6396bb;
+    padding: 20px 10px;
+  }
+  .mobile-show .space_item {
+    padding: 10px 0;
+    vertical-align: baseline;
+  }
+  .mobile-show .space_item .flex {
+    flex-direction: column;
+    padding: 0;
+    text-align: center;
+  }
+  .mobile-show .space_title {
+    font-size: 12px;
+    padding-left: 0;
+  }
+  .mobile-show .space_item_img {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  .mobile-show .banner_modal_wrap {
+    top: 4%;
+    right: 2%;
+  }
+  .mobile-show .banner_modal_img {
+    width: 300px;
+  }
+  .mobile-show .banner_modal_box {
+    padding: 2px 6px 0 6px;
+  }
+  .mobile-show .banner_modal_top {
+    font-size: 12px;
+  }
+  .mobile-show .banner_modal_middle {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .mobile-show .banner_modal_bottom {
+    font-size: 12px;
+    line-height: 12px;
+  }
+  .mobile-show .banner_wrap.center {
+    padding-bottom: 0;
+    background: #fff;
+    display: block;
+  }
+  .mobile-show .color_6396bb.banner_wrap.center {
+    padding: 20px;
+    background: #6396bb;
+  }
+  .mobile-show .middle_wrap .title {
+    font-size: 20px;
+    line-height: 24px;
+  }
+  .mobile-show .middle_wrap .sub_title {
+    line-height: 16px;
+  }
+  .mobile-show .middle_wrap.color_6396bb {
+    background: #6396bb;
+  }
+  .mobile-show .middle_wrap.color_6396bb .title {
+    color: #fff;
+  }
+  .mobile-show .middle_wrap.color_6396bb .sub_title {
+    color: rgba(255, 255, 255, .7);
+    margin-top: 10px;
+  }
+  .mobile-show .middle_wrap.color .title {
+    color: #fff;
+  }
+  .mobile-show .middle_wrap.color_fff .sub_title {
+    color: rgba(0, 0, 0, .7);
+  }
+  .mobile-show .absolute.middle_wrap {
+    position: absolute;
+    top: 4%;
+  }
+  .mobile-show .icon_phone_wrap.absolute {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 50%;
+    transform: translateY(-50%);
+  }
+  .mobile-show .description_wrap {
+    margin-left: 10px;
+  }
+  .mobile-show .description_wrap .small_title {
+    font-size: 12px;
+    color: #111;
+  }
+  .mobile-show .description_wrap .small_sub_title {
+    font-size: 12px;
+    color: rgba(0, 0, 0, .7);
+  }
+  .mobile-show .icon_wrap {
+    width: 40px;
+  }
+  .mobile-show .sub_wrap:first-child {
+    padding-top: 0;
+  }
+  .mobile-show .banner_wrap.banner_top .banner_text {
+    top: 5%;
+    padding: 0 10px;
+  }
+  .mobile-show .parametric_wrap {
+    padding-top: 30px;
+    justify-content: center;
+  }
+  .mobile-show .parametric_item .left {
+    font-size: 14px;
+  }
+  .mobile-show .parametric_item .middle {
+    font-size: 24px;
+  }
+  .mobile-show .parametric_item .right {
+    font-size: 14px;
+  }
+  .mobile-show .specification_wrap {
+    padding: 20px 10px;
+  }
+  .mobile-show .specification_table {
+    padding: 20px 2px;
+    margin-right: 0;
+  }
+  .mobile-show .spacification_td_item {
+    width: 100%;
+    word-wrap: normal;
+    align-items: flex-start;
+  }
+  .mobile-show .H5177_spacification_item:first-child {
+    word-break: break-word;
+    margin-right: 10px;
+  }
+  .mobile-show .H5177_spacification_item .top  {
+    font-size: 12px;
+  }
+  .mobile-show .H5177_spacification_item .bottom  {
+    font-size: 12px;
+  }
+</style>

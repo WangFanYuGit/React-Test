@@ -1,0 +1,23 @@
+
+<div class="coco_content" style="padding-top: 100px;">
+  <div class="coco_btn hvr-grow" data-type="blur">基础</div>
+  <div class="coco_btn" data-type="blur">加载</div>
+</div>
+
+<script>
+  
+  $(document).ready(function() {
+    $('.coco_btn').click(()=> {
+      coco({
+        title: '验证输入',
+        inputAttrs: {
+          placeholder: 'your name',
+        }
+      }).onClose((cc,isOk,done)=> {
+        console.log(cc.closeType)
+        done()
+      })
+    })
+  })
+
+</script>

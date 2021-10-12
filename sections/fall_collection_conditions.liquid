@@ -1,0 +1,67 @@
+<div class="fall_condition_wrap">
+  <h2 class="fall_header page_text">{{ section.settings.condition_title }}</h2>
+  <div class="condition_list">
+    {% for block in section.blocks %}
+      <div class="condition_item page_sub_text">
+        {{ forloop.index }}: {{ block.settings.condition }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+<style>
+  @media screen and (min-width: 769px) {
+    .fall_condition_wrap {
+      background: #f8f8f8;
+      padding-bottom: 4vw;
+    }
+    .condition_list {
+      padding: 0 24vw;
+    }
+    .condition_item {
+      color: #888;
+      padding: 0;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .fall_condition_wrap {
+      background: #f8f8f8;
+      padding-bottom: 20px;
+    }
+    .condition_list {
+      padding: 0 20px;
+    }
+    .condition_item {
+      color: #888;
+      padding: 0;
+    }
+  }
+
+</style>
+
+
+{% schema %}
+  {
+    "name": "Fall Conditions",
+    "settings": [
+      {
+        "type": "text",
+        "id": "condition_title",
+        "label": "Condition Header",
+        "default": "terms & conditions"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "conditions_item",
+        "name": "condition",
+        "settings": [
+        {
+            "type": "text",
+            "id": "condition",
+            "label": "condition text"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

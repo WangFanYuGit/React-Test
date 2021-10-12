@@ -1,0 +1,99 @@
+<script>
+  $(function () {
+
+    $("#substituteProduct").on("click", function () {
+      let handle = $(this).data("handle");
+      getProduct(handle).then(data => {
+        appendProductForm(data)
+      });
+    });
+
+    $(".delete_item-by_add_to_cart").on('click',function(){
+      let id = $(this).data("id")
+      $('body').trigger('qty',[id,0])
+    })
+
+    // 查询商品信息
+    async function getProduct(handle) {
+      let url = `/products/${handle}.js`;
+      try {
+        let response = await fetch(url)
+        let data = await response.json()
+        return data
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    // 查询购物车
+    function getCart() {
+      fetch("/cart.js", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "cors",
+        })
+        .then((response) => {
+          return response.json();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+    // 添加进购物车
+    async function addToCart(formData) {
+      // return await theme.cart.addItemFromForm(formData);
+      let url = '/cart/add.js'
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
+        return await response.json()
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    // 生成product form
+    function appendProductForm(data) {
+      let html = `{%- render 'product-add-to-cart' -%}`;
+      $(".clone_product_wrap").append(html);
+      bindClickHandle()
+    }
+    // 绑定点击事件 修改购物车数量
+    function bindClickHandle() {
+      $('.product_content_bottom').on('click','.shop_now', function (e) {
+        // $(this).addClass('')
+        let formData = {
+          form_type: "product",
+          items: [{
+            quantity: 1,
+            id: Number($(this).data("id")),
+          }, ],
+        };
+        addToCart(formData).then(data => {
+          document.dispatchEvent(new CustomEvent('cart:build'));
+          $('body').trigger('added.ajaxProduct')
+
+          //  document.dispatchEvent(new CustomEvent('cart:updated'));
+          // setTimeout(function(){
+
+          // //  document.dispatchEvent(new CustomEvent('added.ajaxProduct'));
+
+            // theme.NavDrawer.open()
+          // //  var aa =  new theme.CartDrawer()
+          // // theme.CartDrawer.initEventListeners()
+
+          // // $('#NavDrawer').find('.js-drawer-open').trigger('click')
+          // },1000)
+          // $('#CartDrawer').addClass('drawer--is-open')
+          
+         
+        });
+      })
+    }
+  })
+</script>

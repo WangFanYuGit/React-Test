@@ -1,0 +1,34 @@
+{% render 'buying-guides-unboxingVideo' %}
+
+{% schema %}
+  {
+    "name": "Unboxing Video",
+    "class": "unboxing_video",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "video_url",
+        "name": "Video",
+        "settings": [
+          {
+            "id": "video_url",
+            "type": "video_url",
+            "label": "Video Url",
+            "accept": ["youtube", "vimeo"],
+            "info": "Supports YouTube, .MP4 and Vimeo. Not all features supported by Vimeo. [Learn more](https://archetypethemes.co/blogs/motion/how-do-i-add-background-videos)"
+          },
+          {
+            "id": "video_poster",
+            "type": "image_picker",
+            "label": "Product Image"
+          },
+          {
+            "id": "video_title",
+            "type": "text",
+            "label": "Product Title"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

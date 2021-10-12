@@ -1,0 +1,187 @@
+<div class="page_wrap">
+  <div class="swiper-container alluring-lighting-images-wrapper">
+    <div
+      class="banner alluring-lighting-image-slider swiper-wrapper stop-swiping"
+    >
+      <div class="swiper-slide">
+        <img
+          class="swiper-lazy"
+          data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_6_2x_73732560-14bf-429a-9cad-89d65634cd0c.png?v=1622713714"
+        />
+        <div class="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
+      </div>
+      <div class="swiper-slide">
+        <img
+          class="swiper-lazy"
+          data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/3_2_2x_93fad2ae-6306-4897-b323-ab71e1e8adcb.png?v=1622713714"
+        />
+        <div class="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
+      </div>
+      <div class="swiper-slide">
+        <img
+          class="swiper-lazy"
+          data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/2_3_2x_f366ea64-e9e2-400d-9c0d-adf1d9101308.png?v=1622713714"
+        />
+        <div class="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
+      </div>
+      <div class="swiper-slide">
+        <img
+          class="swiper-lazy"
+          data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/4_2x_89603247-0dcf-4fec-9c5e-df3ea06e5728.png?v=1622713714"
+        />
+        <div class="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
+      </div>
+      <div class="swiper-slide">
+        <img
+          class="swiper-lazy"
+          data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/5_2x_d1a2c63d-d294-45cb-a064-3c529c028824.png?v=1622713714"
+        />
+        <div class="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
+      </div>
+    </div>
+  </div>
+  <div class="video_wrap">
+    <video
+      id="video"
+      width="300"
+      height="300"
+      preload="metadata"
+      muted
+      x5-video-player-type="h5"
+      webkit-playsinline
+      type="webm"
+      playsinline
+      src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Govee_Glide_Final-1.mp4?v=1623317005"
+    ></video>
+  </div>
+
+  <div class="button">
+    <input type="checkbox" id="my_switch" class="my_switch" />
+    <label for="my_switch"></label>
+  </div>
+</div>
+
+<style>
+  .page_wrap {
+    width: 100%;
+    position: relative;
+  }
+  .page_wrap .img1 .lazyload {
+    opacity: 0;
+  }
+  .page_wrap .img2 .lazyloaded {
+    opacity: 1;
+    animation: 0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+    animation-name: zoom-fade-small;
+    transition: none;
+  }
+  .video_wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+  .play {
+    display: block;
+    margin: auto;
+  }
+
+  .my_switch {
+    display: none;
+  }
+
+  .my_switch + label {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 22px;
+    min-width: 44px;
+    line-height: 20px;
+    vertical-align: middle;
+    border-radius: 100px;
+    border: 1px solid transparent;
+    background-color: rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    -webkit-transition: all 0.36s;
+    transition: all 0.36s;
+    position: relative;
+  }
+
+  .my_switch:checked + label {
+    background-color: #1890ff;
+  }
+
+  .my_switch + label::before {
+    content: "";
+    display: block;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    border-radius: 18px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.36s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+    -webkit-transition: all 0.36s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+    -webkit-box-shadow: 0 2px 4px 0 rgba(0, 35, 11, 0.2);
+    box-shadow: 0 2px 4px 0 rgba(0, 35, 11, 0.2);
+  }
+
+  .my_switch:checked + label::before {
+    left: 23px;
+    transition: all 0.36s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+    -webkit-transition: all 0.36s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+  }
+
+  .my_switch + label::after {
+    content: "关";
+    position: absolute;
+    top: 1px;
+    left: 24px;
+    font-size: 12px;
+    color: #fff;
+  }
+
+  .my_switch:checked + label::after {
+    content: "开";
+    left: 5px;
+  }
+  .button {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+</style>
+<script src="{{ 'swiper-bundle.min.js' | asset_url }}"></script>
+<script>
+  var lighting_swiper = new Swiper(".alluring-lighting-images-wrapper", {
+    autoplay: {
+      delay: 800,
+    },
+    autoplay: false,
+    loop: true,
+    noSwiping: true,
+    noSwipingClass: "stop-swiping",
+    effect: "fade",
+    lazy: {
+      loadPrevNext: true,
+    },
+  });
+
+  $("#my_switch").change(function () {
+    let checked = $(this).get(0).checked
+    console.log(checked)
+    let video = $("video").get(0);
+
+    if (checked) {
+      video.play();
+      lighting_swiper.autoplay.start();
+    } else {
+      video.pause();
+      lighting_swiper.autoplay.stop();
+    }
+  });
+</script>

@@ -1,0 +1,75 @@
+<div class="summer_sale" data-animate_images="true">
+  {%- section 'summer-sale-banner' -%}
+  {%- section 'summer-sale-hot-sale' -%}
+  {%- section 'summer-sale-new-arrival' -%}
+  {%- section 'summer-sale-flash-sale' -%}
+  {%- section 'summer-sale-category' -%}
+  {%- section 'summer-sale-conditions' -%}
+</div>
+
+<style>
+img {
+  display: block;
+}
+.summer_sale [data-animate_images=true] .lazyload {
+  opacity:0
+}
+.summer_sale [data-animate_images=true] .lazyloaded {
+  opacity:1;
+  animation:0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+  animation-name:zoom-fade-small;
+  transition:none;
+}
+.summer_sale [data-animate_text=true] {
+  opacity: 0;
+}
+.summer_sale .lazyloaded [data-animate_text=true]{
+  opacity: 1;
+  animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+  animation-name: fade-in;
+}
+
+
+@media screen and (min-width: 1921px) {
+  .top_product_shop_wrap {
+    margin-top: 0;
+  }
+}
+@media screen and (min-width: 768px) {
+  .top_products_section {
+    background: #6881fe;
+    padding: 1vw 20vw 0vw;
+  }
+  .header {
+    padding: 2vw 0;
+    text-align: center;
+    font-size: 2.8vw;
+    line-height: 3.8vw;
+    font-weight: bold;
+  }
+  .top_product_list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+@media screen and (max-width: 767px) {
+  .top_products_section {
+    background: #6881fe;
+  }
+  .header {
+    padding: 20px 0;
+    text-align: center;
+    font-size: 24px;
+    line-height: 30px;
+    font-weight: bold;
+  }
+  .top_product_list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  
+}
+</style>

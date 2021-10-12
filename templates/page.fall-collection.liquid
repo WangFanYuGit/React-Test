@@ -1,0 +1,57 @@
+<div class="fall_collection_page">
+  {%- section 'fall_collection_banner' -%}
+  {%- section 'fall_collection_special_products' -%}
+  {%- section 'fall_collection_normal_products' -%}
+  {%- section 'fall_collection_conditions' -%}
+</div>
+
+<style>
+img {
+  display: block;
+  width: 100%;
+}
+.page_text {
+  font-family: 'Avenir LT Std';
+}
+.fall_collection_page  {
+  background: #fff;
+  font-family: 'Avenir Next';
+}
+.fall_collection_page [data-animate_images=true] .lazyload {
+  opacity:0
+}
+.fall_collection_page [data-animate_images=true] .lazyloaded {
+  opacity:1;
+  animation:0.5s cubic-bezier(0.26, 0.54, 0.32, 1) 0s forwards;
+  animation-name:zoom-fade-small;
+  transition:none;
+}
+.fall_collection_page [data-animate_text=true] {
+  opacity: 0;
+}
+.fall_collection_page .lazyloaded [data-animate_text=true]{
+  opacity: 1;
+  animation: 0.8s cubic-bezier(0.26, 0.54, 0.32, 1) 0.3s forwards;
+  animation-name: fade-in;
+}
+
+.fall-collection-special-section, 
+.fall-collection-normal-section {
+  overflow: hidden;
+}
+.fall_header {
+  text-align: center;
+}
+
+@media screen and (min-width: 769px) {
+  .fall_header {
+    padding: 3vw 0 1vw;
+  }
+}
+@media screen and (max-width: 768px) {
+  .fall_header {
+    padding: 20px 0 10px;
+  }
+  
+}
+</style>

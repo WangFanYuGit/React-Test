@@ -1,0 +1,118 @@
+<div class="unboxing_video_list">
+  {% for block in section.blocks %}
+  {% assign video = block.settings.video_url %}
+  {% assign poster = block.settings.video_poster %}
+  {% assign title = block.settings.video_title %}
+    <div class="unboxing_video_item">
+      <div class="item_left">
+        <div class="item_title">{{ title }}</div>
+        <a class="item_watch" href="{{ video }}" rel="nofollow">Watch Now ></a>
+      </div>
+      <a class="item_right" href="{{ video }}" rel="nofollow">
+        {% if poster %}
+        <img class="lazyload" data-src="{{ poster | img_url: 'master' }}" alt="">
+        {% else %}
+        <img class="lazyload" data-src="{{ video.id | prepend: 'https://i.ytimg.com/vi/' | append: '/hqdefault.jpg' }}" alt="">
+        {% endif %}
+        <div class="play_mask">
+          <div class="play_icon">
+            <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1.png?v=1621587474" alt="">
+          </div>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+<style>
+  a.item_watch:hover {
+    color: #00ace7;
+  }
+  .unboxing_video_list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .unboxing_video_item {
+    background: #f7f7f7;
+    width: 31%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.75vw;
+    margin-right: 1.3vw;
+    margin-bottom: 2.5vw;
+    min-height: 178px;
+  }
+  .unboxing_video_item:nth-child(3) {
+    margin-right: 0;
+  }
+  .item_left {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 3.5vw;
+    padding-bottom: 3.5vw;
+    padding-right: 1vw;
+  }
+  .item_title {
+    color: #333;
+    font-size: 1.125vw;
+  }
+  .item_watch {
+    color: #00ace7;
+    font-size: 0.875vw;
+  }
+  .item_watch:hover {
+    cursor: pointer;
+  }
+  .play_mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, .12);
+  }
+  .play_icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 50px;
+  }
+  .item_right {
+    position: relative;
+    flex: 1;
+  }
+
+
+  @media screen and (max-width: 767px) {
+    .unboxing_video_item {
+      width: 48%;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      flex-direction: column-reverse;
+      padding: 0;
+    }
+    .unboxing_video_item:nth-child(2) {
+      margin-right: 0;
+    }
+    .item_left {
+      align-items: center;
+      height: auto;
+    }
+    .item_title {
+      font-size: 18px;
+      padding: 0 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      max-height: 70px;
+      overflow: hidden;
+    }
+    .item_watch {
+      font-size: 14px;
+    }
+  }
+</style>

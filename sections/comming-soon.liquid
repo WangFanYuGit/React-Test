@@ -1,0 +1,606 @@
+{% liquid
+  assign banner = section.settings.banner
+  assign banner_mobile = section.settings.banner_mobile
+%}
+<section class="banner_wrap lazyload">
+  <img src="{{ banner | img_url: 'master' }}" alt="{{ banner.alt }}" class="lazyload mobile-hide">
+  <img src="{{ banner_mobile | img_url: 'master' }}" alt="{{ banner_mobile.alt }}" class="lazyload mobile-show">
+</section>
+
+<section class="comming_soon_form lazyload">
+  <div class="form_wrap">
+    {%- form 'customer', id: 'comming-soon' -%}
+    <div class="subscribe_input {% if form.posted_successfully? %} popup {% endif %}" >
+    {%- if form.posted_successfully? -%}
+      <div class="form_title page_text">Early Bird Discounts Submission Received.</div>
+      <div class="form_sub_title page_sub_text">As soon as your chosen product(s) become available, you’ll receive an email with the discount code.So keep an eye out on your inbox!</div>
+      <a href="/pages/comming-soon" rel="nofollow" class="btn btn--inverse btn--full add-to-cart CCB ">
+        Return
+      </a>
+    {%- endif -%}
+    {% if form.errors %}
+      {{ form.errors | default_errors }}
+    {% endif %}
+    <div class="www {% if form.posted_successfully? %} hide {% endif %}">
+      <div class="form_title page_text">Sign Up for Early Bird Discounts</div>
+      <div class="form_sub_title page_sub_text">Subscribe to receive exclusive discount codes as new products become available.</div>
+    
+      <input placeholder="Your Name" type="hidden" id="ContactFormName-hide" class="" name="acceptsMarketing" autocapitalize="words" value="true">
+      <input placeholder="Your Name" type="text" id="ContactFormName-comming-soon" class="input-full form_input" name="contact[name]" autocapitalize="words" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+      <input placeholder="Your Email Address" type="email" id="ContactFormEmail-comming-soon" class="input-full form_input" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+      <input id="ContactFormTags-comming-soon" type="hidden" name="contact[tags]" value="comming soon">
+      <input type="hidden" name="contact[context]" value="subscribe-form">
+      <div class="form_model_list page_sub_text">
+        <div class="flex-between">
+          <div class="form_model_title" data-animate_text="true">Product You Want: </div>
+          <div class="flex-between" data-animate_text="true">
+            <label for="select_all" class="select_all">Select All
+              <input type="checkbox" id="select_all">
+            </label>
+          </div>
+        </div>
+        {% for block in section.blocks %}
+        {% liquid 
+          assign model = block.settings.product_model
+          assign sku = block.settings.product_sku
+        %}
+          <div class="form_model_item page_sub_text">
+            <input class="form_model_checkbox" type="checkbox" id="{{ sku }}">
+            <label for="{{ sku }}" class="form_model_label" data-animate_text="true">{{ sku | append: ' ' | append: model | preappend: 'Model:'}}</label>
+          </div>
+        {% endfor %}
+      </div>
+    
+      <button type="submit" class="comming_soon btn btn--inverse btn--full add-to-cart CCB " name="commit">
+        Submit
+      </button>
+    
+      <div class="form_notice">
+        <div class="form_tips">*Please keep an eye on your email inbox.</div>
+        <div class="form_icons">
+          <a class="form_icons_item" target="_blank" rel="noopener" href="{{ settings.social_facebook_link }}" title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Facebook' }}">
+          </a>
+          <a class="form_icons_item" target="_blank" rel="noopener" href="{{ settings.social_twitter_link }}" title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Twitter' }}">
+          </a>
+          <a class="form_icons_item" target="_blank" rel="noopener" href="{{ settings.social_youtube_link }}" title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'YouTube' }}">
+          </a>
+          <a class="form_icons_item" target="_blank" rel="noopener" href="{{ settings.social_instagram_link }}" title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Instagram' }}">
+          </a>
+          
+        </div>
+      </div>
+    </div>
+    {%- endform -%}
+  </div>
+</section>
+
+<section class="comming_soon_content lazyload">
+  <div class="page_text comming_soon_title" data-animate_text="true">Launching Very Soon</div>
+  {% for block in section.blocks %}
+  {% if block.type == 'Banner' %}
+  {% liquid
+      assign banner_img = block.settings.banner_img
+      assign banner_img_mobile = block.settings.banner_img_mobile
+    %}
+  <div class="comming_soon_banner">
+    <img src="{{ banner_img | img_url: 'master' }}" alt="{{ banner_img.alt }}" class="lazyload mobile-hide">
+    <img src="{{ banner_img_mobile | img_url: 'master' }}" alt="{{ banner_img_mobile.alt }}" class="lazyload mobile-show">
+  </div>
+  {% endif %}
+  {% endfor %}
+  <div class="product_list">
+    {% for block in section.blocks %}
+    {% if block.type == 'Launching' %}
+    {% liquid 
+        assign scene_img = block.settings.scene_img
+        assign scene_img_mobile = block.settings.scene_img_mobile
+        assign product_title = block.settings.product_title
+        assign product_desc = block.settings.product_desc
+        assign product_image = block.settings.product_image
+        assign product_image_mobile = block.settings.product_image_mobile
+      %}
+      <div class="product_wrap">
+        <div class="product_bg">
+          <img src="{{ scene_img | img_url: 'master' }}" alt="{{ scene_img.alt }}" class="lazyload mobile-hide">
+          <img src="{{ scene_img_mobile | img_url: 'master' }}" alt="{{ scene_img_mobile.alt }}" class="lazyload mobile-show">
+        </div>
+        <div class="product_info lazyload">
+          <div class="product_title" data-animate_text="true">{{ product_title }}</div>
+          <div class="product_shop_wrap">
+            <div class="product_desc page_sub_text" data-animate_text="true">
+              {{ product_desc | replace: ' -','<br>-' }}
+            </div>
+            <div class="product_img">
+              <img data-src="{{ product_image | img_url: 'master' }}" alt="{{ product_image.alt }}" class="lazyload mobile-hide">
+              <img data-src="{{ product_image_mobile | img_url: 'master' }}" alt="{{ product_image_mobile.alt }}" class="lazyload mobile-show">
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+
+<style>
+  .flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .form_icons_item:nth-child(1) {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Facebook_default.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  .form_icons_item:nth-child(2) {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Twitter_default.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  .form_icons_item:nth-child(3) {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Youtube_default.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  .form_icons_item:nth-child(4) {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Ins_default.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  /* hover */
+  .form_icons_item:nth-child(1):hover {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Facebook_active.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  .form_icons_item:nth-child(2):hover {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Twitter_active.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  .form_icons_item:nth-child(3):hover {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Youtube_active.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+  .form_icons_item:nth-child(4):hover {
+    background: url('https://cdn.shopify.com/s/files/1/0556/4203/0246/files/Ins_active.png?v=1627889460') no-repeat;
+    background-size: contain;
+  }
+
+  input[type="checkbox"] {
+    width:20px;
+    height:20px;
+    display: inline-block;
+    text-align:center;
+    vertical-align:middle;
+    line-height:18px;
+    margin-right:10px;
+    position:relative;
+  }
+  input[type="checkbox"]::before {
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    background:url("https://cdn.shopify.com/s/files/1/0556/4203/0246/files/188_2x_452ddeac-e210-4f18-8061-822c548d8545.png?v=1627904897");
+    background-size: contain;
+    width:100%;
+    height:100%;
+  }
+  input[type="checkbox"]:checked::before {
+    content:"";
+    background:url("https://cdn.shopify.com/s/files/1/0556/4203/0246/files/255_2x_9e1924b4-c3d2-474d-8727-0ff14bfc7b82.png?v=1627904897") no-repeat;
+    background-size: contain;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+  }
+  @media screen and (min-width: 769px) {
+    .comming_soon_title {
+      text-align: center;
+      padding: 3.6vw 0 2.5vw;
+    }
+    .comming_soon_form {
+      background-color: #fff;
+      padding: 4vw 20vw 0;
+    }
+    .comming_soon_content {
+      background-color: #fff;
+      padding: 0 20vw 4vw;
+    }
+    .comming_soon .form_wrap {
+      background-color: #F5F5F7;
+      text-align: center;
+      padding: 4vw 14vw;
+    }
+    .comming_soon_banner {
+      margin-bottom: 1vw;
+    }
+
+    .form_title.page_text {
+      font-size: 1.7vw;
+      line-height: 2.3vw;
+      color: #17A2E4;
+    }
+    .form_sub_title.page_sub_text {
+      font-size: 1.2vw;
+      line-height: 1.6vw;
+      color: #252525;
+      margin-bottom: .5vw;
+    }
+    .form_input {
+      margin-bottom: .8vw;
+      color: #B9B9B9;
+      background-color: #fff;
+
+      font-family: 'Avenir Next' !important;
+    }
+    .form_input::placeholder {
+      color: #B9B9B9;
+      font-size: .9vw;
+    }
+    .form_model_list.page_sub_text {
+      border-bottom: 1px solid #D9D9D9;
+      padding-bottom: 0;
+      margin-bottom: 1.5vw;
+    }
+    .form_model_item.page_sub_text {
+      display: flex;
+      align-items: center;
+      padding-bottom: .5vw;
+      border-top: 1px solid #D9D9D9;
+    }
+    .form_model_list .form_model_title {
+      font-size: 1.3vw;
+      text-align: left;
+      margin-bottom: .5vw;
+    }
+    .form_model_item .form_model_checkbox {
+      margin: .5vw .5vw .5vw 0;
+    }
+    .form_model_item .form_model_label {
+      font-size: .9vw !important;
+      margin: .5vw;
+      color: #888888;
+      width: 100%;
+      text-align: left;
+    }
+    .form_model_item .form_model_label:hover {
+      color: #252525;
+    }
+    input.form_model_checkbox:checked + .form_model_label {
+      color: #252525;
+    }
+    .form_notice {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1vw;
+    }
+    .form_tips {
+      color: #888;
+      font-size: .9vw;
+    }
+    .form_icons {
+      width: 10vw;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .form_icons_item:not(:last-child) {
+      margin-right: .5vw;
+    }
+    .form_icons_item {
+      width: 2vw;
+      height: 2vw;
+    }
+
+
+    .product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .product_wrap {
+      display: flex;
+      flex-direction: column;
+      width: calc(50% - 0.75vw);
+      margin-bottom: 1.5vw;
+    }
+    .product_bg {
+      position: relative;
+    }
+    .product_shop_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      min-height: 14vw;
+    }
+    .product_info {
+      padding: 2.5vw 2vw .8vw;
+      background: #fff;
+      color: #333;
+      border: 1px solid #707070;
+      border-top: 0;
+    }
+    .product_title {
+      font-size: 1.3vw;
+      line-height: 1.8vw;
+      padding-bottom: .5vw;
+    }
+    .page_sub_text.product_desc {
+      font-size: .8vw;
+      color: #888;
+    }
+    .product_img {
+      overflow: hidden;
+      max-width: 12vw;
+    }
+    .product_img img {
+      height: 10vw;
+      object-fit: contain;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .comming_soon_title {
+      text-align: center;
+      padding: 36px 0 22px;
+    }
+    .comming_soon_content {
+      background-color: #fff;
+      padding: 0 30px 40px;
+    }
+    .comming_soon_form {
+      background-color: #fff;
+    }
+    .comming_soon .form_wrap {
+      background-color: #F5F5F7;
+      text-align: center;
+      padding: 40px 30px;
+    }
+    .comming_soon_banner {
+      margin-bottom: 20px;
+    }
+    
+    .form_title.page_text {
+      font-size: 20px;
+      line-height: 28px;
+      color: #17A2E4;
+      /* white-space: nowrap; */
+    }
+    .form_sub_title.page_sub_text {
+      font-size: 14px;
+      line-height: 20px;
+      color: #252525;
+      margin-bottom: 8px;
+      /* white-space: nowrap; */
+    }
+    .form_input {
+      margin-bottom: 8px;
+      color: #B9B9B9;
+      background-color: #fff;
+      font-family: 'Avenir Next' !important;
+    }
+    .form_input::placeholder {
+      color: #B9B9B9;
+      font-size: 12px;
+    }
+    .form_model_list.page_sub_text {
+      border-bottom: 1px solid #D9D9D9;
+      padding-bottom: 0;
+      margin-bottom: 15px;
+    }
+    .form_model_item.page_sub_text {
+      display: flex;
+      align-items: center;
+      padding-bottom: 8px;
+      border-top: 1px solid #D9D9D9;
+    }
+    .form_model_list .form_model_title {
+      font-size: 16px;
+      text-align: left;
+      margin-bottom: 8px;
+    }
+    .form_model_item .form_model_checkbox {
+      margin: 8px 8px 8px 0;
+    }
+    .form_model_item .form_model_label {
+      font-size: 12px !important;
+      margin: 8px;
+      color: #888888;
+    }
+    .form_model_item .form_model_label:hover {
+      color: #252525;
+    }
+    input.form_model_checkbox:checked + .form_model_label {
+      color: #252525;
+    }
+    .form_notice {
+      padding-top: 10px;
+    }
+    .form_tips {
+      color: #888;
+      font-size: 12px;
+    }
+    .form_icons {
+      width: 160px;
+      margin: 10px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .form_icons_item:not(:last-child) {
+      margin-right: 5px;
+    }
+    .form_icons_item {
+      width: 30px;
+      height: 30px;
+    }
+    .product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .product_wrap {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 25px;
+    }
+    .product_bg {
+      position: relative;
+    }
+    .product_shop_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .product_info {
+      padding: 21px 20px 10px;
+      background: #fff;
+      color: #333;
+      border: 1px solid #707070;
+      border-top: 0;
+    }
+    .product_title.page_text {
+      font-size: 14px;
+      line-height: 18px;
+      padding-bottom: 8px;
+    }
+    .page_sub_text.product_desc {
+      font-size: 12px;
+      color: #888;
+    }
+    .product_img {
+      max-width: 80px;
+      padding-top: 20px;
+    }
+    .product_img img {
+      object-fit: contain;
+    }
+  }
+</style>
+
+<script>
+  let sku_list = ['comming soon'];
+  // 勾选|取消 全部
+  $('.select_all').on('click', '#select_all', function() {
+    let checked_all = $(this).get(0).checked;
+
+    $(".form_model_checkbox").each((index, item)=> {
+      item.checked = checked_all
+      if (!checked_all) {
+        sku_list = ['comming soon']
+      }
+
+      if (checked_all && !sku_list.includes(item.id)) {
+        sku_list.push(item.id)
+      }
+    })
+    $('#ContactFormTags-comming-soon').val(sku_list.join(','))
+  })
+  
+  // 单选
+  $('.form_model_item').on('click','.form_model_checkbox', function () {
+    // 判断有无全选
+    let select_all = true;
+    $('.form_model_checkbox').each((index, item)=> {
+      if (item.checked === false) {
+        sku_list = sku_list.filter(i => i !== item.id)
+        select_all = false;
+      }else if (!sku_list.includes(item.id)) {
+        sku_list.push(item.id)
+      }
+    })
+    $('#select_all').get(0).checked = select_all
+    $('#ContactFormTags-comming-soon').val(sku_list.join(','))
+  })
+
+  $('.comming_soon.btn').click(function() {
+    event.preventDefault()
+    // $.ajax()
+  })
+
+</script>
+
+{% schema %}
+  {
+    "name": "Comming Soon Pages",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "banner",
+        "label": "Upload Comming Soon Banner of PC"
+      },
+      {
+        "type": "image_picker",
+        "id": "banner_mobile",
+        "label": "Upload Comming Soon Banner of Mobile"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "Banner",
+        "name": "Launching Section Banner",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "banner_img",
+            "label": "Upload Banner Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "banner_img_mobile",
+            "label": "Upload Banner Image of Moblie"
+          }
+        ]
+      },
+      {
+        "type": "Launching",
+        "name": "Launching Section",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "scene_img",
+            "label": "Upload Scene Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "scene_img_mobile",
+            "label": "Upload Scene Image of Moblie"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_image",
+            "label": "Upload Scene Products Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_image_mobile",
+            "label": "Upload Scene Products Image of Mobile"
+          },
+          {
+            "type": "text",
+            "id": "product_title",
+            "label": "Product Title"
+          },
+          {
+            "type": "text",
+            "id": "product_sku",
+            "label": "Product SKU"
+          },
+          {
+            "type": "text",
+            "id": "product_model",
+            "label": "Product Model"
+          },
+          {
+            "type": "text",
+            "id": "product_desc",
+            "label": "Product Description"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

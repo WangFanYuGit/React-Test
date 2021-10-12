@@ -1,0 +1,42 @@
+<section id="{{ section.id }}" class="recommed_wrap page-width lazyload" data-animate_images="true">
+    <h4 class="page_text recommed_header" data-animate_text="true">{{ section.settings.header }}</h4>
+    {%- render 'govee-product-swiper',
+      section: section,
+      swiper_index: 2021,
+      slidesPerView: 4
+      -%}
+</section>
+
+
+
+{% schema %}
+{
+    "name": "Our Recommended",
+    "settings": [
+        {
+            "type": "text",
+            "id": "header",
+            "label": "Our Recommended"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "product",
+            "name": "recommend_product",
+            "settings": [
+                {
+                    "type": "product",
+                    "id": "product",
+                    "label": "Recommend Product"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Our Recommend"
+        }
+    ]
+}
+
+{% endschema %}

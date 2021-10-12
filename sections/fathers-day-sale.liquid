@@ -1,0 +1,57 @@
+{% if section.settings.sales_ended %}
+  {% render 'sale-ended' %}
+
+  {% else %}
+  {% render 'fathers-day-sale' %}
+{% endif %}
+
+
+
+
+{% schema %}
+  {
+    "name": "Fathers Day Sale Pages",
+    "class": "fathers-day-sale",
+    "settings": [
+      {
+        "type": "checkbox",
+        "label": "sale ended",
+        "id": "sales_ended",
+        "default": false
+      }
+    ],
+    "blocks": [
+      {
+        "type": "product_item",
+        "name": "Fathers Day Sales Product",
+        "settings": [
+          {
+            "id": "product_img",
+            "type": "image_picker",
+            "label": "Product Image"
+          },
+          {
+            "id": "product_title",
+            "type": "text",
+            "label": "Product Title"
+          },
+          {
+            "id": "product_sale_price",
+            "type": "text",
+            "label": "Product Sale Price"
+          },
+          {
+            "id": "product_price",
+            "type": "text",
+            "label": "Product Price"
+          },
+          {
+            "id": "product_link",
+            "type": "url",
+            "label": "Product Link"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

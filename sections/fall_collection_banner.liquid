@@ -1,0 +1,26 @@
+
+{% assign banner_img_pc = section.settings.banner_img_pc %}
+{% assign banner_img_mb = section.settings.banner_img_mb %}
+<section class="fall_section_banner" data-animate_images="true">
+    <img data-src="{{ banner_img_pc | img_url: 'master' }}" alt="{{ banner_img_pc.alt }}" class="mobile-hide lazyload">
+    <img data-src="{{ banner_img_mb | img_url: 'master' }}" alt="{{ banner_img_mb.alt }}" class="mobile-show lazyload">
+</section>
+
+{% schema %}
+  {
+    "name": "Fall Conditions",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "banner_img_pc",
+        "label": "banner of pc"
+      },
+      {
+        "type": "image_picker",
+        "id": "banner_img_mb",
+        "label": "banner of mobile"
+      }
+    ],
+    "blocks": []
+  }
+{% endschema %}

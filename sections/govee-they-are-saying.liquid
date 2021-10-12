@@ -1,0 +1,170 @@
+<section class="they_are_say_wrap" data-animate_images="true">
+  {% if section.settings.header != blank %}
+  <h4 class="page_text they_are_say_header">{{ section.settings.header }}</h4>
+  {% endif %}
+
+  <div class="page-width they_are_say_content">
+    <div class="they_are_say_list">
+      {% for block in section.blocks %}
+      <div class="they_are_say_item">
+        <div class="img_manage_size">
+          <img src="{{ block.settings.product_img | img_url: 'master' }}" alt="" class="lazyload">
+        </div>
+        <div class="content_pro font_family_next">
+          {{block.settings.product_name}}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<style>
+  @media screen and (min-width: 769px) {
+    .they_are_say_wrap {
+      background: #fff;
+      padding-bottom: 4.5vw;
+
+    }
+
+    .they_are_say_wrap .they_are_say_header {
+      padding: 4.5vw 0 1.5vw;
+      text-align: center;
+    }
+    .they_are_say_content {
+      max-width: 1400px;
+      padding: 0;
+    }
+    .they_are_say_wrap .they_are_say_list {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .they_are_say_wrap .they_are_say_item {
+      width: calc(25% - 1vw);
+      padding: 1.8vw 2vw 5vw 2vw;
+      box-sizing: border-box;
+      border: 1px solid #DEDEDE;
+    }
+
+    .they_are_say_wrap .they_are_say_item .img_manage_size {
+      display: flex;
+      height: 4.8vw;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .they_are_say_wrap :nth-child(1) img {
+      height: 2.7vw;
+      width: auto;
+    }
+
+    .they_are_say_wrap :nth-child(2) img {
+      height: 2.75vw;
+      width: auto;
+
+    }
+
+    .they_are_say_wrap :nth-child(3) img {
+      height: 3.8vw;
+      width: auto;
+
+    }
+
+    .they_are_say_wrap :nth-child(4) img {
+      height: 2.3vw;
+      width: auto;
+
+    }
+
+
+    .they_are_say_wrap .content_pro {
+      font-size: 1.125vw;
+      color: #252525;
+      padding: 1vw 0vw;
+
+    }
+
+  }
+
+  @media screen and (max-width: 768px) {
+    .they_are_say_wrap {
+      background: #fff;
+    }
+
+    .they_are_say_wrap .they_are_say_header {
+      padding: 40px 0 15px;
+      text-align: center;
+    }
+
+    .they_are_say_wrap .they_are_say_list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: scroll;
+    }
+
+    .they_are_say_wrap .they_are_say_item {
+      min-width: 200px;
+      margin: 14px 10px;
+      padding: 36px 24px;
+      background-color: #fff;
+      border: 1px solid #DEDEDE;
+      position: relative;
+      overflow: scroll;
+    }
+
+    .they_are_say_wrap .they_are_say_item>img {
+      width: 100%;
+    }
+
+    .they_are_say_wrap .content_pro {
+      font-size: 12px;
+      padding: 5px;
+    }
+
+    .img_manage_size {
+      margin-bottom: 20px;
+    }
+
+    .img_manage_size img {
+      max-height: 30px;
+      object-fit: contain;
+    }
+  }
+</style>
+
+{% schema %}
+{
+"name": "they saying",
+"settings": [
+{
+"type": "text",
+"id": "header",
+"label": "saying header"
+}
+],
+"blocks": [
+{
+"type": "they_saying_items",
+"name": "they_saying items",
+"limit": 4,
+"settings": [
+{
+"type": "image_picker",
+"id": "product_img",
+"label": "item image"
+},
+{
+"type": "textarea",
+"id": "product_name",
+"label": "item content"
+}
+]
+}
+],
+"presets": [{
+"name": "Hot they_are_say"
+}]
+}
+
+{% endschema %}

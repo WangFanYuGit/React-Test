@@ -1,0 +1,128 @@
+<div class="buying_guides_wrap">
+  <div class="banner">
+    <img class="lazyload" data-src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/1_f4bbf11a-1064-4bf0-becf-575cad78f87c.jpg?v=1621307063" alt="">
+    <div class="banner_text">Govee Guides</div>
+  </div>
+
+  <!-- 菜单栏 -->
+  <div class="menu_wrap page-width site-header mobile-show" data-sticky="true" data-overlay="false">
+    <span class="menu_title active" data-name="buying_guides">Buying Guides</span>
+    <span class="menu_title " data-name="unboxing_video">Unboxing & Tutorial Video</span>
+    <span class="menu_title" data-name="user_creation">User & Influencer's Creation</span>
+  </div>
+  <div class="menu_wrap page-width mobile-hide">
+    <span class="menu_title active" data-name="buying_guides">Buying Guides</span>
+    <span class="menu_title " data-name="unboxing_video">Unboxing & Tutorial Video</span>
+    <span class="menu_title" data-name="user_creation">User & Influencer's Creation</span>
+  </div>
+  <!-- 内容展示区域 -->
+  <section id="buying_guides_content_wrap" class="page-width">
+    {% section 'buying-guides' %}
+    {% section 'unboxing-video' %}
+    {% section 'user-creation' %}
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+
+  $('.menu_title').click(function() {
+    let name = $(this).data('name');
+    $(this).addClass('active').siblings().removeClass('active');
+    $(`.${name}`).css('display','block').siblings().css('display', 'none');
+  })
+})
+</script>
+<style>
+  .buying_guides_wrap {
+    background-color: #fff;
+  }
+  .banner {
+    position: relative;
+  }
+  .banner_text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 3vw;
+    font-weight: bold;
+  }
+  .active {
+    display: block;
+  }
+  img {
+    display: block;
+  }
+  .menu_title {
+    color: #797979;
+    font-size: 1.4vw;
+    margin-right: 2vw;
+    padding: 4px 10px;
+    border-radius: 2px;
+    /* background-color: #dff7ff; */
+    display: inline-block;
+  }
+  .menu_title:last-child {
+    margin-right: 0;
+  }
+  .menu_title:hover {
+    cursor: pointer;
+  }
+  .menu_title.active {
+    background-color: #00ace7;
+    color: #fff;
+    /* box-shadow: 10px 10px 5px #888888; */
+  }
+  .menu_wrap {
+    padding-top: 40px;
+  }
+  #buying_guides_content_wrap {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    min-height: 400px;
+  }
+  .buying_guides {
+    display: block;
+  }
+  .unboxing_video {
+    display: none;
+  }
+  .user_creation {
+    display: none;
+  }
+
+  .buying_guides_wrap .site-header-sticky {
+    display: none;
+  }
+
+  @media screen and (max-width: 767px) {
+    .buying_guides_wrap .site-header-sticky {
+      display: block;
+    }
+    .banner_text {
+      font-size: 24px;
+    }
+    .menu_wrap {
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+    } 
+    .menu_wrap.mobile-hide {
+      display: none;
+    }
+    #buying_guides_content_wrap {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    .menu_title {
+      flex: 1;
+      text-align: center;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+  }
+</style>

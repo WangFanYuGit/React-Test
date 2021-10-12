@@ -1,0 +1,422 @@
+<section class="free_application_products page-width" data-animate_images="true">
+  <div class="header page_text" data-anmiate_text="true">Products</div>
+  <a class="banner_link" href="/pages/affiliate" target="_blank">Join Govee.com Affiliate Program Now!</a>
+  <div class="tab_wrap">
+    <!-- <button class="tab active" data-type="US">US</button>
+    <button class="tab" data-type="EU">EU</button>
+    <button class="tab" data-type="CA">CA</button>
+    <button class="tab" data-type="UK">UK</button> -->
+  </div>
+
+  <div class="products_list">
+    {%- for block in section.blocks -%}
+      {% if block.type == 'US' or block.type == 'CA' %}
+        {% assign currency = '$'  %}
+        {% elsif block.type == 'UK' %}
+        {% assign currency = '￡'  %}
+        {% elsif block.type == 'EU' %}
+        {% assign currency = '€'  %}
+      {% endif %}
+    {%- liquid 
+        assign product_img = block.settings.product_img
+        assign product_url = block.settings.product_url
+        assign product_title = block.settings.product_title
+        assign product_sku = block.settings.product_sku
+        assign product_price = block.settings.product_price
+        assign product_commission = block.settings.product_commission
+      -%}
+
+
+    <div class="product" data-type="{{ block.type }}">
+      <a href="{{ product_url }}" target="_blank" class="top">
+        <img data-src="{{ product_img | img_url: 'master' }}" alt="{{ product_img.alt }}" class="lazyload">
+        <div class="commission_wrap {% if product_commission == blank %} hide {% endif %}">
+          <span class="commission_text">{{ product_commission | append: '% Commission' }}</span>
+        </div>
+      </a>
+      <div class="bottom">
+        <div class="info">
+          <span class="sku">{{ product_sku | append: ' / '}}</span>
+          <span class="price">{{ product_price | prepend: currency }} {% if block.type == 'CA' %} CAD{% endif %}</span>
+        </div>
+        <a href="{{ product_url }}" target="_blank" class="title">{{ product_title }}</a>
+      </div>
+    </div>
+    {%- endfor -%}
+  </div>
+
+  <a class="link" target="_blank" href="/collections/all-products">
+    <img src="https://cdn.shopify.com/s/files/1/0556/4203/0246/files/b7f23f5d33b1d6e112a645f5c324c132_582819a5-7416-49c0-b846-729c359c0f78.png?v=1627293250" alt="" class="link_icon lazyload">
+    <span>Load More</span>
+  </a>
+</section>
+
+<style>
+
+  .block {
+    display: block !important;
+  }
+  @media screen and (min-width: 768px) {
+    .free_application_products {
+      max-width: 1200px;
+      padding: 4vw 0;
+    }
+    .free_application_products .header {
+      font-size: 2.7vw;
+      line-height: 2.4vw;
+      font-weight: bold;
+      color: #000;
+    }
+    .free_application_products .tab_wrap {
+      display: flex;
+      justify-content: space-between;
+      padding: 2vw 20%;
+    }
+    .free_application_products .tab {
+      color: #323C47;
+      font-weight: bold;
+      padding: .2vw 1.5vw 0;
+      font-size: 1vw;
+    }
+    .free_application_products .tab.active {
+      color: #fff;
+      background:#00ACE7;
+      border-radius: 1.5vw;
+    }
+    .free_application_products .products_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .free_application_products .product {
+      display: flex;
+      flex-direction: column;
+      max-width: calc(33% - 1vw);
+      margin-bottom: 3vw;
+
+      display: none;
+    }
+    .free_application_products .info {
+      font-size: 1vw;
+      padding: .9vw 0;
+    }
+    .free_application_products .sku {
+      color: #000;
+    }
+    .free_application_products .price {
+      color: #07ABF7;
+    }
+    .free_application_products .title {
+      color: #686868;
+      font-size: 1vw;
+    }
+    .free_application_products .link {
+      color: #00ACE7;
+      font-size: .8vw;
+      padding: .5vw 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #F1F8FF;
+    }
+    .free_application_products .link_icon {
+      width: 1vw;
+      display: inline-block;
+      margin-right: .6vw;
+    }
+    .free_application_products .top {
+      position: relative;
+    }
+    .free_application_products .commission_wrap {
+      width: 50%;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      text-align: center;
+      background:#07ABF7;
+      border-top-left-radius: 2vw;
+      font-size: 1vw;
+      line-height: 2vw;
+    }
+  }
+  @media screen and (max-width: 769px) {
+    .free_application_products {
+      padding: 40px 10px;
+    }
+    .free_application_products .header {
+      font-size: 30px;
+      line-height: 34px;
+      font-weight: bold;
+      color: #000;
+    }
+    .free_application_products .tab_wrap {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+    .free_application_products .tab {
+      color: #323C47;
+      font-weight: bold;
+      font-size: 12px;
+      line-height: 22px;
+      flex: 1;
+    }
+    .free_application_products .tab.active {
+      color: #fff;
+      background:#00ACE7;
+      border-radius: 10px;
+    }
+    .free_application_products .products_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .free_application_products .product {
+      display: flex;
+      flex-direction: column;
+      max-width: calc(50% - 10px);
+      margin-bottom: 30px;
+
+      display: none;
+    }
+    .free_application_products .info {
+      font-size: 12px;
+      padding: 10px 0 0 0;
+    }
+    .free_application_products .sku {
+      color: #000;
+    }
+    .free_application_products .price {
+      color: #07ABF7;
+    }
+    .free_application_products .title {
+      color: #686868;
+      font-size: 12px;
+    }
+    .free_application_products .link {
+      color: #00ACE7;
+      font-size: 14px;
+      padding: 6px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #F1F8FF;
+    }
+    .free_application_products .link_icon {
+      width: 18px;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .free_application_products .top {
+      position: relative;
+    }
+    .free_application_products .commission_wrap {
+      width: 80%;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      text-align: center;
+      background:#07ABF7;
+      border-top-left-radius: 10px;
+      font-size: 12px;
+      line-height: 20px;
+    }
+  }
+
+</style>
+
+<script>
+
+  let country_list = ['US', 'EU', 'CA', 'UK']
+  let country = window.location.host.split('.')[0].toUpperCase();
+  if (country === 'DEV-US') country = 'US'
+  let index = country_list.indexOf(country)
+  console.log('index', index)
+  if (country == 'TEST-GOVEE' || country == 'STORE') country = 'US';
+
+  if (index > -1) {
+    country_list.unshift(country_list.splice(index, 1)[0])
+  }
+  console.log('country_list', country_list)
+
+  let tab_html = country_list.map((item, index)=> {
+    let className = item == country ? 'active' : ' '
+    return `<button class="tab ${className}" data-type="${item}">${item}</button>`
+  })
+
+  $('.free_application_products .tab_wrap').html(tab_html.join(' '))
+  
+  showProductList(country)
+
+  $('.tab').on('click', function() {
+    $(this).addClass('active').siblings().removeClass('active');
+    let type = $(this).data('type')
+    showProductList(type)
+  })
+  
+
+  function showProductList(type) {
+    $('.product').each((index, item)=> {
+      $(item).removeClass('block')
+      if ($(item).data('type') == type) {
+        $(item).addClass('block')
+      }
+    })
+  }
+</script>
+
+
+
+{% schema %}
+{
+  "name": "Free Application Products",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "US",
+      "name": "product of usa",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "product_img",
+          "label": "Upload Product Image"
+        },
+        {
+          "type": "text",
+          "id": "product_sku",
+          "label": "Upload Product Sku"
+        },
+        {
+          "type": "text",
+          "id": "product_price",
+          "label": "Upload Product Price"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "Upload Product Title"
+        },
+        {
+          "type": "text",
+          "id": "product_commission",
+          "label": "Upload Product Commission"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Upload Product Url"
+        }
+      ]
+    },
+    {
+      "type": "UK",
+      "name": "product of uk",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "product_img",
+          "label": "Upload Product Image"
+        },
+        {
+          "type": "text",
+          "id": "product_sku",
+          "label": "Upload Product Sku"
+        },
+        {
+          "type": "text",
+          "id": "product_price",
+          "label": "Upload Product Price"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "Upload Product Title"
+        },
+        {
+          "type": "text",
+          "id": "product_commission",
+          "label": "Upload Product Commission"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Upload Product Url"
+        }
+      ]
+    },
+    {
+      "type": "CA",
+      "name": "product of ca",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "product_img",
+          "label": "Upload Product Image"
+        },
+        {
+          "type": "text",
+          "id": "product_sku",
+          "label": "Upload Product Sku"
+        },
+        {
+          "type": "text",
+          "id": "product_price",
+          "label": "Upload Product Price"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "Upload Product Title"
+        },
+        {
+          "type": "text",
+          "id": "product_commission",
+          "label": "Upload Product Commission"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Upload Product Url"
+        }
+      ]
+    },
+    {
+      "type": "EU",
+      "name": "product of eu",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "product_img",
+          "label": "Upload Product Image"
+        },
+        {
+          "type": "text",
+          "id": "product_sku",
+          "label": "Upload Product Sku"
+        },
+        {
+          "type": "text",
+          "id": "product_price",
+          "label": "Upload Product Price"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "Upload Product Title"
+        },
+        {
+          "type": "text",
+          "id": "product_commission",
+          "label": "Upload Product Commission"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Upload Product Url"
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

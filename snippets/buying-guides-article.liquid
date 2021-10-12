@@ -1,0 +1,120 @@
+{% for block in section.blocks %}
+{% assign article = articles[block.settings.article_list] %}
+  <div class="article_items" data-a="{{ article }}">
+    <a href="{{ article.url }}" rel="nofollow">
+      <div class="article_img">
+        <img class="lazyload" data-src="{{ article.image.src | img_url: '600x600' }}" alt="">
+      </div>
+      <div class="article_box">
+        <div class="article_title">
+          {{ article.title }}
+        </div>
+        <div class="article_content">
+          {{ article.excerpt_or_content }}
+        </div>
+      </div>
+    </a>
+  </div>
+{% endfor %}
+<style>
+  .article_items {
+    display: inline-block;
+    width: 31%;
+    vertical-align: text-top;
+    margin-bottom: 40px;
+    /* box-shadow: 6px 6px 6px rgba(0, 0, 0, .2); */
+  }
+  .article_items:not(:nth-child(3)) {
+    margin-right: 1.3vw;
+  }
+  .article_img {
+    width: 100%;
+    min-height: 328px;
+  }
+  .article_img img {
+    display: block;
+  }
+  .article_box {
+    background: #f5f6f7;
+    padding: 0 1.5vw;
+    padding-bottom: 20px;
+    min-height: 200px;
+  }
+  .article_title {
+    color: #333;
+    font-size: 1.5vw;
+    padding: 1.6vw 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-height: 88px;
+    overflow: hidden;
+  }
+  .article_content {
+    font-size: 1vw;
+    color: #777;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    height: 4.375vw;
+    overflow: hidden;
+  }
+  .load_more {
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    background: #eef7fe;
+  }
+  .load_more_title {
+    font-size: 1vw;
+    color: #00ace7;
+  }
+
+  @media screen and (max-width: 767px) {
+    .article_items {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .article_items a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+    .article_items:not(:nth-child(3)) {
+      margin-right: 0;
+    }
+    .article_items {
+      font-size: 16px;
+    }
+    .article_img {
+      min-height: 0;
+      width: 140px;
+    }
+    .article_box {
+      padding: 20px 20px 0;
+      flex: 1;
+      height: 133px;
+      min-height: auto;
+    }
+    .article_title {
+      font-size: 18px;
+      padding: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      height: 60px;
+      overflow: hidden;
+    }
+    .article_content {
+      font-size: 14px;
+      padding: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      height: 50px;
+      overflow: hidden;
+    }
+  }
+</style>

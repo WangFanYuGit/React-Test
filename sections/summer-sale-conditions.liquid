@@ -1,0 +1,65 @@
+
+<div class="conditions_wrap {% if section.blocks.length != blank %} hide {% endif %}">
+  <div class="contitions_title">Terms and Conditions</div>
+  {%- for block in section.blocks -%}
+  <div class="conditions_text">
+    <span>【{{ forloop.index }}】</span>  
+    <span>{{ block.settings.condition }}</span>
+  </div>
+  {%- endfor -%}
+</div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .conditions_wrap {
+      background: #4863fa;
+      padding: 10px 20px 30px;
+    }
+    .contitions_title {
+      text-align: center;
+      font-size: 24px;
+      padding: 10px 0;
+      font-weight: bold;
+    }
+    .conditions_text {
+      font-size: 12px;
+      color: #cccff0;
+    }
+  }
+  @media screen and (min-width: 769px) {
+    .conditions_wrap {
+      background: #4863fa;
+      padding: 1vw 22vw 3vw;
+    }
+    .contitions_title {
+      text-align: center;
+      font-size: 2.1vw;
+      padding: 2vw 0 1.6vw;
+      font-weight: bold
+    }
+    .conditions_text {
+      font-size: 1.2vw;
+      color: #cccff0;
+    }
+  }
+
+</style>
+{% schema %}
+  {
+    "name": "Summer Sale Conditions",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "conditions",
+        "name": "Conditions",
+        "settings": [
+          {
+            "type": "text",
+            "id": "condition",
+            "label": "Conditions Content"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

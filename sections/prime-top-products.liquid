@@ -1,0 +1,386 @@
+{% liquid
+  assign discount_bg = 'https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/265_2x_1e877f82-e25a-45de-863d-fce15adeda91.png?v=1623512350'  
+
+  assign voice_bg = 'https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/195_2x_831e54fd-1076-47c0-a70d-2e9768ba9b44.png?v=1623512350'  
+
+  assign star_bg = 'https://cdn.shopifycdn.net/s/files/1/0556/4203/0246/files/27_2x_f8989dcf-e752-4200-af30-532a69d4aa9a.jpg?v=1623514323'
+
+  assign header = section.settings.top_header
+
+%}
+<section class="top_products_section" data-animate_images="true">
+  <div class="header lazyload" data-animate_text="true">{{ header }}</div>
+  <div class="top_product_list">
+    {% for block in section.blocks %}
+      {% liquid 
+        assign product_img = block.settings.top_products_img
+        assign product_img_mobile = block.settings.top_products_img_mobile
+        assign product_image = block.settings.top_products_image
+        assign product_image_mobile = block.settings.top_products_image_mobile
+        assign voice_control = block.settings.assistantable
+        assign product_title = block.settings.top_products_title
+        assign product_sub_title = block.settings.top_products_sub_title
+        assign product_price_sale = block.settings.top_products_price_sale 
+        assign product_price_virtual = block.settings.top_products_price_virtual 
+        assign product_url = block.settings.top_products_url
+        assign product_sale_percent = product_price_sale | divided_by: product_price_virtual | times: 100 | minus: 100 | abs | round | append: '%' 
+      %}
+    <a href="{{ product_url }}" target="_blank" rel="nofollow" class="top_product_wrap">
+      <div class="top_product_bg">
+        <img src="{{ product_img | img_url: 'master' }}" alt="{{ product_img.alt }}" class="lazyload mobile-hide">
+        <img src="{{ product_img_mobile | img_url: 'master' }}" alt="{{ product_img_mobile.alt }}" class="lazyload mobile-show">
+
+        <div class="top_voice_wrap {% unless voice_control %} hide {% endunless %}">
+          <img src="{{ voice_bg }}" alt="" class="lazyload">
+        </div>
+        <div class="top_discount_wrap">
+          <img src="{{ discount_bg }}" alt="" class="lazyload">
+          <span class="top_discount_text" >
+            {% if forloop.index0 == 0 %}
+              40% <br>
+            {% else %}
+              {{ product_sale_percent }}<br>
+            {% endif %}
+            OFF
+          </span>
+        </div>
+      </div>
+      <div class="top_product_info lazyload">
+        <div class="top_product_title">{{ product_title }}</div>
+        <div class="top_product_sub_title">{{ product_sub_title }}</div>
+        <div class="top_product_star">
+          <img data-src="{{ star_bg }}" alt="" class="lazyload">
+        </div>
+        <div class="top_product_shop_wrap">
+          <div class="top_product_shop_box">
+            <div class="top_product_price_wrap">
+              <div class="top_product_price_sale">${{ product_price_sale }}</div>
+              <div class="top_product_price_virtual">${{ product_price_virtual }}</div>
+            </div>
+            <button class="top_learn_more">
+              Learn More
+            </button>
+          </div>
+          <div class="top_product_img">
+            <img data-src="{{ product_image | img_url: 'master' }}" alt="{{ product_image.alt }}" class="lazyload mobile-hide">
+            <img data-src="{{ product_image_mobile | img_url: 'master' }}" alt="{{ product_image_mobile.alt }}" class="lazyload mobile-show">
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+</section>
+
+
+<style>
+  @media screen and (min-width: 1921px) {
+    .top_product_shop_wrap {
+      margin-top: 0;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    .top_products_section {
+      background: #070658;
+    }
+    .header {
+      padding: 2vw 0;
+      text-align: center;
+      font-size: 2.8vw;
+      line-height: 3.8vw;
+      font-weight: bold;
+    }
+    .top_product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 1vw 18vw 3vw;
+    }
+    .top_product_wrap {
+      display: flex;
+      flex-direction: column;
+      width: calc(50% - 0.75vw);
+      margin-bottom: 1.5vw;
+    }
+    .top_product_bg {
+      position: relative;
+    }
+    .top_voice_wrap {
+      position: absolute;
+      width: 15vw;
+      left: 8%;
+      bottom: 6%;
+    }
+    .top_discount_wrap {
+      position: absolute;
+      width: 3.2vw;
+      right: 5%;
+      top: 0;
+    }
+    .top_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.1vw;
+      line-height: 1.2vw;
+      font-weight: bold;
+    }
+
+    .top_product_info {
+      padding: 2vw 2.5vw;
+      background: #fff;
+      color: #333;
+    }
+    .top_product_title {
+      font-weight: bold;
+      font-size: 1.5vw;
+      line-height: 2vw;
+      padding-right: 20%;
+      padding-bottom: .5vw;
+    }
+    .top_product_sub_title {
+      font-size: .9vw;
+      line-height: 1.2vw;
+      min-height: 2vw;
+    }
+    .top_product_star {
+      width: 5vw;
+      margin-left: -.2vw;
+    }
+    .top_product_shop_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -1.5vw;
+    }
+    .top_product_shop_box {
+      padding-top: 1vw;
+    }
+    .top_product_price_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top_product_price_sale {
+      font-size: 1.5vw;
+      font-weight: bold;
+      line-height: 2vw;
+      margin-right: 0.5vw;
+    }
+    .top_product_price_virtual {
+      font-size: .9vw;
+      line-height: 1.2vw;
+      color: #888;
+      text-decoration: line-through;
+    }
+    .top_learn_more {
+      width: 7.5vw;
+      border-radius: 1vw;
+      line-height: 2vw;
+      text-align: center;
+      color: #fff;
+      background: #17A2E4;
+      font-size: .9vw;
+    }
+    .top_product_img {
+      overflow: hidden;
+    }
+    .top_product_img img {
+      max-width: 50%;
+      height: 8vw;
+      object-fit: contain;
+      float: right;
+    }
+  }
+
+  @media screen and (max-width: 767px) {
+    .top_products_section {
+      background: #070658;
+    }
+    .header {
+      padding: 20px 0;
+      text-align: center;
+      font-size: 24px;
+      line-height: 30px;
+      font-weight: bold;
+    }
+    .top_product_list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 10px 20px 0;
+    }
+    .top_product_wrap {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .top_product_bg {
+      position: relative;
+    }
+    .top_voice_wrap {
+      position: absolute;
+      width: 150px;
+      left: 6%;
+      bottom: 6%;
+    }
+    .top_discount_wrap {
+      position: absolute;
+      width: 40px;
+      right: 5%;
+      top: 0;
+    }
+    .top_discount_text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      line-height: 16px;
+      font-weight: bold;
+    }
+
+    .top_product_info {
+      padding: 30px 20px 10px;
+      background: #fff;
+      color: #333;
+    }
+    .top_product_title {
+      font-weight: bold;
+      font-size: 18px;
+      line-height: 20px;
+      padding-right: 20%;
+      padding-bottom: 5px;
+    }
+    .top_product_sub_title {
+      font-size: 12px;
+      line-height: 12px;
+      min-height: 24px;
+    }
+    .top_product_star {
+      width: 60px;
+      margin-left: -2px;
+    }
+    .top_product_shop_wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -15px;
+    }
+    .top_product_shop_box {
+      padding-top: 10px;
+    }
+    .top_product_price_wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top_product_price_sale {
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 24px;
+      margin-right: 6px;
+    }
+    .top_product_price_virtual {
+      font-size: 12px;
+      line-height: 12px;
+      color: #888;
+      text-decoration: line-through;
+    }
+    .top_learn_more {
+      width: 100px;
+      border-radius: 15px;
+      line-height: 30px;
+      text-align: center;
+      color: #fff;
+      background: #17A2E4;
+      font-size: 12px;
+    }
+    .top_product_img {
+      overflow: hidden;
+    }
+    .top_product_img img {
+      max-width: 50%;
+      float: right;
+    }
+  }
+
+</style>
+
+
+
+{% schema %}
+  {
+    "name": "Prime Top Products",
+    "settings": [
+      {
+        "type": "text",
+        "id": "top_header",
+        "label": "Section Header"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "top_products",
+        "name": "Top Products",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "top_products_img",
+            "label": "Upload Top Products Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "top_products_img_mobile",
+            "label": "Upload Top Products Image of Moblie"
+          },
+          {
+            "type": "image_picker",
+            "id": "top_products_image",
+            "label": "Upload Top Products Physical Image of PC"
+          },
+          {
+            "type": "image_picker",
+            "id": "top_products_image_mobile",
+            "label": "Upload Top Products Physical Image of Mobile"
+          },
+          {
+            "type": "checkbox",
+            "id": "assistantable",
+            "label": "Can Works with [alexa or Hey Google]",
+            "default": true
+          },
+          {
+            "type": "text",
+            "id": "top_products_title",
+            "label": "Top Products Title"
+          },
+          {
+            "type": "text",
+            "id": "top_products_sub_title",
+            "label": "Top Products Description"
+          },
+          {
+            "type": "text",
+            "id": "top_products_price_sale",
+            "label": "Top Products Sale Price"
+          },
+          {
+            "type": "text",
+            "id": "top_products_price_virtual",
+            "label": "Top Products Virtual Price"
+          },
+          {
+            "type": "url",
+            "id": "top_products_url",
+            "label":"Top Products Url" 
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
